@@ -3,7 +3,7 @@
 import {useState} from 'react';
 import {useRouter} from 'next/navigation';
 import AdaptiveSheet from '../../../components/AdaptiveSheet';
-import {NewTransactionComposer} from '../../nuovo/page';
+import NewTransactionComposer from '../../../components/NewTransactionComposer';
 
 export default function NewTransactionModal(){
   const router=useRouter();
