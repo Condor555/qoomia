@@ -54,8 +54,11 @@ export default function AdaptiveSheet({
     if(shell)shell.inert=true;
     if(nav)nav.inert=true;
     const frame=window.requestAnimationFrame(()=>{
+      const content=panelRef.current?.querySelector<HTMLElement>('.adaptive-sheet-content');
+      if(content)content.scrollTop=0;
       const first=panelRef.current?.querySelector<HTMLElement>('[autofocus], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled])');
-      (first||panelRef.current)?.focus();
+      (first||panelRef.current)?.focus({preventScroll:true});
+      if(content)content.scrollTop=0;
     });
     return()=>{
       window.cancelAnimationFrame(frame);
