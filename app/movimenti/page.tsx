@@ -9,6 +9,7 @@ import MovementFilterDropdown from '../../components/MovementFilterDropdown';
 import {onActiveSpaceChanged} from '../../lib/active-space-client';
 import {amountForSave} from '../../lib/amount-expression';
 import {useI18n} from '../../components/LanguageProvider';
+import {cachedJson,invalidateClientJson} from '../../lib/client-json-cache';
 
 type Transaction={
   id:string;
@@ -105,11 +106,10 @@ export default function Movimenti(){
     const request=++metadataRequestRef.current;
     const suffix=targetSpaceId?`?spaceId=${encodeURIComponent(targetSpaceId)}`:'';
     try{
-      const [categoryResponse,memberResponse]=await Promise.all([
-        fetch(`/api/categories${suffix}`,{cache:'no-store'}),
-        fetch(`/api/members${suffix}`,{cache:'no-store'}),
+      const [categoryResult,memberResult]=await Promise.all([
+        cachedJson<{data?:Category[]}>(`/api/categories${suffix}`,{onRevalidate:value=>{if(request===metadataRequestRef.current)setCategories(value.data||[])}}),
+        cachedJson<{data?:Member[]}>(`/api/members${suffix}`,{onRevalidate:value=>{if(request===metadataRequestRef.current)setMembers(value.data||[])}}),
       ]);
-      const [categoryResult,memberResult]=await Promise.all([categoryResponse.json(),memberResponse.json()]);
       if(request!==metadataRequestRef.current)return;
       setCategories(categoryResult.data||[]);
       setMembers(memberResult.data||[]);
@@ -126,7 +126,7 @@ export default function Movimenti(){
     listAbortRef.current?.abort();
     const controller=new AbortController();listAbortRef.current=controller;
     const calendarRange=monthBounds(calendarMonth);
-    const params=new URLSearchParams({page:String(viewMode==='calendar'?1:page),size:viewMode==='calendar'?'500':'30'});
+    const params=new URLSearchParams({page:String(viewMode==='calendar'?1:page),size:viewMode==='calendar'?'250':'30'});
     if(debouncedQ)params.set('q',debouncedQ);
     if(viewMode==='calendar'){
       params.set('start',calendarRange.start);
@@ -140,11 +140,10 @@ export default function Movimenti(){
     if(kindFilter)params.set('kind',kindFilter);
     if(spaceId)params.set('spaceId',spaceId);
     setLoading(true);setError('');
-    fetch(`/api/transactions?${params}`,{cache:'no-store',signal:controller.signal})
-      .then(async response=>({response,result:await response.json()}))
-      .then(({response,result})=>{
+    const url=`/api/transactions?${params}`;
+    cachedJson<{data?:Transaction[];count?:number}>(url,{signal:controller.signal,onRevalidate:result=>{if(request===listRequestRef.current){setRows(Array.isArray(result.data)?result.data:[]);setCount(Number(result.count||0))}}})
+      .then(result=>{
         if(request!==listRequestRef.current)return;
-        if(!response.ok)throw new Error(result.error||'Impossibile caricare i movimenti.');
         setRows(Array.isArray(result.data)?result.data:[]);setCount(Number(result.count||0));
       })
       .catch(error=>{if(error?.name!=='AbortError'&&request===listRequestRef.current){setRows([]);setCount(0);setError(error?.message||'Errore di connessione.')}})
@@ -161,7 +160,7 @@ export default function Movimenti(){
   function changeRange(range:DateRange){setPeriodStart(range.start);setPeriodEnd(range.end);setPage(1)}
   const hasFilters=Boolean(q||periodStart||periodEnd||author||categoryFilter||kindFilter);
   function clearFilters(){setQ('');setDebouncedQ('');setPeriodStart('');setPeriodEnd('');setAuthor('');setCategoryFilter('');setKindFilter('');setPage(1)}
-  function refresh(){setReloadToken(value=>value+1)}
+  function refresh(){invalidateClientJson('/api/transactions','/api/stats','/api/budgets');setReloadToken(value=>value+1)}
 
   useEffect(()=>{
     if(!editing)return;
@@ -319,7 +318,7 @@ export default function Movimenti(){
         const active=selectedDay===day.key;
         return <button type="button" key={day.key} className={`${day.inMonth?'':'outside'}${active?' selected':''}${dayRows.length?' has-transactions':''}`} aria-pressed={active} aria-label={`${formatDate(day.key,{day:'numeric',month:'long'})}${dayRows.length?` · ${dayRows.length} · ${currency(total)}`:''}`} onClick={()=>{if(day.inMonth)setSelectedDay(day.key)}} disabled={!day.inMonth}><span className="calendar-day-number">{day.day}</span>{dayRows.length>0&&<><span className={`calendar-day-total ${total>=0?'green':'red'}`}>{currency(total)}</span><span className="calendar-day-dot" aria-hidden="true"/></>}</button>;
       })}</div>
-      {count>500&&<p className="calendar-overflow" role="status">{t('movements.monthOverflow')}</p>}
+      {count>250&&<p className="calendar-overflow" role="status">{t('movements.monthOverflow')}</p>}
       <div className="calendar-day-detail"><div className="day-heading"><div className="day-date"><small>{t('movements.day')}</small><h3>{formatDate(selectedDay,{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</h3></div>{selectedRows.length>0&&<div className="day-total"><small>{t('movements.dayTotal')}</small><strong className={selectedRows.reduce((sum,row)=>sum+Number(row.amount),0)>=0?'green':'red'}>{currency(selectedRows.reduce((sum,row)=>sum+Number(row.amount),0))}</strong></div>}</div>{selectedRows.length?<div className="calendar-day-transactions">{selectedRows.map(transactionButton)}</div>:<p className="calendar-day-empty">{t('movements.noDayTransactions')}</p>}</div>
     </section>}
 

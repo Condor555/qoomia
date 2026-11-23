@@ -17,7 +17,7 @@ function monthInRome(){
   const value=(type:string)=>parts.find(part=>part.type===type)?.value||'';
   return `${value('year')}-${value('month')}`;
 }
-function thresholdList(value:unknown){return (Array.isArray(value)?value:[]).map(Number).filter(item=>item===80||item===90||item===100).sort((a,b)=>a-b)}
+function thresholdList(value:unknown){const selected=(Array.isArray(value)?value:[]).map(Number).find(item=>item===50||item===60||item===70||item===80||item===90||item===100);return [selected||80]}
 function text(locale:Locale,it:string,en:string){return locale==='en'?en:it}
 
 async function claimDelivery(sb:SupabaseClient,row:{user_id:string;space_id:string;kind:NotificationKind;subject_id:string;period_key:string;threshold:number;payload:Record<string,unknown>}){

@@ -11,6 +11,7 @@ import {useSharedMonth} from '../lib/selected-period-client';
 import {useI18n} from '../components/LanguageProvider';
 import QoomiaLogo from '../components/QoomiaLogo';
 import {InlineError,Skeleton,SkeletonRows} from '../components/UXFeedback';
+import {cachedJson} from '../lib/client-json-cache';
 
 type TopCategory={name:string;value:number;percentage:number;previousValue:number;changePercent:number|null;comparison:'available'|'no-previous-data';icon?:string|null;color?:string|null};
 type Stats={
@@ -49,8 +50,8 @@ export default function Home(){
     try{
       const params=new URLSearchParams({month});
       if(targetSpaceId)params.set('spaceId',targetSpaceId);
-      const response=await fetch(`/api/stats?${params}`,{cache:'no-store',signal:controller.signal});
-      const result=await response.json();
+      const url=`/api/stats?${params}`;
+      const result=await cachedJson<Stats&{error?:string}>(url,{signal:controller.signal,onRevalidate:value=>{if(request===statsRequestRef.current&&!value.error)setStats(value)}});
       if(request===statsRequestRef.current&&!result.error)setStats(result);
     }catch(error:any){if(error?.name!=='AbortError'&&request===statsRequestRef.current)setStats(null)}
   },[month]);
@@ -63,15 +64,15 @@ export default function Home(){
     try{
       const suffix=targetSpaceId?`&spaceId=${encodeURIComponent(targetSpaceId)}`:'';
       const categorySuffix=targetSpaceId?`?spaceId=${encodeURIComponent(targetSpaceId)}`:'';
-      const [transactionResponse,categoryResponse]=await Promise.all([
-        fetch(`/api/transactions?page=1&size=5${suffix}`,{cache:'no-store',signal:controller.signal}),
-        fetch(`/api/categories${categorySuffix}`,{cache:'no-store',signal:controller.signal}),
+      const transactionUrl=`/api/transactions?page=1&size=5${suffix}`,categoryUrl=`/api/categories${categorySuffix}`;
+      const [transactionResult,categoryResult]=await Promise.all([
+        cachedJson<{data?:RecentTransaction[];error?:string}>(transactionUrl,{signal:controller.signal,onRevalidate:value=>{if(request===recentRequestRef.current)setRecent(Array.isArray(value.data)?value.data.slice(0,5):[])}}),
+        cachedJson<{data?:RecentCategory[]}>(categoryUrl,{signal:controller.signal,onRevalidate:value=>{if(request===recentRequestRef.current)setRecentCategories(Array.isArray(value.data)?value.data:[])}}),
       ]);
-      const [transactionResult,categoryResult]=await Promise.all([transactionResponse.json(),categoryResponse.json()]);
       if(request!==recentRequestRef.current)return;
-      if(!transactionResponse.ok)throw new Error(transactionResult.error||'Impossibile caricare i movimenti recenti.');
+      if(transactionResult.error)throw new Error(transactionResult.error||'Impossibile caricare i movimenti recenti.');
       setRecent(Array.isArray(transactionResult.data)?transactionResult.data.slice(0,5):[]);
-      setRecentCategories(categoryResponse.ok&&Array.isArray(categoryResult.data)?categoryResult.data:[]);
+      setRecentCategories(Array.isArray(categoryResult.data)?categoryResult.data:[]);
     }catch(error:any){if(error?.name!=='AbortError'&&request===recentRequestRef.current){setRecent([]);setRecentError(error?.message||'Impossibile caricare i movimenti recenti.')}}
     finally{if(request===recentRequestRef.current)setRecentLoading(false)}
   },[]);
@@ -112,9 +113,8 @@ export default function Home(){
       <section className={`money-card surface${stats?'':' is-loading'}`}><header><span>{t('common.expenses')}</span><Icon name="arrowDown" size={16}/></header><strong className="red">{stats?currency(stats.expense):<Skeleton width="96px" height="22px"/>}</strong></section>
     </div>
 
-    <Link href="/budget" className={`section surface home-budget-summary home-budget-link${stats?.budget.status?` ${stats.budget.status}`:''}`} aria-label={stats?.budget.amount?'Apri Budget del mese':'Configura Budget del mese'}>
-      <div className="section-title"><div><h2>Budget del mese</h2><small>{stats?stats.budget.amount?'Controllo del piano mensile':'Tocca per configurarlo':'Caricamento budget'}</small></div><span className="home-budget-chevron" aria-hidden="true">›</span></div>
-      {stats?<>{stats.budget.amount>0?<><div className="home-budget-values"><span><small>Speso</small><b>{currency(stats.budget.spent)}</b></span><span><small>Disponibile</small><b className={stats.budget.available<0?'red':''}>{currency(stats.budget.available)}</b></span><strong>{stats.budget.percentage}%</strong></div><div className={`budget-progress ${stats.budget.status}`}><span style={{width:`${Math.min(100,stats.budget.percentage)}%`}}/></div>{stats.budget.projectedOverage>0&&<p className="home-budget-warning">Rischio superamento: {currency(stats.budget.projectedOverage)}</p>}</>:<div className="home-budget-empty"><p>Imposta un limite mensile per controllare subito spesa e residuo.</p><span>Configura ora</span></div>}</>:<><Skeleton width="48%" height="16px"/><Skeleton className="home-budget-skeleton"/></>}
+    <Link href="/budget" prefetch className={`section surface home-budget-summary home-budget-link home-budget-teaser${stats?.budget.status?` ${stats.budget.status}`:''}`} aria-label="Apri Budget">
+      {stats?<><div className="home-budget-teaser-row"><div><h2>Budget</h2><small>{stats.budget.amount?`${stats.budget.percentage}% utilizzato · ${currency(stats.budget.available)} disponibili`:`Budget non impostato · ${currency(stats.budget.spent)} spesi`}</small></div><span className="home-budget-teaser-spent"><small>Speso</small><strong>{currency(stats.budget.spent)}</strong></span><span className="home-budget-chevron" aria-hidden="true">›</span></div>{stats.budget.amount>0&&<div className={`budget-progress ${stats.budget.status}`}><span style={{width:`${Math.min(100,stats.budget.percentage)}%`}}/></div>}</>:<div className="home-budget-teaser-loading"><Skeleton width="38%" height="16px"/><Skeleton width="72%" height="11px"/></div>}
     </Link>
 
     <section className="section surface home-recent">

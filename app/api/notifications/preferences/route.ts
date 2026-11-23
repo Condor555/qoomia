@@ -2,10 +2,10 @@ import {NextResponse} from 'next/server';
 import {z} from 'zod';
 import {createClient} from '../../../../lib/supabase/server';
 
-const Threshold=z.union([z.literal(80),z.literal(90),z.literal(100)]);
-const Preferences=z.object({enabled:z.boolean(),budgetEnabled:z.boolean(),budgetThresholds:z.array(Threshold).min(1).max(3),goalsEnabled:z.boolean(),goalThresholds:z.array(Threshold).min(1).max(3)});
-const defaults={enabled:false,budgetEnabled:true,budgetThresholds:[80,90,100],goalsEnabled:true,goalThresholds:[80,90,100]};
-const clean=(values:number[])=>[...new Set(values)].filter(value=>value===80||value===90||value===100).sort((a,b)=>a-b);
+const Threshold=z.union([z.literal(50),z.literal(60),z.literal(70),z.literal(80),z.literal(90),z.literal(100)]);
+const Preferences=z.object({enabled:z.boolean(),budgetEnabled:z.boolean(),budgetThresholds:z.array(Threshold).length(1),goalsEnabled:z.boolean(),goalThresholds:z.array(Threshold).length(1)});
+const defaults={enabled:false,budgetEnabled:true,budgetThresholds:[80],goalsEnabled:true,goalThresholds:[80]};
+const clean=(values:number[])=>{const value=values.find(item=>item===50||item===60||item===70||item===80||item===90||item===100);return [value||80]};
 
 export async function GET(){
   const sb=await createClient();const {data:{user}}=await sb.auth.getUser();

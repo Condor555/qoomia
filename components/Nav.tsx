@@ -79,6 +79,7 @@ export default function Nav() {
       <Link
         key={tab.href}
         href={tab.href}
+        prefetch
         className={active ? 'active' : undefined}
         aria-current={active ? 'page' : undefined}
       >

@@ -8,6 +8,7 @@ import DateInput from './DateInput';
 import SpacePicker,{type SpacePickerOption} from './SpacePicker';
 import {AsyncButton,InlineError,Skeleton} from './UXFeedback';
 import {useToast} from './ToastProvider';
+import {invalidateClientJson} from '../lib/client-json-cache';
 import {amountForSave} from '../lib/amount-expression';
 import {useI18n} from './LanguageProvider';
 
@@ -203,6 +204,7 @@ export default function NewTransactionComposer({embedded=false,onSaved,onDirtyCh
           setMessage(`Movimento salvato, ma ricorrenza non creata: ${recurringResult.error||'errore sconosciuto'}`);return;
         }
       }
+      invalidateClientJson('/api/transactions','/api/stats','/api/budgets');
       setAmount('');setNote('');setCategory('');setSuggestions([]);setSuggestionsOpen(false);setRecurring(false);
       showToast({message:t('new.saved'),tone:'success'});
       onSaved?.();
