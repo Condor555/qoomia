@@ -1,6 +1,7 @@
 import {NextResponse} from 'next/server';
 import {z} from 'zod';
 import {activeSpace} from '../../../../lib/active-space';
+import {safeEvaluateSpaceNotifications} from '../../../../lib/push-notifications';
 
 const Contribution=z.object({
   space_id:z.string().uuid().optional(),
@@ -32,6 +33,7 @@ export async function POST(req:Request){
     const accumulated=(existing||[]).reduce((sum,row)=>sum+Number(row.amount),0);
     if(!goal||goal.status!=='active'||accumulated>=Number(goal.target_amount))return NextResponse.json({error:'Obiettivo non disponibile.'},{status:409});
     const {data,error}=await sb.from('saving_goal_contributions').insert({space_id:spaceId,goal_id:body.goal_id,amount:body.amount,contribution_date:body.contribution_date,note:body.note,contributed_by:user.id}).select().single();
+    if(!error)await safeEvaluateSpaceNotifications(spaceId,['goal']);
     return NextResponse.json({data,error:error?.message,transactionCreated:false},{status:error?400:200});
   }catch(error:any){
     if(error instanceof z.ZodError)return NextResponse.json({error:'Contributo non valido.'},{status:400});
@@ -67,6 +69,7 @@ export async function PATCH(req:Request){
     if(access.row.goal_id!==body.goal_id)return NextResponse.json({error:'Obiettivo non coerente.'},{status:409});
     if(!access.owner){const {data:goal}=await sb.from('saving_goals').select('status').eq('space_id',spaceId).eq('id',body.goal_id).maybeSingle();if(goal?.status!=='active')return NextResponse.json({error:'Solo l’owner può modificare contributi di un obiettivo completato.'},{status:403})}
     const {data,error}=await sb.from('saving_goal_contributions').update({amount:body.amount,contribution_date:body.contribution_date,note:body.note}).eq('space_id',spaceId).eq('id',body.id).select().single();
+    if(!error)await safeEvaluateSpaceNotifications(spaceId,['goal']);
     return NextResponse.json({data,error:error?.message,transactionCreated:false},{status:error?400:200});
   }catch(error:any){if(error instanceof z.ZodError)return NextResponse.json({error:'Aggiornamento contributo non valido.'},{status:400});return NextResponse.json({error:error?.message||'Unauthorized'},{status:400})}
 }
@@ -79,6 +82,7 @@ export async function DELETE(req:Request){
     if(!access.row)return NextResponse.json({error:'Contributo non trovato.'},{status:404});
     if(!access.allowed)return NextResponse.json({error:'Non puoi eliminare il contributo di un altro membro.'},{status:403});
     const {error}=await sb.from('saving_goal_contributions').delete().eq('space_id',spaceId).eq('id',id);
+    if(!error)await safeEvaluateSpaceNotifications(spaceId,['goal']);
     return NextResponse.json({ok:!error,error:error?.message,transactionDeleted:false},{status:error?400:200});
   }catch(error:any){return NextResponse.json({error:error?.message||'Operazione non valida.'},{status:400})}
 }

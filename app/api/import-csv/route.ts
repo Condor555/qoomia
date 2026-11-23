@@ -2,6 +2,7 @@ import {NextResponse} from 'next/server';
 import Papa from 'papaparse';
 import {activeSpace} from '../../../lib/active-space';
 import {inferredCategoryStyle} from '../../../lib/category-style';
+import {safeEvaluateSpaceNotifications} from '../../../lib/push-notifications';
 
 const aliases={
   id:['id','transaction id','transactionid'],
@@ -95,6 +96,7 @@ export async function POST(req:Request){
       if(error)return NextResponse.json({error:error.message,imported,read:rows.length,skipped},{status:400});
       imported+=data?.length||0;
     }
+    if(imported)await safeEvaluateSpaceNotifications(spaceId,['budget']);
     return NextResponse.json({imported,read:rows.length,duplicates:valid.length-imported,skipped,reclassified,format:delimiter===';'?'semicolon':'comma'});
   }catch(error:any){
     return NextResponse.json({error:error?.message||'Unauthorized'},{status:401});

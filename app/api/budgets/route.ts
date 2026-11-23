@@ -2,6 +2,7 @@ import {NextResponse} from 'next/server';
 import {z} from 'zod';
 import {activeSpace} from '../../../lib/active-space';
 import {loadMacroBudgetSnapshot,MONTH_PATTERN,monthStart,roundMoney,roundPercent} from '../../../lib/macro-budget';
+import {safeEvaluateSpaceNotifications} from '../../../lib/push-notifications';
 
 const PlanPayload=z.object({
   space_id:z.string().uuid().optional(),
@@ -50,11 +51,13 @@ export async function PUT(req:Request){
         return {macro_category_id:item.macro_category_id,allocation_percent:roundPercent(item.percentage),base_amount:roundMoney(distributable*item.percentage/100),rollover_amount:macro.rolloverAmount};
       });
       const {data,error}=await sb.rpc('save_macro_budget_plan',{p_space_id:spaceId,p_month:monthStart(payload.month),p_total_amount:roundMoney(payload.total_budget),p_allocations:allocations});
+      if(!error)await safeEvaluateSpaceNotifications(spaceId,['budget']);
       return NextResponse.json({data,error:error?.message},{status:error?400:200});
     }
     // Compatibilità con il payload V3.9: non elimina né trasforma i budget categoria legacy.
     const payload=LegacyPayload.parse(raw);const {sb,spaceId}=await activeSpace(payload.space_id);
     const {data,error}=await sb.rpc('set_space_budget',{p_space_id:spaceId,p_month:monthStart(payload.month),p_category_name:payload.category_name||null,p_amount:payload.amount});
+    if(!error)await safeEvaluateSpaceNotifications(spaceId,['budget']);
     return NextResponse.json({data,legacy:true,error:error?.message},{status:error?400:200});
   }catch(error:any){
     if(error instanceof z.ZodError)return NextResponse.json({error:'Piano budget non valido.'},{status:400});

@@ -2,13 +2,13 @@
 
 import Link from 'next/link';
 import {useRouter} from 'next/navigation';
-import {InfoIcon} from '@phosphor-icons/react/ssr';
+import {BellIcon,InfoIcon} from '@phosphor-icons/react/ssr';
 import {createClient} from '../../lib/supabase/client';
 import Icon,{type IconName} from '../../components/Icon';
 import {useI18n} from '../../components/LanguageProvider';
 import type {TranslationKey} from '../../lib/i18n';
 
-type SettingsItem={href:string;icon:IconName|'info';title:TranslationKey;sub:TranslationKey};
+type SettingsItem={href:string;icon:IconName|'bell'|'info';title:TranslationKey;sub:TranslationKey};
 
 const items:SettingsItem[]=[
   {href:'/account/profilo',icon:'user',title:'account.profileTitle',sub:'account.profileSub'},
@@ -16,13 +16,16 @@ const items:SettingsItem[]=[
   {href:'/account/aspetto',icon:'sun',title:'account.appearanceTitle',sub:'account.appearanceSub'},
   {href:'/account/categorie',icon:'category',title:'account.categoriesTitle',sub:'account.categoriesSub'},
   {href:'/account/ricorrenze',icon:'repeat',title:'account.recurringTitle',sub:'account.recurringSub'},
+  {href:'/account/notifiche',icon:'bell',title:'account.notificationsTitle',sub:'account.notificationsSub'},
   {href:'/spazi',icon:'family',title:'account.spacesTitle',sub:'account.spacesSub'},
   {href:'/account/dati',icon:'download',title:'account.dataTitle',sub:'account.dataSub'},
   {href:'/account/informazioni',icon:'info',title:'account.infoTitle',sub:'account.infoSub'},
 ];
 
 function SettingsIcon({name}:{name:SettingsItem['icon']}){
-  return name==='info'?<InfoIcon size={22} weight="regular" aria-hidden="true"/>:<Icon name={name}/>;
+  if(name==='info')return <InfoIcon size={22} weight="regular" aria-hidden="true"/>;
+  if(name==='bell')return <BellIcon size={22} weight="regular" aria-hidden="true"/>;
+  return <Icon name={name}/>;
 }
 
 export default function Impostazioni(){

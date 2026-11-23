@@ -1,6 +1,7 @@
 import {NextResponse} from 'next/server';
 import {z} from 'zod';
 import {activeSpace} from '../../../lib/active-space';
+import {safeEvaluateSpaceNotifications} from '../../../lib/push-notifications';
 
 const Schema=z.object({
   date:z.string(),
@@ -73,6 +74,7 @@ export async function POST(req:Request){
       note:payload.note,
       account_name:space?.account_name||'Spese',
     }).select().single();
+    if(!error)await safeEvaluateSpaceNotifications(spaceId,['budget']);
     return NextResponse.json({data,error:error?.message},{status:error?400:200});
   }catch(error:any){
     if(error instanceof z.ZodError)return NextResponse.json({error:error.issues[0]?.message||'Dati non validi.'},{status:400});

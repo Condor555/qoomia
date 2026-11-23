@@ -59,7 +59,8 @@ export default function Budget(){
   const unallocatedAmount=roundMoney(draftDistributable*unallocatedPercent/100),overallocatedAmount=roundMoney(draftDistributable*overallocatedPercent/100);
   const distributionState=allocationPercentTotal>100.001?'over':allocationPercentTotal>=99.999?'complete':'partial';
   const allCategories=useMemo(()=>data?.macros.flatMap(macro=>macro.categories.map(category=>({...category,macroId:macro.id}))).sort((a,b)=>a.name.localeCompare(b.name,'it'))||[],[data]);
-  const comparison=data?.changePercent==null?t('budget.noComparison'):t('budget.vsPrevious',{value:`${data.changePercent>0?'+':''}${data.changePercent}`});
+  const hasExpenseComparison=data?.changePercent!=null&&Number.isFinite(data.changePercent)&&data.previousExpense>0;
+  const comparison=hasExpenseComparison&&data?t('budget.vsPrevious',{value:`${data.changePercent!>0?'+':''}${data.changePercent}`}):null;
   const activeTotal=data?.hasBudgetPlan?data.totalBudget:draftTotal,hasActiveLimit=activeTotal>0;
   const activePercentage=hasActiveLimit&&data?Math.round(data.totalSpent/activeTotal*100):0,activeAvailable=hasActiveLimit&&data?activeTotal-data.totalSpent:null;
   const activeStatus:Status=hasActiveLimit&&data&&data.totalSpent>=activeTotal?'over':hasActiveLimit&&data&&data.totalSpent>=activeTotal*.8?'warning':'ok';
@@ -93,8 +94,9 @@ export default function Budget(){
     {data&&(data.hasBudgetPlan||initializing)&&<>
       {initializing&&!data.hasBudgetPlan&&<button type="button" className="secondary budget-cancel-setup" onClick={()=>setInitializing(false)}>{t('budget.cancelSetup')}</button>}
       <section className={`budget-hero macro-budget-hero surface ${activeStatus}`}>
-        <div className="budget-hero-head"><div><small>{t('budget.totalMonthly')}</small><strong>{currency(data.totalSpent)} <span>{t('budget.spent')}</span></strong></div><b>{hasActiveLimit?`${activePercentage}%`:'—'}</b></div><ProgressBar value={activePercentage} status={activeStatus}/>
-        <div className="budget-numbers"><span>{t('budget.totalRemaining')} <b className={(activeAvailable??0)<0?'red':''}>{activeAvailable==null?'—':currency(activeAvailable)}</b></span>{data.hasBudgetPlan&&<span>{comparison}</span>}</div>
+        <div className="budget-hero-head"><div><small>{t('budget.totalMonthly')}</small><strong>{currency(data.totalSpent)} <span>{t('budget.spent')}</span></strong>{!hasActiveLimit&&<span className="budget-plan-state">Budget {t('budget.notSet').toLocaleLowerCase()}</span>}</div>{hasActiveLimit&&<b>{activePercentage}%</b>}</div>
+        {hasActiveLimit&&<ProgressBar value={activePercentage} status={activeStatus}/>} 
+        <div className="budget-numbers"><span>{t('budget.totalRemaining')} <b className={(activeAvailable??0)<0?'red':''}>{activeAvailable==null?t('budget.notSet'):currency(activeAvailable)}</b></span>{comparison&&<span className="budget-spending-comparison"><small>{t('common.expenses')}</small>{comparison}</span>}</div>
         <div className="commitment-grid"><div><small>{t('budget.commitments')}</small><b>{currency(data.commitments)}</b></div><div><small>{t('budget.distributable')}</small><b>{currency(draftDistributable)}</b></div><div><small>{t('budget.unallocated')}</small><b>{currency(unallocatedAmount)}</b></div></div>
         {previewOvercommitted>0&&<div className="budget-warning" role="alert">{t('budget.overcommitted',{amount:currency(previewOvercommitted)})}</div>}
         <label className="budget-input"><span>{t('budget.spaceLimit')}</span><AmountExpressionInput compact disabled={!data.canEdit} value={totalDraft} onChange={changeTotal} ariaLabel={t('budget.spaceLimitAria')}/></label>

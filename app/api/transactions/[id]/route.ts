@@ -1,6 +1,7 @@
 import {NextResponse} from 'next/server';
 import {z} from 'zod';
 import {activeSpace} from '../../../../lib/active-space';
+import {safeEvaluateSpaceNotifications} from '../../../../lib/push-notifications';
 const Patch=z.object({date:z.string(),category_name:z.string().min(1),amount:z.number(),note:z.string().default(''),account_name:z.string().min(1),kind:z.enum(['expense','income']),scope:z.enum(['occurrence','series']).default('occurrence')});
 function recurringId(row:any){return row.recurring_id||(row.source==='recurring'&&typeof row.source_id==='string'?row.source_id.split(':')[0]:null)}
 export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){
@@ -21,6 +22,7 @@ export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){
       const {error:seriesError}=await sb.from('recurring_transactions').update({category_name:body.category_name,amount,note:body.note,account_name:accountName}).eq('space_id',spaceId).eq('id',seriesId);
       if(seriesError)return NextResponse.json({error:`Movimento aggiornato, ma serie non aggiornata: ${seriesError.message}`,data},{status:409});
     }
+    await safeEvaluateSpaceNotifications(spaceId,['budget']);
     return NextResponse.json({data,seriesUpdated:body.scope==='series'&&Boolean(seriesId)});
   }catch(error:any){return NextResponse.json({error:error?.message||'Unauthorized'},{status:400})}
 }
@@ -32,6 +34,7 @@ export async function DELETE(req:Request,{params}:{params:Promise<{id:string}>})
     const seriesId=recurringId(current);
     if(scope==='series'&&seriesId){const {error:seriesError}=await sb.from('recurring_transactions').update({active:false}).eq('space_id',spaceId).eq('id',seriesId);if(seriesError)return NextResponse.json({error:seriesError.message},{status:400})}
     const {error}=await sb.from('transactions').delete().eq('space_id',spaceId).eq('id',id);
+    if(!error)await safeEvaluateSpaceNotifications(spaceId,['budget']);
     return NextResponse.json({ok:!error,error:error?.message,seriesStopped:scope==='series'&&Boolean(seriesId)},{status:error?400:200});
   }catch(error:any){return NextResponse.json({error:error?.message||'Unauthorized'},{status:400})}
 }
