@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect,useRef,useState} from 'react';
+import {useEffect,useRef,useState,type CSSProperties} from 'react';
 import AmountExpressionInput from './AmountExpressionInput';
 import CategoryIcon from './CategoryIcon';
 import CategoryPickerSheet from './CategoryPickerSheet';
@@ -39,6 +39,7 @@ export default function NewTransactionComposer({embedded=false,onSaved,onDirtyCh
   const [suggestionsBusy,setSuggestionsBusy]=useState(false);
   const [activeSuggestion,setActiveSuggestion]=useState(0);
   const [categoryPickerOpen,setCategoryPickerOpen]=useState(false);
+  const [keyboardInset,setKeyboardInset]=useState(0);
   const destinationRequestRef=useRef(0);
   const suggestionRequestRef=useRef(0);
   const suppressAutocompleteRef=useRef(false);
@@ -60,6 +61,16 @@ export default function NewTransactionComposer({embedded=false,onSaved,onDirtyCh
   },[]);
 
   useEffect(()=>{onDirtyChange?.(Boolean(amount.trim()||note.trim()||category||recurring))},[amount,note,category,recurring,onDirtyChange]);
+
+  useEffect(()=>{
+    const visual=window.visualViewport;
+    function update(){
+      const inset=Math.max(0,window.innerHeight-(visual?.height||window.innerHeight)-(visual?.offsetTop||0));
+      setKeyboardInset(inset>80?inset:0);
+    }
+    update();visual?.addEventListener('resize',update);visual?.addEventListener('scroll',update);
+    return()=>{visual?.removeEventListener('resize',update);visual?.removeEventListener('scroll',update)};
+  },[]);
 
   async function loadDestination(targetSpaceId:string){
     const request=++destinationRequestRef.current;
@@ -205,7 +216,7 @@ export default function NewTransactionComposer({embedded=false,onSaved,onDirtyCh
 
   return <>
     {!embedded&&<header className="page-head"><div><h1>{t('new.title')}</h1><p>{t('new.subtitle')}</p></div></header>}
-    <section className={`entry-card surface${embedded?' entry-card-embedded':''}`}>
+    <section className={`entry-card surface${embedded?' entry-card-embedded':''}${keyboardInset?' composer-keyboard-open':''}`} style={{'--composer-keyboard-inset':`${keyboardInset}px`} as CSSProperties} onFocusCapture={event=>{const target=event.target instanceof HTMLElement?event.target:null;if(keyboardInset&&target)window.setTimeout(()=>target.scrollIntoView({block:'center',behavior:'smooth'}),160)}}>
       <SpacePicker spaces={spaces} value={spaceId} onChange={chooseSpace} variant="destination" label={t('space.destination')} help={t('new.destinationHelp')} disabled={busy||loadingSpace}/>
       <div className="segmented"><button type="button" className={kind==='expense'?'active':''} onClick={()=>chooseKind('expense')}>{t('common.expense')}</button><button type="button" className={kind==='income'?'active':''} onClick={()=>chooseKind('income')}>{t('common.income')}</button></div>
       <AmountExpressionInput className="amount-input-wrap" value={amount} onChange={setAmount} ariaLabel={t('new.amount')}/>

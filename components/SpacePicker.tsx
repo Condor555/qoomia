@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect,useId,useRef,useState} from 'react';
+import {useEffect,useId,useRef,useState,type CSSProperties} from 'react';
 import Icon from './Icon';
 import {useI18n} from './LanguageProvider';
 
@@ -21,6 +21,7 @@ export default function SpacePicker({spaces,value,onChange,variant='destination'
   const {t}=useI18n();
   const [open,setOpen]=useState(false);
   const [activeIndex,setActiveIndex]=useState(0);
+  const [viewportHeight,setViewportHeight]=useState(0);
   const rootRef=useRef<HTMLDivElement>(null);
   const triggerRef=useRef<HTMLButtonElement>(null);
   const optionRefs=useRef<Array<HTMLButtonElement|null>>([]);
@@ -35,6 +36,14 @@ export default function SpacePicker({spaces,value,onChange,variant='destination'
     };
     document.addEventListener('pointerdown',close);
     return()=>document.removeEventListener('pointerdown',close);
+  },[open]);
+
+  useEffect(()=>{
+    if(!open)return;
+    const visual=window.visualViewport;
+    const update=()=>setViewportHeight(Math.max(280,visual?.height||window.innerHeight));
+    update();visual?.addEventListener('resize',update);visual?.addEventListener('scroll',update);
+    return()=>{visual?.removeEventListener('resize',update);visual?.removeEventListener('scroll',update)};
   },[open]);
 
   useEffect(()=>{
@@ -91,7 +100,7 @@ export default function SpacePicker({spaces,value,onChange,variant='destination'
   const iconName=selected?.type==='personal'?'user':'family';
   const accessibleLabel=label||(variant==='compact'?t('space.viewed'):t('space.destination'));
 
-  return <div ref={rootRef} className={`space-picker space-picker-${variant}${open?' is-open':''}${className?` ${className}`:''}`}>
+  return <div ref={rootRef} className={`space-picker space-picker-${variant}${open?' is-open':''}${className?` ${className}`:''}`} style={{'--visual-viewport-height':viewportHeight?`${viewportHeight}px`:'100dvh'} as CSSProperties}>
     {variant==='destination'&&<label className="space-picker-label">{accessibleLabel}</label>}
     <button
       ref={triggerRef}
@@ -136,3 +145,5 @@ export default function SpacePicker({spaces,value,onChange,variant='destination'
     </div>}
   </div>;
 }
+
+

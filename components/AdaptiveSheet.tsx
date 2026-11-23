@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect,useId,useRef,useState,type ReactNode} from 'react';
+import {useEffect,useId,useRef,useState,type CSSProperties,type ReactNode} from 'react';
 import {createPortal} from 'react-dom';
 
 type SheetSize='compact'|'medium'|'large'|'full';
@@ -20,6 +20,7 @@ type AdaptiveSheetProps={
   className?:string;
   showHeader?:boolean;
   restoreScroll?:boolean;
+  showGrabber?:boolean;
 };
 
 const focusable='a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
@@ -27,7 +28,7 @@ const focusable='a[href],button:not([disabled]),input:not([disabled]),select:not
 export default function AdaptiveSheet({
   open,onClose,title,eyebrow,children,size='large',busy=false,dirty=false,
   closeLabel='Chiudi',discardTitle='Scartare le modifiche?',
-  discardMessage='Le modifiche non salvate andranno perse.',className='',showHeader=true,restoreScroll=true,
+  discardMessage='Le modifiche non salvate andranno perse.',className='',showHeader=true,restoreScroll=true,showGrabber=false,
 }:AdaptiveSheetProps){
   const titleId=useId();
   const panelRef=useRef<HTMLDivElement|null>(null);
@@ -35,8 +36,35 @@ export default function AdaptiveSheet({
   const scrollPositionRef=useRef(0);
   const [mounted,setMounted]=useState(false);
   const [confirmDiscard,setConfirmDiscard]=useState(false);
+  const [viewport,setViewport]=useState({top:0,height:0,keyboard:0});
 
   useEffect(()=>setMounted(true),[]);
+
+  useEffect(()=>{
+    if(!open||!mounted)return;
+    const visual=window.visualViewport;
+    function updateViewport(){
+      const top=Math.max(0,visual?.offsetTop||0);
+      const height=Math.max(280,visual?.height||window.innerHeight);
+      const keyboard=Math.max(0,window.innerHeight-height-top);
+      setViewport({top,height,keyboard});
+    }
+    function keepFocusedVisible(event:FocusEvent){
+      const target=event.target instanceof HTMLElement?event.target:null;
+      if(!target||!panelRef.current?.contains(target)||!target.matches('input,textarea,select,[contenteditable="true"]'))return;
+      window.setTimeout(()=>target.scrollIntoView({block:'center',inline:'nearest',behavior:'smooth'}),180);
+    }
+    const panel=panelRef.current;
+    updateViewport();
+    visual?.addEventListener('resize',updateViewport);
+    visual?.addEventListener('scroll',updateViewport);
+    panel?.addEventListener('focusin',keepFocusedVisible);
+    return()=>{
+      visual?.removeEventListener('resize',updateViewport);
+      visual?.removeEventListener('scroll',updateViewport);
+      panel?.removeEventListener('focusin',keepFocusedVisible);
+    };
+  },[open,mounted]);
 
   function requestClose(){
     if(busy)return;
@@ -98,9 +126,9 @@ export default function AdaptiveSheet({
   if(!open||!mounted)return null;
 
   return createPortal(
-    <div className="adaptive-sheet-backdrop" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)requestClose()}}>
+    <div className={`adaptive-sheet-backdrop${viewport.keyboard>80?' keyboard-open':''}`} style={{'--sheet-viewport-top':`${viewport.top}px`,'--sheet-viewport-height':viewport.height?`${viewport.height}px`:'100dvh','--sheet-keyboard-inset':`${viewport.keyboard}px`} as CSSProperties} role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)requestClose()}}>
       <div ref={panelRef} className={`adaptive-sheet adaptive-sheet-${size} surface ${className}`.trim()} role="dialog" aria-modal="true" aria-labelledby={titleId} tabIndex={-1}>
-        <span className="adaptive-sheet-grabber" aria-hidden="true"/>
+        {showGrabber&&<span className="adaptive-sheet-grabber" aria-hidden="true"/>}
         {showHeader&&<header className="adaptive-sheet-header"><div>{eyebrow&&<small>{eyebrow}</small>}<h2 id={titleId}>{title}</h2></div><button type="button" className="sheet-close" aria-label={closeLabel} disabled={busy} onClick={requestClose}>×</button></header>}
         {!showHeader&&<h2 id={titleId} className="sr-only">{title}</h2>}
         <div className="adaptive-sheet-content">{children}</div>
