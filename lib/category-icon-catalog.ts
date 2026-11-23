@@ -149,3 +149,5 @@ export function suggestIconsForCategory(name:string,limit=8){
   }).filter(item=>item.score>0).sort((a,b)=>b.score-a.score||a.entry.label.localeCompare(b.entry.label,'it'));
   return scored.slice(0,limit).map(item=>item.entry);
 }
+
+

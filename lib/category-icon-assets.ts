@@ -7,3 +7,5 @@ import {findIconEntry} from './category-icon-catalog';
 export function categoryIconAsset(icon?:string|null){
   return findIconEntry(icon)?.asset||null;
 }
+
+

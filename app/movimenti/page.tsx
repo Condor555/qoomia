@@ -140,6 +140,15 @@ export default function Movimenti(){
   function changeRange(range:DateRange){setPeriodStart(range.start);setPeriodEnd(range.end);setPage(1)}
   const activeFilterCount=[Boolean(periodStart||periodEnd),Boolean(author),Boolean(categoryFilter),Boolean(kindFilter)].filter(Boolean).length;
   function refresh(){setPage(1);setReloadToken(value=>value+1)}
+  function changeSearch(value:string){
+    setQ(value);
+    if(!value.trim()){
+      setDebouncedQ('');
+      setPage(1);
+      setError('');
+    }
+  }
+  function resetFilters(){setPeriodStart('');setPeriodEnd('');setAuthor('');setCategoryFilter('');setKindFilter('');setPage(1);setError('')}
 
   const groups=useMemo(()=>rows.reduce<Record<string,Transaction[]>>((all,row)=>{
     (all[row.date]||=[]).push(row);
@@ -251,14 +260,15 @@ export default function Movimenti(){
 
   return <>
     <header className="page-head"><div><h1>{t('movements.title')}</h1><p>{loading?t('movements.updating'):count===1?t('movements.one'):t('movements.many',{count})}</p></div></header>
-    <div className="movement-search-toolbar"><div className="search-box surface"><Icon name="search" size={19}/><input value={q} onChange={event=>setQ(event.target.value)} placeholder={t('movements.search')} aria-label={t('movements.search')}/>{q&&<button type="button" className="search-clear" aria-label="Cancella ricerca" onClick={()=>{setQ('');setDebouncedQ('');setPage(1)}}>×</button>}</div><button type="button" className={`movement-filter-button${activeFilterCount?' active':''}`} aria-label={activeFilterCount?`Filtri, ${activeFilterCount} attivi`:'Apri filtri'} aria-haspopup="dialog" onClick={()=>setFiltersOpen(true)}><Icon name="more" size={22}/>{activeFilterCount>0&&<span aria-hidden="true">{activeFilterCount}</span>}</button></div>
+    <div className="movement-search-toolbar"><div className="search-box surface"><Icon name="search" size={19}/><input value={q} onChange={event=>changeSearch(event.target.value)} placeholder={t('movements.search')} aria-label={t('movements.search')}/>{q&&<button type="button" className="search-clear" aria-label="Cancella ricerca" onClick={()=>changeSearch('')}>×</button>}</div><button type="button" className={`movement-filter-button${activeFilterCount?' active':''}`} aria-label={activeFilterCount?`Filtri, ${activeFilterCount} attivi`:'Apri filtri'} aria-haspopup="dialog" onClick={()=>setFiltersOpen(true)}><Icon name="more" size={22}/>{activeFilterCount>0&&<span aria-hidden="true">{activeFilterCount}</span>}</button></div>
+    {activeFilterCount>0&&<div className="movement-active-filters" aria-label="Filtri attivi">{(periodStart||periodEnd)&&<button type="button" onClick={()=>changeRange({start:'',end:''})}><span>Periodo</span><b aria-hidden="true">×</b></button>}{categoryFilter&&<button type="button" onClick={()=>{setCategoryFilter('');setPage(1)}}><span>{categoryFilter}</span><b aria-hidden="true">×</b></button>}{kindFilter&&<button type="button" onClick={()=>{setKindFilter('');setPage(1)}}><span>{kindFilter==='expense'?'Uscite':'Entrate'}</span><b aria-hidden="true">×</b></button>}{author&&<button type="button" onClick={()=>{setAuthor('');setPage(1)}}><span>{members.find(member=>member.userId===author)?.name||'Autore'}</span><b aria-hidden="true">×</b></button>}<button type="button" className="movement-reset-shortcut" onClick={resetFilters}>Azzera</button></div>}
     {error&&<InlineError message={error} onRetry={refresh}/>}
     {loading&&page===1&&!rows.length&&<div className="movement-loading surface"><SkeletonRows rows={5}/></div>}
     {!loading&&!error&&!rows.length&&<EmptyState title={t('movements.empty')} description={t('movements.emptyHelp')} icon="list"/>}
-    {Object.entries(groups).map(([day,list])=>{const dayTotal=list.reduce((sum,row)=>sum+Number(row.amount),0);return <section className="day day-ledger" key={day}><div className="day-heading"><div className="day-date"><small>{t('movements.day')}</small><h3>{formatDate(day,{weekday:'long',day:'numeric',month:'short',year:'numeric'})}</h3></div><div className="day-total"><small>{t('movements.dayTotal')}</small><strong className={dayTotal>0?'green':dayTotal<0?'red':'muted'}>{dayTotal>0?'+ ':''}{currency(dayTotal)}</strong></div></div><div className="tx-card day-transactions surface">{list.map(row=>{
+    <div className={loading&&rows.length?'movement-results is-updating':'movement-results'} aria-busy={loading}>{Object.entries(groups).map(([day,list])=>{const dayTotal=list.reduce((sum,row)=>sum+Number(row.amount),0);return <section className="day day-ledger" key={day}><div className="day-heading"><div className="day-date"><small>{t('movements.day')}</small><h3>{formatDate(day,{weekday:'long',day:'numeric',month:'short',year:'numeric'})}</h3></div><div className="day-total"><small>{t('movements.dayTotal')}</small><strong className={dayTotal>0?'green':dayTotal<0?'red':'muted'}>{dayTotal>0?'+ ':''}{currency(dayTotal)}</strong></div></div><div className="tx-card day-transactions surface">{list.map(row=>{
       const rowCategory=categoryData(row.category_name);
       return <button type="button" className="transaction transaction-button" key={row.id} onClick={()=>open(row)}><CategoryIcon name={row.category_name} icon={rowCategory?.icon} color={rowCategory?.color}/><span><b>{row.note||row.category_name}</b><small>{row.category_name}{row.author_name?` · ${row.author_name}`:''}</small></span><strong className={Number(row.amount)>=0?'green':'red'}>{Number(row.amount)>=0?'+ ':''}{currency(Number(row.amount))}</strong></button>;
-    })}</div></section>})}
+    })}</div></section>})}</div>
     {rows.length<count&&<div className="pager progressive-pager"><AsyncButton variant="secondary" busy={loading} busyLabel="Caricamento…" onClick={()=>setPage(value=>value+1)}>Carica altri ({rows.length} di {count})</AsyncButton></div>}
 
     {editing&&<AdaptiveSheet open onClose={closeModal} title={modalView==='detail'?(editing.note||editing.category_name):modalView==='edit'?'Modifica movimento':'Elimina movimento'} eyebrow={modalView==='detail'?'Dettaglio movimento':modalView==='edit'?(editing.note||editing.category_name):'Conferma'} size={modalView==='detail'?'medium':'large'} busy={busy} dirty={editDirty} className="transaction-modal-card"><div className="transaction-sheet-body">
@@ -309,7 +319,7 @@ export default function Movimenti(){
       <section className="movement-filter-group"><h3>Tipo</h3><MovementFilterDropdown label={t('movements.type')} value={kindFilter} options={kindOptions} onChange={value=>{setKindFilter(value);setPage(1)}}/></section>
       {members.length>1&&<section className="movement-filter-group"><h3>{t('movements.by')}</h3><div className="filter-author-chips"><button type="button" className={!author?'active':''} aria-pressed={!author} onClick={()=>{setAuthor('');setPage(1)}}>{t('movements.all')}</button>{members.map(member=><button type="button" key={member.userId} className={author===member.userId?'active':''} aria-pressed={author===member.userId} onClick={()=>{setAuthor(member.userId);setPage(1)}}>{member.name}</button>)}</div></section>}
       <div className="movement-filter-status" role="status">{activeFilterCount?`${activeFilterCount} ${activeFilterCount===1?'filtro attivo':'filtri attivi'} · aggiornamento immediato`:'Nessun filtro attivo'}</div>
-      <button type="button" className="clear-filters-sheet" disabled={!activeFilterCount} onClick={()=>{setPeriodStart('');setPeriodEnd('');setAuthor('');setCategoryFilter('');setKindFilter('');setPage(1)}}>Azzera filtri</button>
+      <button type="button" className="clear-filters-sheet" disabled={!activeFilterCount} onClick={resetFilters}>Azzera filtri</button>
     </div></AdaptiveSheet>
   </>;
 }

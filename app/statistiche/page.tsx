@@ -10,7 +10,7 @@ import {onActiveSpaceChanged} from '../../lib/active-space-client';
 import {categoryStyle} from '../../lib/category-style';
 import {useSharedMonth} from '../../lib/selected-period-client';
 import {InlineError,Skeleton,SkeletonRows} from '../../components/UXFeedback';
-import {categoryIconAsset} from '../../lib/category-icon-assets';
+import CategoryColorIcon from '../../components/CategoryColorIcon';
 
 type Category={name:string;value:number;budget:number;budgetPercentage:number;icon?:string|null;color?:string|null};
 type Author={userId:string;name:string;value:number;percentage:number};
@@ -49,11 +49,11 @@ export default function Statistiche(){
     const radius=Number(props.outerRadius||0)+24;
     const x=Number(props.cx||0)+radius*Math.cos(angle);
     const y=Number(props.cy||0)+radius*Math.sin(angle);
-    const asset=categoryIconAsset(category.icon||categoryStyle(category.name).icon);
+    const style=categoryStyle(category.name,{icon:category.icon||undefined,color:category.color||undefined});
     const anchor=x>Number(props.cx||0)?'start':'end';
     const iconX=anchor==='start'?x-11:x-11;
     const textX=anchor==='start'?x+17:x-17;
-    return <g className="donut-category-label"><circle cx={x} cy={y} r="14" fill="var(--surface)" stroke="var(--line)"/>{asset?<image href={asset} x={iconX} y={y-11} width="22" height="22" preserveAspectRatio="xMidYMid meet"/>:<circle cx={x} cy={y} r="7" fill={category.color||categoryStyle(category.name).color}/>}<text x={textX} y={y+4} textAnchor={anchor} fill="var(--muted)" fontSize="10" fontWeight="700">{Math.round(percent*100)}%</text></g>;
+    return <g className="donut-category-label"><circle cx={x} cy={y} r="14" fill="var(--surface)" stroke="var(--line)"/><foreignObject x={iconX} y={y-11} width="22" height="22"><span className="donut-category-icon"><CategoryColorIcon icon={style.icon} size={22}/></span></foreignObject><text x={textX} y={y+4} textAnchor={anchor} fill="var(--muted)" fontSize="10" fontWeight="700">{Math.round(percent*100)}%</text></g>;
   }
   const selectedMonthName=stats?new Intl.DateTimeFormat(localeTag,{month:'long',timeZone:'UTC'}).format(new Date(`${stats.month}-01T00:00:00Z`)):'';
   const projectionCard=!stats

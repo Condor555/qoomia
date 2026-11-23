@@ -45,8 +45,10 @@ I pilastri dell'esperienza sono **Spazi Privati e Condivisi**, **Macro Budget e 
 
 ### Esperienza V4.1.5
 
-- hotfix iPhone 16: SpacePicker come vero popover ancorato al trigger (sotto o sopra secondo lo spazio disponibile), CTA movimento adattiva alla tastiera, conferma modifiche più leggibile e grabber rimosso dalle sheet con chiusura X;
-- donut Statistiche con label esterne che usano le icone Icons8 locali e legenda completa icona, categoria, importo e percentuale;
+- hotfix iPhone 16: SpacePicker come vero popover ancorato al trigger (sotto o sopra secondo lo spazio disponibile), CTA movimento compatta e adattiva alla tastiera, conferma modifiche più leggibile e grabber rimosso dalle sheet con chiusura X;
+- card Budget Home interamente tappabile, con accesso immediato e chevron discreto senza aggiungere una tab principale;
+- ricerca Movimenti con reset automatico alla cancellazione e chip dei filtri rimovibili singolarmente;
+- donut Statistiche con label esterne basate sulla stessa pipeline `CategoryColorIcon`/Icons8 locale e legenda completa icona, categoria, importo e percentuale;
 - componenti condivisi per skeleton, errori inline, stati vuoti, toast e pulsanti asincroni, senza falsi valori zero durante il caricamento;
 - barra Cerca movimenti con filtri immediati raccolti in `AdaptiveSheet` e indicatore dei filtri attivi;
 - detail, modifica, selezione categoria, categorie, ricorrenze, obiettivi, Budget e conferme uniformati con `AdaptiveSheet`;
