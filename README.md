@@ -6,7 +6,7 @@
 
 **Dai senso alle tue spese, in privato o in famiglia.**
 
-[![Versione](https://img.shields.io/badge/versione-4.1.3-0F766E?style=flat-square)](#stato-del-progetto)
+[![Versione](https://img.shields.io/badge/versione-4.1.4-0F766E?style=flat-square)](#stato-del-progetto)
 [![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3FCF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com/)
@@ -42,6 +42,15 @@ I pilastri dell'esperienza sono **Spazi Privati e Condivisi**, **Macro Budget e 
 - catalogo locale di icone categoria con ricerca e suggerimenti;
 - import CSV compatibile con intestazioni italiane e inglesi;
 - export CSV.
+
+### Esperienza V4.1.4
+
+- `AdaptiveSheet` condivisa con focus trap, Escape, ripristino del focus, blocco dello sfondo e presentazione adattiva mobile/desktop;
+- “Nuovo movimento” aperto come compose sheet tramite route intercettata, mantenendo `/nuovo` come pagina completa per URL diretto e refresh;
+- conferme distruttive coerenti al posto di `confirm()` e form di rinomina al posto di `prompt()`;
+- valori non ancora caricati mostrati come skeleton/“—”, senza falsi zeri;
+- caricamento differito del grafico Home e rendering diretto delle icone locali senza doppio preload;
+- nuovi indici PostgreSQL per lista, filtri e ricerca testuale dei movimenti.
 
 ### Budget e pianificazione
 
@@ -129,6 +138,7 @@ Per un'istanza esistente applicare soltanto le migration necessarie, nell'ordine
 - `20261120_v3_9_4_user_language.sql`.
 - `20261120_v4_1_savings_goals.sql`.
 - `20261120_v4_1_1_ux_icon_cleanup.sql`.
+- `20261123_v4_1_4_performance.sql`.
 
 Avviare quindi l'ambiente di sviluppo:
 
@@ -174,7 +184,7 @@ Verificare sempre i termini delle rispettive licenze prima di distribuire o modi
 
 ## Stato del progetto
 
-**Versione corrente: V4.1.3 Qoomia Icons8 Catalog.**
+**Versione corrente: V4.1.4 UX Foundation & Performance.**
 
 Sono implementati multiutente, Spazi Privati e Condivisi, movimenti, categorie per tipo e spazio, Budget con rollover, ricorrenze, statistiche, Obiettivi di risparmio, import/export CSV, i18n e PWA.
 

@@ -2,7 +2,7 @@
 
 import {useCallback,useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
-import {LineChart,Line,XAxis,YAxis,Tooltip,ResponsiveContainer,CartesianGrid} from 'recharts';
+import dynamic from 'next/dynamic';
 import Icon from '../components/Icon';
 import CategoryIcon from '../components/CategoryIcon';
 import MonthPicker from '../components/MonthPicker';
@@ -27,6 +27,7 @@ type Stats={
   savingGoals:Array<{id:string;name:string;icon:string;color:string;targetAmount:number;accumulated:number;remaining:number;progress:number;targetDate:string|null}>;
 };
 type Trend={month:string;income:number;expense:number};
+const HomeTrendChart=dynamic(()=>import('../components/HomeTrendChart'),{ssr:false,loading:()=> <div className="chart-skeleton" aria-label="Caricamento grafico"/>});
 
 export default function Home(){
   const {currency,localeTag,t}=useI18n();
@@ -92,20 +93,20 @@ export default function Home(){
   return <>
     <header className="page-head home-head"><div className="home-brand"><QoomiaLogo size={42}/><div><h1>Qoomia</h1><p>{t('home.subtitle')}</p></div></div><MonthPicker value={month} onChange={setMonth}/></header>
 
-    <section className="balance-card">
+    <section className={`balance-card${stats?'':' is-loading'}`} aria-busy={!stats}>
       <header><Icon name="wallet" size={18}/><span>{t('home.monthBalance')}</span><Icon name="chart" size={20}/></header>
-      <strong>{currency(stats?.balance||0)}</strong>
-      <div className="balance-average"><span>{t('home.dailyAverage')}</span><b>{currency(stats?.dailyAverageExpense||0)}</b><small>{stats?.daysConsidered?(stats.daysConsidered===1?t('home.elapsedOne'):t('home.elapsedMany',{count:stats.daysConsidered})):t('home.noElapsed')}</small></div>
+      <strong>{stats?currency(stats.balance):'—'}</strong>
+      <div className="balance-average"><span>{t('home.dailyAverage')}</span><b>{stats?currency(stats.dailyAverageExpense):'—'}</b><small>{stats?(stats.daysConsidered?(stats.daysConsidered===1?t('home.elapsedOne'):t('home.elapsedMany',{count:stats.daysConsidered})):t('home.noElapsed')):'Caricamento…'}</small></div>
     </section>
 
     <div className="money-grid">
-      <section className="money-card surface"><header><span>{t('common.incomes')}</span><Icon name="arrowUp" size={16}/></header><strong className="green">{currency(stats?.income||0)}</strong></section>
-      <section className="money-card surface"><header><span>{t('common.expenses')}</span><Icon name="arrowDown" size={16}/></header><strong className="red">{currency(stats?.expense||0)}</strong></section>
+      <section className={`money-card surface${stats?'':' is-loading'}`}><header><span>{t('common.incomes')}</span><Icon name="arrowUp" size={16}/></header><strong className="green">{stats?currency(stats.income):'—'}</strong></section>
+      <section className={`money-card surface${stats?'':' is-loading'}`}><header><span>{t('common.expenses')}</span><Icon name="arrowDown" size={16}/></header><strong className="red">{stats?currency(stats.expense):'—'}</strong></section>
     </div>
 
     <section className="section surface">
       <div className="section-title"><h2>{t('home.trend')}</h2><small>{t('home.lastSixMonths')}</small></div>
-      <div className="home-chart"><ResponsiveContainer width="100%" height="100%"><LineChart data={trends} margin={{top:8,right:8,left:-22,bottom:0}}><CartesianGrid stroke="var(--line)" vertical={false}/><XAxis dataKey="month" tickFormatter={value=>new Intl.DateTimeFormat(localeTag,{month:'short'}).format(new Date(`${value}-01`))} axisLine={false} tickLine={false}/><YAxis axisLine={false} tickLine={false}/><Tooltip formatter={(value,name)=>[currency(Number(value)),name==='income'?t('common.incomes'):t('common.expenses')]}/><Line dataKey="income" stroke="#35c38f" strokeWidth={3} dot={{r:3}}/><Line dataKey="expense" stroke="#ef6469" strokeWidth={3} dot={{r:3}}/></LineChart></ResponsiveContainer></div>
+      <div className="home-chart"><HomeTrendChart data={trends} currency={currency} localeTag={localeTag} incomeLabel={t('common.incomes')} expenseLabel={t('common.expenses')}/></div>
       <div className="chart-key"><span><i className="key-green"/>{t('common.incomes')}</span><span><i className="key-red"/>{t('common.expenses')}</span></div>
     </section>
 
@@ -127,7 +128,7 @@ export default function Home(){
     </section>
 
     <section className="section surface">
-      <div className="section-title"><h2>{t('home.topCategories')}</h2><small>{t('home.movementsCount',{count:stats?.count||0})}</small></div>
+      <div className="section-title"><h2>{t('home.topCategories')}</h2><small>{stats?t('home.movementsCount',{count:stats.count}):'Caricamento…'}</small></div>
       {stats?.categories?.slice(0,5).map(category=>{
         const style=categoryStyle(category.name);
         return <div className="category-row" key={category.name}><CategoryIcon name={category.name}/><div className="category-main"><div className="category-row-head"><b>{category.name}</b><strong>{currency(category.value)}</strong></div><div className="category-progress-row"><div className="progress"><span style={{width:`${Math.max(4,category.value/(stats.categories[0]?.value||1)*100)}%`,background:style.color}}/></div><small className="category-percentage">{Math.round(category.value/total*100)}%</small></div></div></div>;

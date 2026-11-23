@@ -11,8 +11,9 @@ type Category={name:string;kind:'expense'|'income';icon?:string|null;color?:stri
 type Space=SpacePickerOption;
 type Kind='expense'|'income';
 type Suggestion={note:string;category:string|null;categoryConfidence:number;frequency:number;lastUsed:string|null};
+type NewTransactionComposerProps={embedded?:boolean;onSaved?:()=>void;onDirtyChange?:(dirty:boolean)=>void};
 
-export default function Nuovo(){
+export function NewTransactionComposer({embedded=false,onSaved,onDirtyChange}:NewTransactionComposerProps){
   const {currency,t}=useI18n();
   const [amount,setAmount]=useState('');
   const [note,setNote]=useState('');
@@ -51,6 +52,8 @@ export default function Nuovo(){
       })
       .catch(()=>{setMessage('Errore di connessione.');setLoadingSpace(false);});
   },[]);
+
+  useEffect(()=>{onDirtyChange?.(Boolean(amount.trim()||note.trim()||category||recurring))},[amount,note,category,recurring,onDirtyChange]);
 
   async function loadDestination(targetSpaceId:string){
     const request=++destinationRequestRef.current;
@@ -92,7 +95,7 @@ export default function Nuovo(){
       suppressAutocompleteRef.current=false;
       return;
     }
-    if(clean.length<2||!spaceId||loadingSpace){
+    if(clean.length<3||!spaceId||loadingSpace){
       suggestionRequestRef.current++;
       setSuggestions([]);
       setSuggestionsOpen(false);
@@ -120,13 +123,13 @@ export default function Nuovo(){
       }finally{
         if(request===suggestionRequestRef.current)setSuggestionsBusy(false);
       }
-    },240);
+    },320);
     return()=>{clearTimeout(timer);controller.abort();};
   },[note,spaceId,loadingSpace,categories,kind]);
 
   function changeNote(value:string){
     setNote(value);
-    if(value.trim().length<2){setSuggestions([]);setSuggestionsOpen(false);}
+    if(value.trim().length<3){setSuggestions([]);setSuggestionsOpen(false);}
   }
 
   function selectSuggestion(suggestion:Suggestion){
@@ -185,6 +188,7 @@ export default function Nuovo(){
       }
       setMessage(t('new.saved'));
       setAmount('');setNote('');setCategory('');setSuggestions([]);setSuggestionsOpen(false);setRecurring(false);
+      onSaved?.();
     }catch{setMessage('Errore di connessione.');}
     finally{setBusy(false);}
   }
@@ -195,8 +199,8 @@ export default function Nuovo(){
   function chooseKind(next:Kind){if(next===kind)return;setKind(next);setCategory('');setSuggestions([]);setSuggestionsOpen(false);suggestionRequestRef.current++;}
 
   return <>
-    <header className="page-head"><div><h1>{t('new.title')}</h1><p>{t('new.subtitle')}</p></div></header>
-    <section className="entry-card surface">
+    {!embedded&&<header className="page-head"><div><h1>{t('new.title')}</h1><p>{t('new.subtitle')}</p></div></header>}
+    <section className={`entry-card surface${embedded?' entry-card-embedded':''}`}>
       <SpacePicker spaces={spaces} value={spaceId} onChange={chooseSpace} variant="destination" label={t('space.destination')} help={t('new.destinationHelp')} disabled={busy||loadingSpace}/>
       <div className="segmented"><button type="button" className={kind==='expense'?'active':''} onClick={()=>chooseKind('expense')}>{t('common.expense')}</button><button type="button" className={kind==='income'?'active':''} onClick={()=>chooseKind('income')}>{t('common.income')}</button></div>
       <AmountExpressionInput className="amount-input-wrap" value={amount} onChange={setAmount} ariaLabel={t('new.amount')}/>
@@ -209,4 +213,8 @@ export default function Nuovo(){
       {message&&<div className="notice" role="status">{message}</div>}
     </section>
   </>;
+}
+
+export default function Nuovo(){
+  return <NewTransactionComposer/>;
 }

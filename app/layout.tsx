@@ -23,9 +23,9 @@ export const viewport:Viewport={
   initialScale:1,
   viewportFit:'cover',
   colorScheme:'light dark',
-  themeColor:[{media:'(prefers-color-scheme: light)',color:'#F8FAFC'},{media:'(prefers-color-scheme: dark)',color:'#090D16'}],
+  themeColor:[{media:'(prefers-color-scheme: light)',color:'#F2F2F7'},{media:'(prefers-color-scheme: dark)',color:'#000000'}],
 };
 
-export default function Layout({children}:{children:React.ReactNode}){
-  return <html lang="it" suppressHydrationWarning><body><ThemeProvider/><LanguageProvider><main className="shell"><AppHeader/>{children}</main><Nav/></LanguageProvider></body></html>;
+export default function Layout({children,modal}:{children:React.ReactNode;modal:React.ReactNode}){
+  return <html lang="it" suppressHydrationWarning><body><ThemeProvider/><LanguageProvider><main className="shell"><AppHeader/>{children}</main><Nav/>{modal}</LanguageProvider></body></html>;
 }

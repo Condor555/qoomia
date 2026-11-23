@@ -2,6 +2,7 @@
 
 import {useEffect,useMemo,useRef,useState} from 'react';
 import AmountExpressionInput from '../../components/AmountExpressionInput';
+import AdaptiveSheet from '../../components/AdaptiveSheet';
 import Icon from '../../components/Icon';
 import CategoryIcon from '../../components/CategoryIcon';
 import DateRangePicker,{type DateRange} from '../../components/DateRangePicker';
@@ -102,9 +103,10 @@ export default function Movimenti(){
       .then(({response,result})=>{
         if(request!==listRequestRef.current)return;
         if(!response.ok)throw new Error(result.error||'Impossibile caricare i movimenti.');
-        setRows(Array.isArray(result.data)?result.data:[]);setCount(Number(result.count||0));
+        const nextRows:Array<Transaction>=Array.isArray(result.data)?result.data:[];
+        setRows(current=>page===1?nextRows:[...current,...nextRows.filter(row=>!current.some(item=>item.id===row.id))]);setCount(Number(result.count||0));
       })
-      .catch(error=>{if(error?.name!=='AbortError'&&request===listRequestRef.current){setRows([]);setCount(0);setError(error?.message||'Errore di connessione.')}})
+      .catch(error=>{if(error?.name!=='AbortError'&&request===listRequestRef.current){if(page===1){setRows([]);setCount(0)}setError(error?.message||'Errore di connessione.')}})
       .finally(()=>{if(request===listRequestRef.current)setLoading(false)});
     return()=>controller.abort();
   },[debouncedQ,periodStart,periodEnd,author,categoryFilter,kindFilter,page,spaceId,reloadToken]);
@@ -118,16 +120,7 @@ export default function Movimenti(){
   function changeRange(range:DateRange){setPeriodStart(range.start);setPeriodEnd(range.end);setPage(1)}
   const hasFilters=Boolean(q||periodStart||periodEnd||author||categoryFilter||kindFilter);
   function clearFilters(){setQ('');setDebouncedQ('');setPeriodStart('');setPeriodEnd('');setAuthor('');setCategoryFilter('');setKindFilter('');setPage(1)}
-  function refresh(){setReloadToken(value=>value+1)}
-
-  useEffect(()=>{
-    if(!editing)return;
-    function onKeyDown(event:KeyboardEvent){
-      if(event.key==='Escape'&&!busy)closeModal();
-    }
-    window.addEventListener('keydown',onKeyDown);
-    return()=>window.removeEventListener('keydown',onKeyDown);
-  },[editing,busy]);
+  function refresh(){setPage(1);setReloadToken(value=>value+1)}
 
   const groups=useMemo(()=>rows.reduce<Record<string,Transaction[]>>((all,row)=>{
     (all[row.date]||=[]).push(row);
@@ -240,9 +233,9 @@ export default function Movimenti(){
       const rowCategory=categoryData(row.category_name);
       return <button type="button" className="transaction transaction-button" key={row.id} onClick={()=>open(row)}><CategoryIcon name={row.category_name} icon={rowCategory?.icon} color={rowCategory?.color}/><span><b>{row.note||row.category_name}</b><small>{row.category_name}{row.author_name?` · ${row.author_name}`:''}</small></span><strong className={Number(row.amount)>=0?'green':'red'}>{Number(row.amount)>=0?'+ ':''}{currency(Number(row.amount))}</strong></button>;
     })}</div></section>})}
-    <div className="pager"><button disabled={page===1||loading} onClick={()=>setPage(value=>Math.max(1,value-1))}>{t('movements.previous')}</button><span>{page}</span><button disabled={page*30>=count||loading} onClick={()=>setPage(value=>value+1)}>{t('movements.next')}</button></div>
+    {rows.length<count&&<div className="pager progressive-pager"><button disabled={loading} onClick={()=>setPage(value=>value+1)}>{loading?'Caricamento…':`Carica altri (${rows.length} di ${count})`}</button></div>}
 
-    {editing&&<div className="modal transaction-modal" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget&&!busy)closeModal()}}><div className="modal-card transaction-modal-card surface" role="dialog" aria-modal="true" aria-labelledby="transaction-modal-title">
+    {editing&&<AdaptiveSheet open onClose={closeModal} title={modalView==='detail'?'Dettaglio movimento':modalView==='edit'?'Modifica movimento':'Elimina movimento'} size={modalView==='detail'?'medium':'large'} busy={busy} showHeader={false} className="transaction-modal-card"><div className="transaction-sheet-body">
       {modalView==='detail'&&<>
         <header className="transaction-modal-head">
           <div><span className="transaction-eyebrow">Dettaglio movimento</span><h2 id="transaction-modal-title">{editing.note||editing.category_name}</h2></div>
@@ -290,6 +283,6 @@ export default function Movimenti(){
         {modalMsg&&<div className="notice" role="status">{modalMsg}</div>}
         <div className="transaction-confirm-actions"><button type="button" className="secondary" disabled={busy} onClick={()=>{setModalView('detail');setModalMsg('')}}>Annulla</button><button type="button" className="delete-btn" disabled={busy} onClick={remove}>{busy?'Eliminazione…':'Elimina definitivamente'}</button></div>
       </section>}
-    </div></div>}
+    </div></AdaptiveSheet>}
   </>;
 }

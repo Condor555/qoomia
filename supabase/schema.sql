@@ -2,6 +2,7 @@
 -- Per aggiornare un database esistente usare supabase/migrations/20261119_v3_6_multiuser.sql.
 
 create extension if not exists pgcrypto;
+create extension if not exists pg_trgm;
 
 create table public.profiles(
   user_id uuid primary key references auth.users(id) on delete cascade,
@@ -64,6 +65,10 @@ create table public.space_delete_votes(
 create unique index spaces_one_personal_per_user on public.spaces(created_by) where type='personal';
 create index transactions_space_date_idx on public.transactions(space_id,date desc);
 create index transactions_space_author_idx on public.transactions(space_id,created_by);
+create index transactions_space_date_created_idx on public.transactions(space_id,date desc,created_at desc);
+create index transactions_space_category_date_idx on public.transactions(space_id,category_name,date desc);
+create index transactions_space_author_date_idx on public.transactions(space_id,created_by,date desc);
+create index transactions_note_trgm_idx on public.transactions using gin(note gin_trgm_ops);
 create index recurring_space_next_idx on public.recurring_transactions(space_id,next_run) where active=true;
 
 create or replace function public.stamp_transaction_scope()
