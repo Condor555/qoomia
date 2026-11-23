@@ -57,7 +57,8 @@ I pilastri dell'esperienza sono **Spazi Privati e Condivisi**, **Macro Budget e 
 - Category Picker con ricerca, categorie recenti/frequenti e icone Icons8 Color locali;
 - Home focalizzata su saldo, flussi, Budget, movimenti recenti, obiettivi e categorie principali;
 - report per categoria con icone e collegamento ai Movimenti già filtrati;
-- CSS iPhone/PWA consolidato mantenendo lo sheet flottante e il DateInput V4.1.4.
+- CSS iPhone/PWA consolidato mantenendo lo sheet flottante e il DateInput V4.1.4;
+- `ToastProvider` collocato nel layout condiviso: `/nuovo`, la route modale e il prerender Next.js usano lo stesso contesto senza errori.
 
 ### Esperienza V4.1.4
 
