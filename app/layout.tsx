@@ -2,9 +2,8 @@ import type {Metadata,Viewport} from 'next';
 import AppHeader from '../components/AppHeader';
 import LanguageProvider from '../components/LanguageProvider';
 import Nav from '../components/Nav';
+import FloatingAddMovement from '../components/FloatingAddMovement';
 import ThemeProvider from '../components/ThemeProvider';
-import ToastProvider from '../components/ToastProvider';
-import TransactionFab from '../components/TransactionFab';
 import './globals.css';
 
 const siteUrl=process.env.NEXT_PUBLIC_SITE_URL||'https://qoomia.vercel.app';
@@ -25,9 +24,9 @@ export const viewport:Viewport={
   initialScale:1,
   viewportFit:'cover',
   colorScheme:'light dark',
-  themeColor:[{media:'(prefers-color-scheme: light)',color:'#F2F2F7'},{media:'(prefers-color-scheme: dark)',color:'#000000'}],
+  themeColor:[{media:'(prefers-color-scheme: light)',color:'#F8FAFC'},{media:'(prefers-color-scheme: dark)',color:'#090D16'}],
 };
 
-export default function Layout({children,modal}:{children:React.ReactNode;modal:React.ReactNode}){
-  return <html lang="it" suppressHydrationWarning><body><ThemeProvider/><LanguageProvider><ToastProvider><main className="shell"><AppHeader/>{children}</main><TransactionFab/><Nav/>{modal}</ToastProvider></LanguageProvider></body></html>;
+export default function Layout({children}:{children:React.ReactNode}){
+  return <html lang="it" suppressHydrationWarning><body><ThemeProvider/><LanguageProvider><main className="shell"><AppHeader/>{children}</main><FloatingAddMovement/><Nav/></LanguageProvider></body></html>;
 }

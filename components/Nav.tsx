@@ -39,7 +39,8 @@ const navigationTabs: NavigationTab[] = [
     label: 'nav.statistics',
     icon: 'chart',
     isActive: (pathname) =>
-      pathname === '/statistiche' || pathname.startsWith('/statistiche/'),
+      pathname === '/statistiche' ||
+      pathname.startsWith('/statistiche/'),
   },
   {
     href: '/account',
@@ -95,5 +96,3 @@ export default function Nav() {
     </nav>
   );
 }
-
-

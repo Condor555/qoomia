@@ -2,10 +2,6 @@
 
 import {useEffect,useMemo,useRef,useState} from 'react';
 import AmountExpressionInput from '../../components/AmountExpressionInput';
-import AdaptiveSheet from '../../components/AdaptiveSheet';
-import CategoryPickerSheet from '../../components/CategoryPickerSheet';
-import ConfirmDialog from '../../components/ConfirmDialog';
-import DateInput from '../../components/DateInput';
 import Icon from '../../components/Icon';
 import CategoryIcon from '../../components/CategoryIcon';
 import DateRangePicker,{type DateRange} from '../../components/DateRangePicker';
@@ -13,8 +9,6 @@ import MovementFilterDropdown from '../../components/MovementFilterDropdown';
 import {onActiveSpaceChanged} from '../../lib/active-space-client';
 import {amountForSave} from '../../lib/amount-expression';
 import {useI18n} from '../../components/LanguageProvider';
-import {AsyncButton,EmptyState,InlineError,SkeletonRows} from '../../components/UXFeedback';
-import {useToast} from '../../components/ToastProvider';
 
 type Transaction={
   id:string;
@@ -35,10 +29,43 @@ type Member={userId:string;name:string};
 type Kind='expense'|'income';
 type Scope='occurrence'|'series';
 type ModalView='detail'|'edit'|'delete';
+type ViewMode='list'|'calendar';
+
+function localDateKey(value=new Date()){
+  const year=value.getFullYear();
+  const month=String(value.getMonth()+1).padStart(2,'0');
+  const day=String(value.getDate()).padStart(2,'0');
+  return `${year}-${month}-${day}`;
+}
+
+function currentMonthKey(){return localDateKey().slice(0,7)}
+
+function monthBounds(month:string){
+  const [year,monthNumber]=month.split('-').map(Number);
+  const lastDay=new Date(year,monthNumber,0).getDate();
+  return {start:`${month}-01`,end:`${month}-${String(lastDay).padStart(2,'0')}`};
+}
+
+function moveMonth(month:string,offset:number){
+  const [year,monthNumber]=month.split('-').map(Number);
+  const next=new Date(year,monthNumber-1+offset,1,12);
+  return `${next.getFullYear()}-${String(next.getMonth()+1).padStart(2,'0')}`;
+}
+
+function calendarCells(month:string){
+  const [year,monthNumber]=month.split('-').map(Number);
+  const first=new Date(year,monthNumber-1,1,12);
+  const mondayOffset=(first.getDay()+6)%7;
+  const daysInMonth=new Date(year,monthNumber,0).getDate();
+  const cells=Math.ceil((mondayOffset+daysInMonth)/7)*7;
+  return Array.from({length:cells},(_,index)=>{
+    const value=new Date(year,monthNumber-1,index-mondayOffset+1,12);
+    return {key:localDateKey(value),day:value.getDate(),inMonth:value.getMonth()===monthNumber-1};
+  });
+}
 
 export default function Movimenti(){
-  const {currency,date:formatDate,t}=useI18n();
-  const {showToast}=useToast();
+  const {currency,date:formatDate,localeTag,t}=useI18n();
   const [rows,setRows]=useState<Transaction[]>([]);
   const [categories,setCategories]=useState<Category[]>([]);
   const [members,setMembers]=useState<Member[]>([]);
@@ -55,6 +82,9 @@ export default function Movimenti(){
   const [error,setError]=useState('');
   const [loading,setLoading]=useState(false);
   const [reloadToken,setReloadToken]=useState(0);
+  const [viewMode,setViewMode]=useState<ViewMode>('list');
+  const [calendarMonth,setCalendarMonth]=useState(currentMonthKey);
+  const [selectedDay,setSelectedDay]=useState(localDateKey);
 
   const [editing,setEditing]=useState<Transaction|null>(null);
   const [modalView,setModalView]=useState<ModalView>('detail');
@@ -67,10 +97,6 @@ export default function Movimenti(){
   const [scope,setScope]=useState<Scope>('occurrence');
   const [busy,setBusy]=useState(false);
   const [modalMsg,setModalMsg]=useState('');
-  const [categoryPickerOpen,setCategoryPickerOpen]=useState(false);
-  const [discardEditOpen,setDiscardEditOpen]=useState(false);
-  const [filtersOpen,setFiltersOpen]=useState(false);
-  const [urlReady,setUrlReady]=useState(false);
   const listRequestRef=useRef(0);
   const metadataRequestRef=useRef(0);
   const listAbortRef=useRef<AbortController|null>(null);
@@ -96,23 +122,19 @@ export default function Movimenti(){
   },[q]);
 
   useEffect(()=>{
-    const params=new URLSearchParams(window.location.search);
-    const nextQuery=params.get('q')||'';
-    setQ(nextQuery);setDebouncedQ(nextQuery.trim());
-    setPeriodStart(params.get('start')||'');setPeriodEnd(params.get('end')||'');
-    setCategoryFilter(params.get('category')||'');setKindFilter(params.get('kind')||'');setAuthor(params.get('author')||'');
-    setUrlReady(true);
-  },[]);
-
-  useEffect(()=>{
-    if(!urlReady)return;
     const request=++listRequestRef.current;
     listAbortRef.current?.abort();
     const controller=new AbortController();listAbortRef.current=controller;
-    const params=new URLSearchParams({page:String(page)});
+    const calendarRange=monthBounds(calendarMonth);
+    const params=new URLSearchParams({page:String(viewMode==='calendar'?1:page),size:viewMode==='calendar'?'500':'30'});
     if(debouncedQ)params.set('q',debouncedQ);
-    if(periodStart)params.set('start',periodStart);
-    if(periodEnd)params.set('end',periodEnd);
+    if(viewMode==='calendar'){
+      params.set('start',calendarRange.start);
+      params.set('end',calendarRange.end);
+    }else{
+      if(periodStart)params.set('start',periodStart);
+      if(periodEnd)params.set('end',periodEnd);
+    }
     if(author)params.set('author',author);
     if(categoryFilter)params.set('category',categoryFilter);
     if(kindFilter)params.set('kind',kindFilter);
@@ -123,37 +145,41 @@ export default function Movimenti(){
       .then(({response,result})=>{
         if(request!==listRequestRef.current)return;
         if(!response.ok)throw new Error(result.error||'Impossibile caricare i movimenti.');
-        const nextRows:Array<Transaction>=Array.isArray(result.data)?result.data:[];
-        setRows(current=>page===1?nextRows:[...current,...nextRows.filter(row=>!current.some(item=>item.id===row.id))]);setCount(Number(result.count||0));
+        setRows(Array.isArray(result.data)?result.data:[]);setCount(Number(result.count||0));
       })
-      .catch(error=>{if(error?.name!=='AbortError'&&request===listRequestRef.current){if(page===1){setRows([]);setCount(0)}setError(error?.message||'Errore di connessione.')}})
+      .catch(error=>{if(error?.name!=='AbortError'&&request===listRequestRef.current){setRows([]);setCount(0);setError(error?.message||'Errore di connessione.')}})
       .finally(()=>{if(request===listRequestRef.current)setLoading(false)});
     return()=>controller.abort();
-  },[urlReady,debouncedQ,periodStart,periodEnd,author,categoryFilter,kindFilter,page,spaceId,reloadToken]);
+  },[debouncedQ,periodStart,periodEnd,author,categoryFilter,kindFilter,page,spaceId,reloadToken,viewMode,calendarMonth]);
 
   useEffect(()=>{loadMetadata()},[]);
   useEffect(()=>onActiveSpaceChanged(id=>{
     listRequestRef.current++;listAbortRef.current?.abort();metadataRequestRef.current++;
-    setSpaceId(id);setRows([]);setCount(0);setPage(1);setAuthor('');setEditing(null);void loadMetadata(id);
+    setSpaceId(id);setRows([]);setCount(0);setPage(1);setAuthor('');setCategoryFilter('');setEditing(null);void loadMetadata(id);
   }),[]);
 
   function changeRange(range:DateRange){setPeriodStart(range.start);setPeriodEnd(range.end);setPage(1)}
-  const activeFilterCount=[Boolean(periodStart||periodEnd),Boolean(author),Boolean(categoryFilter),Boolean(kindFilter)].filter(Boolean).length;
-  function refresh(){setPage(1);setReloadToken(value=>value+1)}
-  function changeSearch(value:string){
-    setQ(value);
-    if(!value.trim()){
-      setDebouncedQ('');
-      setPage(1);
-      setError('');
+  const hasFilters=Boolean(q||periodStart||periodEnd||author||categoryFilter||kindFilter);
+  function clearFilters(){setQ('');setDebouncedQ('');setPeriodStart('');setPeriodEnd('');setAuthor('');setCategoryFilter('');setKindFilter('');setPage(1)}
+  function refresh(){setReloadToken(value=>value+1)}
+
+  useEffect(()=>{
+    if(!editing)return;
+    function onKeyDown(event:KeyboardEvent){
+      if(event.key==='Escape'&&!busy)closeModal();
     }
-  }
-  function resetFilters(){setPeriodStart('');setPeriodEnd('');setAuthor('');setCategoryFilter('');setKindFilter('');setPage(1);setError('')}
+    window.addEventListener('keydown',onKeyDown);
+    return()=>window.removeEventListener('keydown',onKeyDown);
+  },[editing,busy]);
 
   const groups=useMemo(()=>rows.reduce<Record<string,Transaction[]>>((all,row)=>{
     (all[row.date]||=[]).push(row);
     return all;
   },{}),[rows]);
+  const calendarDays=useMemo(()=>calendarCells(calendarMonth),[calendarMonth]);
+  const weekdayLabels=useMemo(()=>Array.from({length:7},(_,index)=>new Intl.DateTimeFormat(localeTag,{weekday:'narrow'}).format(new Date(2026,10,2+index,12))),[localeTag]);
+  const calendarTitle=useMemo(()=>new Intl.DateTimeFormat(localeTag,{month:'long',year:'numeric'}).format(new Date(`${calendarMonth}-01T12:00:00`)),[calendarMonth,localeTag]);
+  const selectedRows=useMemo(()=>groups[selectedDay]||[],[groups,selectedDay]);
   const categoryOptions=useMemo(()=>[
     {value:'',label:t('movements.allCategories')},
     ...categories.map(item=>({value:item.name,label:item.name})),
@@ -166,6 +192,23 @@ export default function Movimenti(){
 
   function categoryData(name:string){
     return categories.find(item=>item.name===name);
+  }
+
+  function setMode(next:ViewMode){
+    setViewMode(next);
+    setPage(1);
+    if(next==='calendar'){
+      const nextMonth=periodStart?.slice(0,7)||currentMonthKey();
+      setCalendarMonth(nextMonth);
+      setSelectedDay(nextMonth===currentMonthKey()?localDateKey():`${nextMonth}-01`);
+    }
+  }
+
+  function changeCalendarMonth(offset:number){
+    const next=moveMonth(calendarMonth,offset);
+    setCalendarMonth(next);
+    setSelectedDay(next===currentMonthKey()?localDateKey():`${next}-01`);
+    setPage(1);
   }
 
   function open(row:Transaction){
@@ -189,6 +232,7 @@ export default function Movimenti(){
 
   const recurring=editing?.source==='recurring'&&Boolean(editing.recurring_id||editing.source_id);
   const activeCategory=editing?categoryData(editing.category_name):undefined;
+  const editCategories=categories.filter(item=>item.kind===kind);
   function changeEditKind(next:Kind){if(next===kind)return;setKind(next);setCategory(categories.find(item=>item.kind===next)?.name||'');}
 
   async function save(){
@@ -216,7 +260,6 @@ export default function Movimenti(){
         return;
       }
       closeModal();
-      showToast({message:'Movimento aggiornato.',tone:'success'});
       refresh();
     }catch{
       setModalMsg('Errore di connessione.');
@@ -237,7 +280,6 @@ export default function Movimenti(){
         return;
       }
       closeModal();
-      showToast({message:'Movimento eliminato.',tone:'success'});
       refresh();
     }catch{
       setModalMsg('Errore di connessione.');
@@ -246,33 +288,48 @@ export default function Movimenti(){
     }
   }
 
-  const editDirty=Boolean(editing&&modalView==='edit'&&(
-    date!==editing.date||category!==editing.category_name||
-    amount!==String(Math.abs(Number(editing.amount))).replace('.',',')||
-    note!==(editing.note||'')||account!==(editing.account_name||'Spese')||
-    kind!==(Number(editing.amount)<0?'expense':'income')
-  ));
-  function cancelEdit(){if(editDirty)setDiscardEditOpen(true);else setModalView('detail')}
-  function discardEdit(){
-    if(editing){setDate(editing.date);setCategory(editing.category_name);setAmount(String(Math.abs(Number(editing.amount))).replace('.',','));setNote(editing.note||'');setAccount(editing.account_name||'Spese');setKind(Number(editing.amount)<0?'expense':'income')}
-    setDiscardEditOpen(false);setModalMsg('');setModalView('detail');
+  function transactionButton(row:Transaction){
+    const rowCategory=categoryData(row.category_name);
+    return <button type="button" className="transaction transaction-button" key={row.id} onClick={()=>open(row)}><CategoryIcon name={row.category_name} icon={rowCategory?.icon} color={rowCategory?.color}/><span><b>{row.note||row.category_name}</b><small>{row.category_name}{row.author_name?` · ${row.author_name}`:''}</small></span><strong className={Number(row.amount)>=0?'green':'red'}>{Number(row.amount)>=0?'+ ':''}{currency(Number(row.amount))}</strong></button>;
   }
 
   return <>
-    <header className="page-head"><div><h1>{t('movements.title')}</h1><p>{loading?t('movements.updating'):count===1?t('movements.one'):t('movements.many',{count})}</p></div></header>
-    <div className="movement-search-toolbar"><div className="search-box surface"><Icon name="search" size={19}/><input value={q} onChange={event=>changeSearch(event.target.value)} placeholder={t('movements.search')} aria-label={t('movements.search')}/>{q&&<button type="button" className="search-clear" aria-label="Cancella ricerca" onClick={()=>changeSearch('')}>×</button>}</div><button type="button" className={`movement-filter-button${activeFilterCount?' active':''}`} aria-label={activeFilterCount?`Filtri, ${activeFilterCount} attivi`:'Apri filtri'} aria-haspopup="dialog" onClick={()=>setFiltersOpen(true)}><Icon name="more" size={22}/>{activeFilterCount>0&&<span aria-hidden="true">{activeFilterCount}</span>}</button></div>
-    {activeFilterCount>0&&<div className="movement-active-filters" aria-label="Filtri attivi">{(periodStart||periodEnd)&&<button type="button" onClick={()=>changeRange({start:'',end:''})}><span>Periodo</span><b aria-hidden="true">×</b></button>}{categoryFilter&&<button type="button" onClick={()=>{setCategoryFilter('');setPage(1)}}><span>{categoryFilter}</span><b aria-hidden="true">×</b></button>}{kindFilter&&<button type="button" onClick={()=>{setKindFilter('');setPage(1)}}><span>{kindFilter==='expense'?'Uscite':'Entrate'}</span><b aria-hidden="true">×</b></button>}{author&&<button type="button" onClick={()=>{setAuthor('');setPage(1)}}><span>{members.find(member=>member.userId===author)?.name||'Autore'}</span><b aria-hidden="true">×</b></button>}<button type="button" className="movement-reset-shortcut" onClick={resetFilters}>Azzera</button></div>}
-    {error&&<InlineError message={error} onRetry={refresh}/>}
-    {loading&&page===1&&!rows.length&&<div className="movement-loading surface"><SkeletonRows rows={5}/></div>}
-    {!loading&&!error&&!rows.length&&<EmptyState title={t('movements.empty')} description={t('movements.emptyHelp')} icon="list"/>}
-    <div className={loading&&rows.length?'movement-results is-updating':'movement-results'} aria-busy={loading}>{Object.entries(groups).map(([day,list])=>{const dayTotal=list.reduce((sum,row)=>sum+Number(row.amount),0);return <section className="day day-ledger" key={day}><div className="day-heading"><div className="day-date"><small>{t('movements.day')}</small><h3>{formatDate(day,{weekday:'long',day:'numeric',month:'short',year:'numeric'})}</h3></div><div className="day-total"><small>{t('movements.dayTotal')}</small><strong className={dayTotal>0?'green':dayTotal<0?'red':'muted'}>{dayTotal>0?'+ ':''}{currency(dayTotal)}</strong></div></div><div className="tx-card day-transactions surface">{list.map(row=>{
-      const rowCategory=categoryData(row.category_name);
-      return <button type="button" className="transaction transaction-button" key={row.id} onClick={()=>open(row)}><CategoryIcon name={row.category_name} icon={rowCategory?.icon} color={rowCategory?.color}/><span><b>{row.note||row.category_name}</b><small>{row.category_name}{row.author_name?` · ${row.author_name}`:''}</small></span><strong className={Number(row.amount)>=0?'green':'red'}>{Number(row.amount)>=0?'+ ':''}{currency(Number(row.amount))}</strong></button>;
-    })}</div></section>})}</div>
-    {rows.length<count&&<div className="pager progressive-pager"><AsyncButton variant="secondary" busy={loading} busyLabel="Caricamento…" onClick={()=>setPage(value=>value+1)}>Carica altri ({rows.length} di {count})</AsyncButton></div>}
+    <header className="page-head movements-head"><div><h1>{t('movements.title')}</h1><p>{loading?t('movements.updating'):count===1?t('movements.one'):t('movements.many',{count})}</p></div><div className="movement-view-toggle" role="group" aria-label={t('movements.title')}><button type="button" className={viewMode==='list'?'active':''} aria-pressed={viewMode==='list'} onClick={()=>setMode('list')}><Icon name="list" size={18}/><span>{t('movements.listView')}</span></button><button type="button" className={viewMode==='calendar'?'active':''} aria-pressed={viewMode==='calendar'} onClick={()=>setMode('calendar')}><Icon name="calendar" size={18}/><span>{t('movements.calendarView')}</span></button></div></header>
+    <div className="search-box surface"><Icon name="search" size={19}/><input value={q} onChange={event=>setQ(event.target.value)} placeholder={t('movements.search')} aria-label={t('movements.search')}/>{q&&<button type="button" className="search-clear" aria-label={t('movements.clearFilters')} onClick={()=>{setQ('');setDebouncedQ('');setPage(1)}}>×</button>}</div>
+    <div className="live-filter-bar">
+      {viewMode==='list'&&<DateRangePicker start={periodStart} end={periodEnd} onChange={changeRange}/>}
+      <MovementFilterDropdown label={t('movements.category')} value={categoryFilter} options={categoryOptions} onChange={value=>{setCategoryFilter(value);setPage(1)}}/>
+      <MovementFilterDropdown label={t('movements.type')} value={kindFilter} options={kindOptions} onChange={value=>{setKindFilter(value);setPage(1)}}/>
+      {hasFilters&&<button type="button" className="clear-filters" onClick={clearFilters}>{t('movements.clearFilters')}</button>}
+    </div>
+    {members.length>1&&<div className="author-filter" aria-label={t('movements.by')}><span>{t('movements.by')}</span><div><button type="button" className={!author?'active':''} aria-pressed={!author} onClick={()=>{setAuthor('');setPage(1)}}>{t('movements.all')}</button>{members.map(member=><button type="button" key={member.userId} className={author===member.userId?'active':''} aria-pressed={author===member.userId} onClick={()=>{setAuthor(member.userId);setPage(1)}}>{member.name}</button>)}</div></div>}
+    {error&&<div className="auth-error" role="alert">{error}</div>}
+    {viewMode==='list'&&<>
+      {!loading&&!error&&!rows.length&&<div className="empty-state surface"><b>{t('movements.empty')}</b><p>{t('movements.emptyHelp')}</p></div>}
+      {Object.entries(groups).map(([day,list])=>{const dayTotal=list.reduce((sum,row)=>sum+Number(row.amount),0);return <section className="day day-ledger" key={day}><div className="day-heading"><div className="day-date"><small>{t('movements.day')}</small><h3>{formatDate(day,{weekday:'long',day:'numeric',month:'short',year:'numeric'})}</h3></div><div className="day-total"><small>{t('movements.dayTotal')}</small><strong className={dayTotal>0?'green':dayTotal<0?'red':'muted'}>{dayTotal>0?'+ ':''}{currency(dayTotal)}</strong></div></div><div className="tx-card day-transactions surface">{list.map(transactionButton)}</div></section>})}
+      <div className="pager"><button disabled={page===1||loading} onClick={()=>setPage(value=>Math.max(1,value-1))}>{t('movements.previous')}</button><span>{page}</span><button disabled={page*30>=count||loading} onClick={()=>setPage(value=>value+1)}>{t('movements.next')}</button></div>
+    </>}
 
-    {editing&&<AdaptiveSheet open onClose={closeModal} title={modalView==='detail'?(editing.note||editing.category_name):modalView==='edit'?'Modifica movimento':'Elimina movimento'} eyebrow={modalView==='detail'?'Dettaglio movimento':modalView==='edit'?(editing.note||editing.category_name):'Conferma'} size={modalView==='detail'?'medium':'large'} busy={busy} dirty={editDirty} className="transaction-modal-card"><div className="transaction-sheet-body">
+    {viewMode==='calendar'&&<section className="transaction-calendar surface" aria-label={t('movements.calendarView')}>
+      <header className="calendar-toolbar"><button type="button" onClick={()=>changeCalendarMonth(-1)} aria-label={t('movements.previousMonth')}><Icon name="chevronLeft" size={21}/></button><div><h2>{calendarTitle}</h2><small>{t('movements.calendarHelp')}</small></div><button type="button" onClick={()=>changeCalendarMonth(1)} aria-label={t('movements.nextMonth')}><Icon name="chevronLeft" size={21}/></button></header>
+      <div className="calendar-weekdays" aria-hidden="true">{weekdayLabels.map((label,index)=><span key={`${label}-${index}`}>{label}</span>)}</div>
+      <div className="calendar-grid">{calendarDays.map(day=>{
+        const dayRows=groups[day.key]||[];
+        const total=dayRows.reduce((sum,row)=>sum+Number(row.amount),0);
+        const active=selectedDay===day.key;
+        return <button type="button" key={day.key} className={`${day.inMonth?'':'outside'}${active?' selected':''}${dayRows.length?' has-transactions':''}`} aria-pressed={active} aria-label={`${formatDate(day.key,{day:'numeric',month:'long'})}${dayRows.length?` · ${dayRows.length} · ${currency(total)}`:''}`} onClick={()=>{if(day.inMonth)setSelectedDay(day.key)}} disabled={!day.inMonth}><span className="calendar-day-number">{day.day}</span>{dayRows.length>0&&<><span className={`calendar-day-total ${total>=0?'green':'red'}`}>{currency(total)}</span><span className="calendar-day-dot" aria-hidden="true"/></>}</button>;
+      })}</div>
+      {count>500&&<p className="calendar-overflow" role="status">{t('movements.monthOverflow')}</p>}
+      <div className="calendar-day-detail"><div className="day-heading"><div className="day-date"><small>{t('movements.day')}</small><h3>{formatDate(selectedDay,{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</h3></div>{selectedRows.length>0&&<div className="day-total"><small>{t('movements.dayTotal')}</small><strong className={selectedRows.reduce((sum,row)=>sum+Number(row.amount),0)>=0?'green':'red'}>{currency(selectedRows.reduce((sum,row)=>sum+Number(row.amount),0))}</strong></div>}</div>{selectedRows.length?<div className="calendar-day-transactions">{selectedRows.map(transactionButton)}</div>:<p className="calendar-day-empty">{t('movements.noDayTransactions')}</p>}</div>
+    </section>}
+
+    {editing&&<div className="modal transaction-modal" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget&&!busy)closeModal()}}><div className="modal-card transaction-modal-card surface" role="dialog" aria-modal="true" aria-labelledby="transaction-modal-title">
       {modalView==='detail'&&<>
+        <header className="transaction-modal-head">
+          <div><span className="transaction-eyebrow">Dettaglio movimento</span><h2 id="transaction-modal-title">{editing.note||editing.category_name}</h2></div>
+          <button type="button" className="transaction-close" aria-label="Chiudi dettaglio" onClick={closeModal}>×</button>
+        </header>
+
         <section className="transaction-hero">
           <CategoryIcon name={editing.category_name} icon={activeCategory?.icon} color={activeCategory?.color} size={58}/>
           <div className="transaction-hero-copy"><strong className={Number(editing.amount)>=0?'green':'red'}>{Number(editing.amount)>=0?'+ ':''}{currency(Number(editing.amount))}</strong><span>{editing.category_name}</span></div>
@@ -292,14 +349,18 @@ export default function Movimenti(){
       </>}
 
       {modalView==='edit'&&<>
+        <header className="transaction-modal-head">
+          <div><span className="transaction-eyebrow">{editing.note||editing.category_name}</span><h2 id="transaction-modal-title">Modifica movimento</h2></div>
+          <button type="button" className="transaction-close" aria-label="Annulla modifica" disabled={busy} onClick={()=>setModalView('detail')}>×</button>
+        </header>
         <div className="segmented"><button type="button" className={kind==='expense'?'active':''} onClick={()=>changeEditKind('expense')}>Uscita</button><button type="button" className={kind==='income'?'active':''} onClick={()=>changeEditKind('income')}>Entrata</button></div>
-        <div className="two-col transaction-meta-grid"><div className="field"><label htmlFor="edit-transaction-amount">Importo</label><AmountExpressionInput id="edit-transaction-amount" value={amount} onChange={setAmount} ariaLabel="Importo del movimento"/></div><div className="field"><label>Data</label><DateInput value={date} onChange={setDate} ariaLabel="Data del movimento"/></div></div>
+        <div className="two-col"><div className="field"><label htmlFor="edit-transaction-amount">Importo</label><AmountExpressionInput id="edit-transaction-amount" value={amount} onChange={setAmount} ariaLabel="Importo del movimento"/></div><div className="field"><label>Data</label><input type="date" value={date} onChange={event=>setDate(event.target.value)}/></div></div>
         <div className="field"><label>Descrizione</label><input value={note} onChange={event=>setNote(event.target.value)}/></div>
-        <div className="field"><label>Categoria {kind==='income'?'di entrata':'di spesa'}</label><button type="button" className="category-picker-trigger" onClick={()=>setCategoryPickerOpen(true)}><CategoryIcon name={category||editing.category_name} icon={categoryData(category)?.icon} color={categoryData(category)?.color} size={44}/><span><small>{kind==='income'?'Categoria di entrata':'Categoria di spesa'}</small><strong>{category||'Seleziona categoria'}</strong></span><b aria-hidden="true">›</b></button></div>
+        <div className="field"><label>Categoria {kind==='income'?'di entrata':'di spesa'}</label><div className="transaction-category-field"><CategoryIcon name={category||editing.category_name} icon={categoryData(category)?.icon} color={categoryData(category)?.color} size={44}/><select value={category} onChange={event=>setCategory(event.target.value)}>{editCategories.map(item=><option key={item.name}>{item.name}</option>)}</select></div></div>
         <div className="field"><label>Conto</label><input value={account} readOnly aria-readonly="true" title="Modificabile da Impostazioni > Conto per lo spazio visualizzato"/></div>
         {recurring&&<div className="transaction-scope"><b>Applica la modifica a</b><div className="scope-choice"><label><input type="radio" name="edit-scope" checked={scope==='occurrence'} onChange={()=>setScope('occurrence')}/> Solo questa occorrenza</label><label><input type="radio" name="edit-scope" checked={scope==='series'} onChange={()=>setScope('series')}/> Occorrenza e serie futura</label></div></div>}
-        {modalMsg&&<InlineError message={modalMsg}/>}
-        <div className="transaction-edit-actions"><AsyncButton className="save-btn" busy={busy} busyLabel="Salvataggio…" onClick={save}>Salva modifiche</AsyncButton><button className="secondary" disabled={busy} onClick={cancelEdit}>Annulla</button></div>
+        {modalMsg&&<div className="notice" role="status">{modalMsg}</div>}
+        <div className="transaction-edit-actions"><button className="save-btn" disabled={busy} onClick={save}>{busy?'Salvataggio…':'Salva modifiche'}</button><button className="secondary" disabled={busy} onClick={()=>{setModalView('detail');setModalMsg('')}}>Annulla</button></div>
       </>}
 
       {modalView==='delete'&&<section className="transaction-confirm" aria-labelledby="transaction-modal-title">
@@ -307,19 +368,9 @@ export default function Movimenti(){
         <h2 id="transaction-modal-title">Eliminare il movimento?</h2>
         <p>{recurring&&scope==='series'?'Questa occorrenza verrà eliminata e la serie futura sarà interrotta. I movimenti precedenti resteranno invariati.':'Il movimento verrà eliminato definitivamente. L’operazione non può essere annullata.'}</p>
         <div className="transaction-confirm-summary"><span>{editing.note||editing.category_name}</span><strong className={Number(editing.amount)>=0?'green':'red'}>{Number(editing.amount)>=0?'+ ':''}{currency(Number(editing.amount))}</strong></div>
-        {modalMsg&&<InlineError message={modalMsg}/>}
-        <div className="transaction-confirm-actions"><button type="button" className="secondary" disabled={busy} onClick={()=>{setModalView('detail');setModalMsg('')}}>Annulla</button><AsyncButton type="button" variant="danger" busy={busy} busyLabel="Eliminazione…" onClick={remove}>Elimina definitivamente</AsyncButton></div>
+        {modalMsg&&<div className="notice" role="status">{modalMsg}</div>}
+        <div className="transaction-confirm-actions"><button type="button" className="secondary" disabled={busy} onClick={()=>{setModalView('detail');setModalMsg('')}}>Annulla</button><button type="button" className="delete-btn" disabled={busy} onClick={remove}>{busy?'Eliminazione…':'Elimina definitivamente'}</button></div>
       </section>}
-    </div></AdaptiveSheet>}
-    <CategoryPickerSheet open={categoryPickerOpen} onClose={()=>setCategoryPickerOpen(false)} categories={categories} value={category} kind={kind} onKindChange={changeEditKind} onChange={setCategory} spaceId={spaceId}/>
-    <ConfirmDialog open={discardEditOpen} title="Scartare le modifiche?" message="Le modifiche al movimento non sono state salvate." confirmLabel="Scarta" destructive onClose={()=>setDiscardEditOpen(false)} onConfirm={discardEdit}/>
-    <AdaptiveSheet open={filtersOpen} onClose={()=>setFiltersOpen(false)} title="Filtri" eyebrow="Movimenti" size="medium" className="movement-filters-sheet"><div className="movement-filter-sheet-content">
-      <section className="movement-filter-group"><h3>Periodo</h3><DateRangePicker start={periodStart} end={periodEnd} onChange={changeRange}/></section>
-      <section className="movement-filter-group"><h3>Categoria</h3><MovementFilterDropdown label={t('movements.category')} value={categoryFilter} options={categoryOptions} onChange={value=>{setCategoryFilter(value);setPage(1)}}/></section>
-      <section className="movement-filter-group"><h3>Tipo</h3><MovementFilterDropdown label={t('movements.type')} value={kindFilter} options={kindOptions} onChange={value=>{setKindFilter(value);setPage(1)}}/></section>
-      {members.length>1&&<section className="movement-filter-group"><h3>{t('movements.by')}</h3><div className="filter-author-chips"><button type="button" className={!author?'active':''} aria-pressed={!author} onClick={()=>{setAuthor('');setPage(1)}}>{t('movements.all')}</button>{members.map(member=><button type="button" key={member.userId} className={author===member.userId?'active':''} aria-pressed={author===member.userId} onClick={()=>{setAuthor(member.userId);setPage(1)}}>{member.name}</button>)}</div></section>}
-      <div className="movement-filter-status" role="status">{activeFilterCount?`${activeFilterCount} ${activeFilterCount===1?'filtro attivo':'filtri attivi'} · aggiornamento immediato`:'Nessun filtro attivo'}</div>
-      <button type="button" className="clear-filters-sheet" disabled={!activeFilterCount} onClick={resetFilters}>Azzera filtri</button>
-    </div></AdaptiveSheet>
+    </div></div>}
   </>;
 }

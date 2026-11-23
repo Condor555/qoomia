@@ -395,7 +395,7 @@ html[data-theme="dark"] .space-picker-trigger,html[data-theme="dark"] .space-pic
 @media(max-width:520px){
   .app-space-bar{margin-bottom:9px}
   .space-picker-compact{max-width:220px}
-  
+  .space-picker-compact .space-picker-list{position:fixed;top:auto;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));width:auto;min-width:0;max-height:min(320px,55vh);overflow:auto}
   .recurring-section-head{align-items:flex-start;gap:10px;flex-wrap:wrap}
   .recurring-space-picker{margin-left:auto}
   .space-picker-destination .space-picker-list{min-width:0}
@@ -559,7 +559,7 @@ html[data-theme="dark"] .space-picker-trigger,html[data-theme="dark"] .space-pic
 
 /* Qoomia V4.1.1 — UX follow-up */
 .account-custom-space-picker{width:100%;max-width:none;margin:10px 0 13px;z-index:45}.account-custom-space-picker .space-picker-trigger{width:100%;min-height:48px;border-radius:15px;padding:8px 11px}.account-custom-space-picker .space-picker-list{left:0;right:auto;width:100%}.category-editor-actions{display:grid;gap:8px;margin-top:14px}.category-editor-actions>button{width:100%;min-height:48px;margin:0}.category-editor-actions .category-save-button{background:var(--primary);color:#fff}.category-editor-actions .delete-btn{background:#c94f57;color:#fff}.category-editor-actions+.merge-box{margin-top:16px}.goals-back{margin-bottom:14px}.goal-history-item{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 4px;border:0;border-top:1px solid var(--line);border-radius:0;background:transparent;color:var(--text);text-align:left}.goal-history-item:first-child{border-top:0}.goal-history-item:disabled{cursor:default;opacity:1}.goal-history-item.editable{cursor:pointer}.goal-history-item.editable:hover,.goal-history-item.editable:focus-visible{outline:0;background:var(--surface2);border-radius:12px;padding-left:10px;padding-right:10px}.goal-history-item>span{min-width:0}.goal-history-item b,.goal-history-item small{display:block}.goal-history-item small{margin-top:3px;color:var(--muted)}.goal-history-item p{margin:5px 0 0;color:var(--muted);font-size:12px}.goal-history-item>strong{flex:0 0 auto;color:var(--primary);font-size:11px}.goal-contribution-modal>.delete-btn{width:100%;margin-top:8px}.goal-contribution-modal>.save-btn+.delete-btn{margin-top:8px}
-@media(max-width:430px){.category-editor-actions{margin-top:12px}.goals-back{margin-bottom:12px}.goal-history-item{min-height:48px}}
+@media(max-width:430px){.account-custom-space-picker .space-picker-list{position:fixed;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));width:auto;max-height:min(320px,55vh)}.category-editor-actions{margin-top:12px}.goals-back{margin-bottom:12px}.goal-history-item{min-height:48px}}
 
 @media(max-width:430px){.back-link{min-height:44px}.transaction-close{width:44px;height:44px;min-width:44px;min-height:44px;padding:0}}
 
@@ -583,388 +583,77 @@ input,select,textarea{font-size:16px}
 @media(max-width:430px){.shell{padding-top:calc(16px + env(safe-area-inset-top));padding-right:max(13px,env(safe-area-inset-right));padding-bottom:calc(104px + env(safe-area-inset-bottom));padding-left:max(13px,env(safe-area-inset-left))}.bottom-nav{width:calc(100% - max(14px,env(safe-area-inset-left)) - max(14px,env(safe-area-inset-right)));left:calc(50% + (env(safe-area-inset-left) - env(safe-area-inset-right))/2)}input,select,textarea{min-height:44px}.auth-screen{margin-top:max(16px,env(safe-area-inset-top))}.catalog-picker input[type="search"]{font-size:16px}.modal{padding-top:max(8px,env(safe-area-inset-top));padding-right:max(8px,env(safe-area-inset-right));padding-bottom:max(8px,env(safe-area-inset-bottom));padding-left:max(8px,env(safe-area-inset-left))}.modal-card{max-height:calc(100dvh - max(16px,env(safe-area-inset-top)) - max(16px,env(safe-area-inset-bottom)))}}
 @media(orientation:landscape) and (max-height:500px){.shell{padding-top:calc(10px + env(safe-area-inset-top));padding-right:max(16px,env(safe-area-inset-right));padding-bottom:calc(88px + env(safe-area-inset-bottom));padding-left:max(16px,env(safe-area-inset-left))}.bottom-nav{height:62px;bottom:calc(4px + env(safe-area-inset-bottom))}.bottom-nav .nav-plus{width:46px;height:46px;flex-basis:46px}.modal{align-items:flex-start}.modal-card{max-height:calc(100dvh - max(12px,env(safe-area-inset-top)) - max(12px,env(safe-area-inset-bottom)))}}
 
-@media(pointer:coarse){button,input,select,textarea,.back-link,.bottom-nav>a,.profile-menu-row,.settings-link,.source-repository-link,.space-picker-compact .space-picker-trigger,.movement-filter-trigger,.confirm-payment,.transaction-button{min-height:46px}.search-box input{min-height:46px}.recurrence-actions button{min-width:46px;min-height:46px}.transaction-close{width:46px;height:46px;min-width:46px;min-height:46px;padding:0}}
+@media(pointer:coarse){button,input,select,textarea,.back-link,.bottom-nav>a,.profile-menu-row,.settings-link,.source-repository-link{min-height:44px}.search-box input{min-height:44px}.recurrence-actions button{min-width:44px;min-height:44px}}
+
+@media(pointer:coarse){.space-picker-compact .space-picker-trigger,.movement-filter-trigger,.confirm-payment,.bottom-nav>a{min-height:44px}.transaction-close{width:44px;height:44px;min-width:44px;min-height:44px;padding:0}.transaction-button{min-height:44px}}
+
+@media(pointer:coarse){button,input,select,textarea,.back-link,.bottom-nav>a,.profile-menu-row,.settings-link,.source-repository-link{min-height:46px}.space-picker-compact .space-picker-trigger,.movement-filter-trigger,.confirm-payment{min-height:46px}.transaction-close{width:46px;height:46px;min-width:46px;min-height:46px}}
 
 /* Qoomia V4.1.2 — desktop scroll e Ricorrenze list-first */
 .recurring-primary-action{display:flex;justify-content:flex-end;margin:14px 0 4px}.recurring-primary-action button{min-height:46px}.recurring-create-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px}.recurring-create-modal-head small{display:block;color:var(--muted);font-size:10px}.recurring-create-modal-head h2{margin:2px 0 0}.recurring-create-modal .recurring-create-card{margin:0;max-height:calc(100dvh - 30px);overflow-y:auto}.recurring-overview{margin-top:18px}
 @media(max-width:430px){.recurring-primary-action button{width:100%}.recurring-create-modal .recurring-create-card{max-height:calc(100dvh - max(16px,env(safe-area-inset-top)) - max(16px,env(safe-area-inset-bottom)))}}
 
 
-/* V4.1.4 — Adaptive sheets, Apple-friendly hierarchy and perceived performance */
-:root{--bg:#F2F2F7;--surface:#FFFFFF;--surface2:#F7F7FA;--text:#111113;--muted:#6C6C70;--line:rgba(60,60,67,.18);--shadow:0 8px 28px rgba(0,0,0,.07)}
-html[data-theme="dark"]{--bg:#000000;--surface:#1C1C1E;--surface2:#2C2C2E;--text:#F5F5F7;--muted:#AEAEB2;--line:rgba(84,84,88,.65);--shadow:none}
-body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;font-size:16px}
-button{font-weight:650}
-.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
-.adaptive-sheet-backdrop{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px;background:rgba(0,0,0,.42);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-.adaptive-sheet{position:relative;width:min(100%,560px);max-height:min(90dvh,820px);overflow:hidden;border-radius:24px;outline:0;display:flex;flex-direction:column}
-.adaptive-sheet-compact{width:min(100%,420px)}
-.adaptive-sheet-medium{width:min(100%,500px)}
-.adaptive-sheet-large,.adaptive-sheet-full{width:min(100%,560px)}
-.adaptive-sheet-full{max-height:94dvh}
-.adaptive-sheet-grabber{display:none;width:36px;height:5px;margin:8px auto 0;border-radius:99px;background:var(--line)}
-.adaptive-sheet-header{flex:0 0 auto;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px 20px 14px;border-bottom:1px solid var(--line)}
-.adaptive-sheet-header small{display:block;margin-bottom:4px;color:var(--muted);font-size:12px;font-weight:650}
-.adaptive-sheet-header h2{font-size:22px;line-height:1.15;letter-spacing:-.35px}
-.sheet-close{flex:0 0 auto;width:36px;height:36px;padding:0;border-radius:50%;display:grid;place-items:center;background:var(--surface2);color:var(--muted);font-size:25px;font-weight:400;line-height:1}
-.sheet-close:focus-visible,.adaptive-sheet :focus-visible{outline:3px solid rgba(15,118,110,.28);outline-offset:2px}
-.adaptive-sheet-content{min-height:0;overflow:auto;overscroll-behavior:contain;padding:18px 20px calc(20px + env(safe-area-inset-bottom))}
-.entry-card-embedded{padding:0;border:0;box-shadow:none;background:transparent}
-.sheet-discard-layer{position:absolute;inset:0;z-index:3;display:grid;place-items:center;padding:18px;background:rgba(0,0,0,.36);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
-.sheet-discard-card{width:min(100%,380px);padding:22px;text-align:center;border-radius:22px}
-.sheet-discard-card>span,.confirm-sheet>span{width:52px;height:52px;margin:0 auto 14px;border-radius:17px;display:grid;place-items:center;background:rgba(226,75,85,.12);color:var(--red);font-size:24px;font-weight:800}
-.sheet-discard-card h3,.confirm-sheet h2{margin:0;font-size:21px}
-.sheet-discard-card p,.confirm-sheet p{margin:9px 0 18px;line-height:1.45}
-.sheet-discard-card>div,.confirm-sheet-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.sheet-discard-card button,.confirm-sheet-actions button{width:100%;margin:0}
-.confirm-sheet{text-align:center;padding:4px 0}
-.confirm-sheet .confirm-icon{color:var(--primary);background:rgba(15,118,110,.11)}
-.adaptive-sheet.transaction-modal-card>*{margin-left:0;margin-right:0}
-.adaptive-sheet.transaction-modal-card .adaptive-sheet-content{padding:0}
-.transaction-sheet-body>*{margin-left:22px;margin-right:22px}
-.transaction-sheet-body .transaction-confirm{padding-top:6px}
-.recurring-create-sheet .adaptive-sheet-header,.recurring-edit-sheet .adaptive-sheet-header{display:none}
-.recurring-create-sheet .adaptive-sheet-content,.recurring-edit-sheet .adaptive-sheet-content{padding-top:10px}
-.recurring-create-sheet .settings-card{margin:0;padding:0;border:0;box-shadow:none;background:transparent}
-.recurring-edit-sheet .recurring-edit-modal{padding:0}
-.is-loading{position:relative;overflow:hidden}
-.is-loading::after,.chart-skeleton::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);animation:qoomia-shimmer 1.25s ease-in-out infinite}
-.chart-skeleton{position:relative;width:100%;height:100%;overflow:hidden;border-radius:16px;background:var(--surface2)}
-@keyframes qoomia-shimmer{to{transform:translateX(100%)}}
-@media(max-width:600px){
-  .adaptive-sheet-backdrop{place-items:end center;padding:0;background:rgba(0,0,0,.48)}
-  .adaptive-sheet,.adaptive-sheet-compact,.adaptive-sheet-medium,.adaptive-sheet-large,.adaptive-sheet-full{width:100%;max-height:92dvh;border-radius:24px 24px 0 0;border-bottom:0}
-  .adaptive-sheet-full{max-height:100dvh;border-radius:0}
-  .adaptive-sheet-grabber{display:block}
-  .adaptive-sheet-full .adaptive-sheet-grabber{visibility:hidden}
-  .adaptive-sheet-header{padding:14px 18px 12px}
-  .adaptive-sheet-content{padding:16px 18px calc(18px + env(safe-area-inset-bottom))}
-  .transaction-sheet-body>*{margin-left:18px;margin-right:18px}
-}
-@media(prefers-reduced-motion:no-preference){.adaptive-sheet{animation:qoomia-sheet-in .2s ease-out both}@keyframes qoomia-sheet-in{from{opacity:0;transform:translateY(18px) scale(.99)}to{opacity:1;transform:none}}}
-@media(prefers-reduced-motion:reduce){.is-loading::after,.chart-skeleton::after,.ui-skeleton,.async-spinner{animation:none}}
-.progressive-pager{margin:20px 0 4px}.progressive-pager button{width:100%;background:var(--surface);color:var(--primary);border:1px solid var(--line)}
-
-/* V4.1.4 hotfix — floating iPhone compose sheet and readable transaction metadata */
-.new-transaction-sheet{isolation:isolate}
-.transaction-meta-grid{grid-template-columns:minmax(0,1fr) minmax(170px,.82fr);align-items:end}
-.transaction-meta-grid>.field{min-width:0}
-.transaction-meta-grid input{width:100%;min-width:0}
-.transaction-account-field input{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:var(--surface2);color:var(--text);font-weight:650}
-
-@media(max-width:600px){
-  .new-transaction-sheet.adaptive-sheet-full{
-    width:calc(100% - max(24px,calc(env(safe-area-inset-left) + env(safe-area-inset-right) + 24px)));
-    max-height:calc(100dvh - max(18px,env(safe-area-inset-top)) - max(12px,env(safe-area-inset-bottom)));
-    margin:0 max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));
-    border:1px solid var(--line);
-    border-bottom:1px solid var(--line);
-    border-radius:28px;
-    box-shadow:0 24px 64px rgba(0,0,0,.22),0 4px 18px rgba(0,0,0,.12);
-    background:var(--surface);
-  }
-  .new-transaction-sheet.adaptive-sheet-full .adaptive-sheet-grabber{
-    display:block;
-    visibility:visible;
-    width:34px;
-    height:4px;
-    margin:7px auto 1px;
-    background:rgba(120,120,128,.34);
-  }
-  .new-transaction-sheet .adaptive-sheet-header{
-    align-items:center;
-    padding:7px 14px 11px;
-    border-bottom:1px solid var(--line);
-  }
-  .new-transaction-sheet .adaptive-sheet-header small{
-    margin-bottom:2px;
-    font-size:10px;
-    line-height:1.2;
-    font-weight:750;
-    letter-spacing:.05em;
-    text-transform:uppercase;
-  }
-  .new-transaction-sheet .adaptive-sheet-header h2{
-    font-size:22px;
-    line-height:1.12;
-    letter-spacing:-.45px;
-  }
-  .new-transaction-sheet .sheet-close{
-    width:40px;
-    height:40px;
-    min-width:40px;
-    min-height:40px;
-    background:var(--surface2);
-    color:var(--muted);
-    font-size:24px;
-  }
-  .new-transaction-sheet .adaptive-sheet-content{
-    padding:12px 14px 14px;
-    scrollbar-width:none;
-  }
-  .new-transaction-sheet .adaptive-sheet-content::-webkit-scrollbar{display:none}
-  .new-transaction-sheet .entry-card-embedded{
-    display:grid;
-    gap:14px;
-    min-width:0;
-  }
-  .new-transaction-sheet .entry-card-embedded>*{margin-top:0;margin-bottom:0}
-  .new-transaction-sheet .entry-card-embedded .segmented{border-radius:17px}
-  .new-transaction-sheet .entry-card-embedded .segmented button{min-height:48px;border-radius:13px}
-  .new-transaction-sheet .entry-card-embedded .amount-input-wrap{padding:2px 0}
-  .new-transaction-sheet .entry-card-embedded .field{min-width:0;margin-top:0}
-  .new-transaction-sheet .entry-card-embedded input,
-  .new-transaction-sheet .entry-card-embedded select{min-width:0}
-  .new-transaction-sheet .entry-card-embedded .toggle-card{margin-top:0;border:1px solid transparent}
-  .new-transaction-sheet .entry-card-embedded>.save-btn{
-    position:sticky;
-    bottom:0;
-    z-index:2;
-    width:100%;
-    min-height:54px;
-    margin:2px 0 0;
-    border-radius:16px;
-    box-shadow:0 8px 22px rgba(15,118,110,.18);
-  }
-}
-
-@media(max-width:430px){
-  .transaction-meta-grid{grid-template-columns:1fr;gap:10px}
-  .transaction-account-field input{min-height:50px}
-}
-
-@media(max-width:370px){
-  .new-transaction-sheet.adaptive-sheet-full{
-    width:calc(100% - max(16px,calc(env(safe-area-inset-left) + env(safe-area-inset-right) + 16px)));
-    margin-right:max(8px,env(safe-area-inset-right));
-    margin-bottom:max(8px,env(safe-area-inset-bottom));
-    margin-left:max(8px,env(safe-area-inset-left));
-    border-radius:24px;
-  }
-  .new-transaction-sheet .adaptive-sheet-content{padding-right:11px;padding-left:11px}
-}
-
-@media(min-width:601px){
-  .new-transaction-sheet{box-shadow:0 28px 80px rgba(0,0,0,.22),0 6px 22px rgba(0,0,0,.10)}
-  .category-picker-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
-  .toast-viewport{bottom:24px}
-  .category-picker-sheet{max-width:560px}
-  .category-primary-action button{width:auto}
-  .home-budget-empty{align-items:center;flex-direction:row}
-  .home-budget-values{grid-template-columns:1fr 1fr auto}
-  .home-budget-values>strong{grid-column:auto;justify-self:auto}
-}
-
-/* V4.1.4 hotfix — Qoomia date card and destination helper scroll guard */
-.date-input-control{
-  position:relative;
-  width:100%;
-  height:50px;
-  min-height:50px;
-  display:grid;
-  grid-template-columns:auto minmax(0,1fr) auto;
-  align-items:center;
-  gap:10px;
-  padding:0 13px;
-  overflow:hidden;
-  border:1px solid var(--line);
-  border-radius:14px;
-  background:var(--surface);
-  color:var(--text);
-  cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
-}
-.date-input-control:focus-within{
-  border-color:var(--primary);
-  box-shadow:0 0 0 3px rgba(15,118,110,.12);
-}
-.date-input-control.is-disabled{cursor:not-allowed;opacity:.6}
-.date-input-leading{color:var(--primary);pointer-events:none}
-.date-input-value{
-  min-width:0;
-  overflow:hidden;
-  color:var(--text);
-  font-size:15px;
-  font-weight:600;
-  line-height:1;
-  text-align:left;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  pointer-events:none;
-}
-.date-input-chevron{color:var(--muted);opacity:.78;pointer-events:none}
-.date-input-native{
-  position:absolute;
-  inset:0;
-  z-index:2;
-  width:100%;
-  height:100%;
-  min-height:100%;
-  margin:0;
-  padding:0;
-  border:0;
-  border-radius:inherit;
-  opacity:.001;
-  color:transparent;
-  background:transparent;
-  cursor:pointer;
-  -webkit-appearance:none;
-  appearance:none;
-}
-.date-input-native:focus{border:0;box-shadow:none;outline:0}
-.date-input-native::-webkit-date-and-time-value{color:transparent;text-align:left}
-.date-input-native::-webkit-calendar-picker-indicator{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  margin:0;
-  padding:0;
-  opacity:0;
-  cursor:pointer;
-}
-.date-input-native::-webkit-inner-spin-button,
-.date-input-native::-webkit-clear-button{display:none;-webkit-appearance:none}
-.transaction-meta-grid .transaction-account-field input,
-.transaction-meta-grid .date-input-control{height:50px;min-height:50px}
-
-.new-transaction-sheet .space-picker-destination{
-  position:relative;
-  z-index:1;
-  flex:none;
-  min-height:max-content;
-  overflow:visible;
-}
-.new-transaction-sheet .space-picker-help{
-  position:static;
-  display:block;
-  margin:7px 0 0;
-  overflow:visible;
-  white-space:normal;
-  text-overflow:clip;
-  line-height:1.4;
-  transform:none;
-}
-.new-transaction-sheet .adaptive-sheet-content{
-  scroll-padding-top:12px;
-  overflow-anchor:none;
-}
-
-.date-input-control>.date-input-leading,
-.date-input-control>.date-input-chevron{
-  position:static;
-  inset:auto;
-  transform:none;
-}
-.date-input-control>.date-input-leading{justify-self:start}
-.date-input-control>.date-input-chevron{justify-self:end}
-
-
-/* Qoomia V4.1.5 — UX consistency, mobile-first components */
-.ui-skeleton{display:inline-block;max-width:100%;min-height:10px;border-radius:999px;background:linear-gradient(90deg,color-mix(in srgb,var(--line) 72%,var(--surface)) 20%,color-mix(in srgb,var(--surface2) 82%,#fff) 48%,color-mix(in srgb,var(--line) 72%,var(--surface)) 76%);background-size:220% 100%;animation:qoomia-skeleton 1.25s ease-in-out infinite;color:transparent;vertical-align:middle;overflow:hidden}
-@keyframes qoomia-skeleton{0%{background-position:100% 0}100%{background-position:-100% 0}}
-.ui-skeleton-balance{width:min(230px,72vw);height:42px;background-color:rgba(255,255,255,.2)}
-.balance-card .ui-skeleton{background:linear-gradient(90deg,rgba(255,255,255,.14),rgba(255,255,255,.34),rgba(255,255,255,.14));background-size:220% 100%}
-.ui-skeleton-rows{display:grid;gap:2px;width:100%}
-.ui-skeleton-row{display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:11px;min-height:62px;padding:9px 0;border-bottom:1px solid var(--line)}
-.ui-skeleton-row:last-child{border-bottom:0}.ui-skeleton-row>span{display:grid;gap:7px;min-width:0}.ui-skeleton-avatar{width:40px;height:40px;border-radius:13px}.ui-skeleton-line{height:11px}.ui-skeleton-line.wide{width:min(190px,76%)}.ui-skeleton-line.short{width:min(120px,52%);height:9px}.ui-skeleton-amount{width:72px;height:14px}.ui-skeleton-chart{display:block;width:100%;height:190px;margin:17px 0;border-radius:18px}
-.ui-inline-error{display:grid;grid-template-columns:32px minmax(0,1fr) auto;align-items:center;gap:10px;margin:12px 0;padding:11px 12px;border:1px solid color-mix(in srgb,var(--red) 28%,var(--line));border-radius:14px;background:color-mix(in srgb,var(--red) 8%,var(--surface));color:var(--text)}
-.ui-inline-error p{margin:0;color:var(--text);font-size:12px;line-height:1.4}.ui-feedback-icon{display:grid;place-items:center;width:30px;height:30px;border-radius:10px;background:color-mix(in srgb,var(--red) 15%,var(--surface));color:var(--red);font-weight:900}.ui-inline-action{min-height:38px;padding:8px 11px;background:transparent;color:var(--red);border:1px solid color-mix(in srgb,var(--red) 25%,var(--line));font-size:11px}
-.ui-empty-state{display:flex;flex-direction:column;align-items:center;gap:8px;padding:28px 18px;text-align:center}.ui-empty-state p{max-width:360px;margin:0;line-height:1.45}.ui-empty-icon{display:grid;place-items:center;width:48px;height:48px;border-radius:15px;background:var(--surface2);color:var(--primary)}.ui-empty-action{width:100%;margin-top:5px}.ui-empty-action>*{width:100%}
-.async-button{display:inline-flex;align-items:center;justify-content:center;gap:8px}.async-button-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--line)}.async-button-danger{background:#c94f57;color:#fff}.async-spinner{width:17px;height:17px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:qoomia-spin .7s linear infinite}@keyframes qoomia-spin{to{transform:rotate(360deg)}}
-.toast-viewport{position:fixed;z-index:400;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));width:min(calc(100% - 24px),430px);display:grid;gap:8px;transform:translateX(-50%);pointer-events:none}.app-toast{display:grid;grid-template-columns:30px minmax(0,1fr) 34px;align-items:center;gap:9px;padding:10px 11px;border:1px solid var(--line);border-radius:16px;background:color-mix(in srgb,var(--surface) 94%,transparent);box-shadow:0 16px 46px rgba(0,0,0,.2);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);pointer-events:auto}.app-toast>span{display:grid;place-items:center;width:28px;height:28px;border-radius:9px;background:color-mix(in srgb,var(--primary) 13%,var(--surface));color:var(--primary);font-weight:900}.app-toast-error>span{background:color-mix(in srgb,var(--red) 13%,var(--surface));color:var(--red)}.app-toast p{margin:0;color:var(--text);font-size:12px;font-weight:700}.app-toast button{min-width:34px;min-height:34px;padding:0;background:transparent;color:var(--muted);font-size:21px}
-.category-picker-trigger,.category-picker-trigger-shell{width:100%;min-height:54px;display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;gap:10px;padding:6px 12px 6px 6px;border:1px solid var(--line);border-radius:15px;background:var(--surface);color:var(--text);text-align:left;box-shadow:none}.category-picker-trigger:hover,.category-picker-trigger:focus-visible{border-color:var(--primary);outline:0;box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 13%,transparent)}.category-picker-trigger>span{min-width:0}.category-picker-trigger small,.category-picker-trigger strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.category-picker-trigger small{color:var(--muted);font-size:9px;font-weight:650}.category-picker-trigger strong{margin-top:2px;font-size:14px}.category-picker-trigger>b{color:var(--muted);font-size:22px}.category-picker-trigger-shell{grid-template-columns:44px minmax(0,1fr)}
-.category-picker-sheet .adaptive-sheet-content{display:grid;gap:15px}.category-picker-kind{grid-template-columns:1fr 1fr}.category-picker-search{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;min-height:48px;padding:0 10px;border:1px solid var(--line);border-radius:15px;background:var(--surface2);color:var(--muted)}.category-picker-search:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 13%,transparent)}.category-picker-search input{min-height:46px;padding:0;border:0;background:transparent;box-shadow:none}.category-picker-search button{width:34px;min-height:34px;padding:0;background:transparent;color:var(--muted);font-size:21px}.category-picker-section{display:grid;gap:9px}.category-picker-section h3{margin:0;color:var(--muted);font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.category-picker-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.category-picker-grid button{position:relative;min-width:0;min-height:91px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:9px 5px;border:1px solid var(--line);border-radius:15px;background:var(--surface);color:var(--text);box-shadow:none}.category-picker-grid button.selected{border-color:var(--primary);background:color-mix(in srgb,var(--primary) 8%,var(--surface));box-shadow:0 0 0 2px color-mix(in srgb,var(--primary) 10%,transparent)}.category-picker-grid button>span{width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px}.category-picker-grid button>b{position:absolute;top:5px;right:6px;display:grid;place-items:center;width:19px;height:19px;border-radius:999px;background:var(--primary);color:#fff;font-size:10px}.category-manage-link{min-height:48px;display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);border-radius:14px;background:var(--surface2);color:var(--primary);font-weight:800;text-decoration:none}
-.home-recent .section-title a{color:var(--primary);font-weight:800;text-decoration:none}.home-recent-list{display:grid}.home-recent-row{display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:10px;min-height:61px;padding:9px 0;border-top:1px solid var(--line);color:var(--text);text-decoration:none}.home-recent-row:first-child{border-top:0}.home-recent-row>span{min-width:0}.home-recent-row b,.home-recent-row small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.home-recent-row small{margin-top:3px;color:var(--muted);font-size:10px}.home-recent-row>strong{white-space:nowrap;font-size:12px;font-variant-numeric:tabular-nums}.home-recent-empty{padding:7px 0}.home-recent-empty p{margin:0 0 8px}.home-recent-empty a{color:var(--primary);font-weight:800;text-decoration:none}.movement-loading{margin-top:14px;padding:8px 14px}.analytics-loading{display:grid;gap:8px}.home-goals-loading{padding-top:2px}
-.transaction-modal-card .adaptive-sheet-content{padding-top:8px}.transaction-sheet-body{padding-bottom:4px}.transaction-sheet-body>.segmented{margin-top:2px}.transaction-edit-actions .async-button{width:100%}.transaction-confirm-actions .async-button{width:100%;min-height:45px}
-
-/* Qoomia V4.1.5 — simplified Movimenti filters and category report icons */
-.movement-search-toolbar{display:grid;grid-template-columns:minmax(0,1fr) 48px;align-items:center;gap:9px;margin-bottom:12px}.movement-search-toolbar .search-box{width:100%;margin:0}.movement-filter-button{position:relative;width:48px;height:48px;min-width:48px;min-height:48px;padding:0;display:grid;place-items:center;border:1px solid var(--line);border-radius:15px;background:var(--surface);color:var(--muted);box-shadow:var(--shadow)}.movement-filter-button.active{border-color:color-mix(in srgb,var(--primary) 45%,var(--line));background:color-mix(in srgb,var(--primary) 9%,var(--surface));color:var(--primary)}.movement-filter-button>span{position:absolute;top:-5px;right:-5px;display:grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border:2px solid var(--bg);border-radius:999px;background:var(--primary);color:#fff;font-size:9px;font-weight:900}.movement-filter-sheet-content{display:grid;gap:17px;padding-bottom:4px}.movement-filter-group{display:grid;gap:8px}.movement-filter-group h3{margin:0;color:var(--muted);font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.movement-filter-group .date-range,.movement-filter-group .date-range-pill,.movement-filter-group .movement-filter-dropdown,.movement-filter-group .movement-filter-trigger{width:100%;max-width:none}.movement-filter-group .date-range-pill{min-height:50px}.movement-filter-group .movement-filter-trigger{min-height:50px;background:var(--surface2)}.movement-filter-group .movement-filter-list{left:0;right:0;width:100%;max-height:260px;overflow:auto}.filter-author-chips{display:flex;gap:7px;overflow-x:auto;padding:1px 1px 5px;scrollbar-width:none}.filter-author-chips::-webkit-scrollbar{display:none}.filter-author-chips button{flex:0 0 auto;min-height:42px;padding:9px 12px;border:1px solid var(--line);background:var(--surface2);color:var(--text);white-space:nowrap}.filter-author-chips button.active{border-color:var(--primary);background:var(--primary);color:#fff}.movement-filter-status{padding:10px 11px;border-radius:12px;background:var(--surface2);color:var(--muted);font-size:10px;text-align:center}.clear-filters-sheet{width:100%;min-height:48px;background:transparent;color:var(--primary);border:1px solid color-mix(in srgb,var(--primary) 30%,var(--line))}.clear-filters-sheet:disabled{opacity:.45;cursor:not-allowed}
-.category-report-list{display:grid}.category-report-row{display:grid;grid-template-columns:36px minmax(0,1fr) auto;align-items:center;gap:10px;min-height:57px;padding:9px 0;border-top:1px solid var(--line)}.category-report-row:first-child{border-top:0}.category-report-row>span{min-width:0}.category-report-row b,.category-report-row small{display:block}.category-report-row b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.category-report-row small{margin-top:3px;color:var(--muted);font-size:10px}.category-report-row>strong{white-space:nowrap;font-size:13px;font-variant-numeric:tabular-nums}.analytics-macro-category.category-report-row{display:grid;grid-template-columns:32px minmax(0,1fr) auto;padding:9px 0}.analytics-macro-category.category-report-row .category-icon{flex:0 0 auto}
-
-/* Qoomia V4.1.5 — hierarchy: one primary action and lighter serial content */
-.category-primary-action,.recurring-primary-action{display:flex;justify-content:flex-end;margin:12px 0}.category-primary-action button{width:100%;min-height:46px}.category-settings{display:grid}.category-setting{min-height:58px;padding:9px 2px;border-bottom:1px solid var(--line);border-radius:0;background:transparent}.category-setting:last-child{border-bottom:0}.category-editor-form{display:grid;gap:11px}.category-editor-form>.picker-label{margin:2px 0 -4px}.category-editor-form>.save-btn{margin-top:5px}.category-editor-sheet .adaptive-sheet-content{padding-top:10px}
-.home-budget-summary .section-title a{color:var(--primary);font-weight:800;text-decoration:none}.home-budget-values{display:grid;grid-template-columns:1fr 1fr;align-items:end;gap:9px;margin-bottom:10px}.home-budget-values>strong{grid-column:1/-1;justify-self:start}.home-budget-values span small,.home-budget-values span b{display:block}.home-budget-values span small{color:var(--muted);font-size:10px}.home-budget-values span b{margin-top:3px;font-size:14px}.home-budget-values>strong{padding:5px 8px;border-radius:999px;background:var(--surface2);font-size:12px}.home-budget-warning{margin:9px 0 0;color:var(--red);font-size:11px;font-weight:750}.home-budget-empty{display:flex;align-items:flex-start;flex-direction:column;justify-content:space-between;gap:12px}.home-budget-empty p{margin:0;font-size:12px}.home-budget-empty a{flex:0 0 auto;color:var(--primary);font-size:11px;font-weight:800;text-decoration:none}.home-budget-skeleton{display:block;width:100%;height:10px;margin-top:14px}
-.category-report-row{color:var(--text);text-decoration:none}.category-report-row:hover,.category-report-row:focus-visible{outline:0;background:color-mix(in srgb,var(--primary) 6%,var(--surface));border-radius:12px}.saving-goal-sheet .goal-modal-head,.goal-contribution-sheet .goal-modal-head,.goal-history-sheet .goal-modal-head,.macro-editor-sheet .macro-editor>header,.recurring-create-sheet .recurring-create-modal-head,.recurring-edit-sheet .recurring-edit-modal>header{display:none}.saving-goal-editor,.goal-contribution-modal,.goal-history-modal,.macro-editor{padding:0;border:0;background:transparent;box-shadow:none}.saving-goals-list,.recurring-list{gap:0}.recurring-list .recurrence-card{border-bottom:1px solid var(--line);border-radius:0;background:transparent}.recurring-list .recurrence-card:last-child{border-bottom:0}
-
-/* Qoomia V4.1.5 iPhone 16 hotfix — viewport, keyboard and transient overlays */
-.adaptive-sheet-backdrop{inset:auto 0 auto 0;top:var(--sheet-viewport-top,0px);height:var(--sheet-viewport-height,100dvh);min-height:280px;z-index:320}
-.adaptive-sheet-backdrop.keyboard-open{padding-top:8px;padding-bottom:8px}
-.adaptive-sheet-backdrop.keyboard-open .adaptive-sheet{max-height:calc(var(--sheet-viewport-height,100dvh) - 16px)}
-.adaptive-sheet-backdrop.keyboard-open .adaptive-sheet-content{scroll-padding-top:72px;scroll-padding-bottom:104px}
-.adaptive-sheet-backdrop.keyboard-open .new-transaction-sheet.adaptive-sheet-full{max-height:calc(var(--sheet-viewport-height,100dvh) - 12px);margin-top:6px;margin-bottom:6px}
-.adaptive-sheet-backdrop.keyboard-open .new-transaction-sheet .entry-card-embedded>.save-btn,.adaptive-sheet-backdrop.keyboard-open .transaction-edit-actions{bottom:0}
-.new-transaction-sheet .entry-card-embedded>.save-btn{padding-bottom:max(15px,env(safe-area-inset-bottom));background:linear-gradient(135deg,var(--primary),var(--primary2))}
-.transaction-edit-actions{position:sticky;z-index:4;bottom:0;padding:9px 0 max(9px,env(safe-area-inset-bottom));margin-bottom:0;background:linear-gradient(to bottom,transparent 0,var(--surface) 18px,var(--surface) 100%)}
-.sheet-discard-layer{position:fixed;inset:auto 0 auto 0;top:var(--sheet-viewport-top,0px);height:var(--sheet-viewport-height,100dvh);z-index:12;padding:max(18px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));background:rgba(8,11,20,.52);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
-.sheet-discard-card{width:min(100%,400px);padding:24px 20px 20px;border-radius:24px;box-shadow:0 26px 70px rgba(0,0,0,.28)}
-.sheet-discard-card h3{font-size:22px;line-height:1.15;letter-spacing:-.35px}.sheet-discard-card p{max-width:310px;margin:10px auto 20px;font-size:14px;line-height:1.5}.sheet-discard-card>div{grid-template-columns:minmax(0,1.28fr) minmax(104px,.82fr);gap:10px}.sheet-discard-card button{min-height:52px;padding:10px 12px;font-size:13px;line-height:1.2}.sheet-discard-card .secondary{white-space:nowrap}
-@media(max-width:520px){
-  
-  .space-picker.is-open{z-index:380}.app-space-bar:has(.space-picker.is-open){z-index:380}
-  .adaptive-sheet,.adaptive-sheet-compact,.adaptive-sheet-medium,.adaptive-sheet-large,.adaptive-sheet-full{max-height:min(92dvh,calc(var(--sheet-viewport-height,100dvh) - 8px))}
-  .adaptive-sheet-grabber{width:36px;height:4px;margin:8px auto 1px;background:rgba(120,120,128,.34)}
-}
-@media(max-width:390px){.sheet-discard-card>div{grid-template-columns:1fr}.sheet-discard-card .secondary{white-space:normal}.sheet-discard-card .delete-btn{order:-1}.category-donut-wrap{height:245px}.donut-category-label text{font-size:9px}.category-donut-wrap .donut-center b{font-size:15px}}
-
-.category-donut-wrap{height:270px;overflow:visible}.category-donut-wrap .recharts-wrapper,.category-donut-wrap svg{overflow:visible}.donut-category-label image{pointer-events:none}.category-donut-wrap .donut-center{transform:scale(.92)}
-
-.entry-card:not(.entry-card-embedded).composer-keyboard-open{padding-bottom:84px}.entry-card:not(.entry-card-embedded).composer-keyboard-open>.save-btn{position:fixed;z-index:210;right:max(13px,env(safe-area-inset-right));bottom:calc(var(--composer-keyboard-inset,0px) + 10px);left:max(13px,env(safe-area-inset-left));width:auto;max-width:534px;margin:0 auto;box-shadow:0 12px 34px rgba(15,118,110,.3)}
-
-/* Qoomia V4.1.5 definitive SpacePicker — trigger-anchored portal popover */
-.space-picker-popover{
-  position:fixed;
-  z-index:460;
-  min-width:0;
-  margin:0;
-  overflow-x:hidden;
-  overflow-y:auto;
-  overscroll-behavior:contain;
-  padding:6px;
-  border:1px solid var(--line);
-  border-radius:16px;
-  background:var(--surface);
-  color:var(--text);
-  box-shadow:0 18px 48px rgba(13,18,37,.28);
-  -webkit-overflow-scrolling:touch;
-  transform-origin:center top;
-}
-.space-picker-popover.is-above{transform-origin:center bottom}
-.space-picker-popover.is-positioning{position:fixed;left:-10000px;top:-10000px;visibility:hidden;pointer-events:none}
-.space-picker-popover .space-picker-option{min-height:48px}
-html[data-theme="dark"] .space-picker-popover{color-scheme:dark;box-shadow:0 22px 56px rgba(0,0,0,.48)}
-@media(prefers-reduced-motion:no-preference){
-  .space-picker-popover:not(.is-positioning){animation:qoomia-space-popover-in .14s ease-out both}
-  @keyframes qoomia-space-popover-in{from{opacity:0;transform:translateY(-3px) scale(.985)}to{opacity:1;transform:none}}
-  .space-picker-popover.is-above:not(.is-positioning){animation-name:qoomia-space-popover-above-in}
-  @keyframes qoomia-space-popover-above-in{from{opacity:0;transform:translateY(3px) scale(.985)}to{opacity:1;transform:none}}
-}
-@media(prefers-reduced-motion:reduce){.space-picker-popover{animation:none}}
-
-:root{--q-safe-left:env(safe-area-inset-left,0px);--q-safe-right:env(safe-area-inset-right,0px);--q-safe-top:env(safe-area-inset-top,0px);--q-safe-bottom:env(safe-area-inset-bottom,0px)}
-
-
-/* Qoomia V4.1.5 final polish — compact CTAs, discoverable Budget, intuitive reset */
-.new-transaction-sheet .entry-card-embedded>.save-btn{min-height:48px;height:48px;padding:10px 15px;border-radius:14px;font-size:15px;line-height:1.15}
-.transaction-edit-actions .save-btn,.transaction-edit-actions .async-button{min-height:48px;padding:10px 15px;border-radius:14px;font-size:15px}
-.home-budget-link{display:block;color:var(--text);text-decoration:none;cursor:pointer;transition:border-color .16s ease,transform .16s ease,background .16s ease}.home-budget-link:hover,.home-budget-link:focus-visible{outline:0;border-color:color-mix(in srgb,var(--primary) 42%,var(--line));background:color-mix(in srgb,var(--primary) 4%,var(--surface));transform:translateY(-1px)}.home-budget-open{display:inline-flex;align-items:center;gap:5px;color:var(--primary);font-size:11px;font-weight:850;white-space:nowrap}.home-budget-open b{font-size:19px;line-height:1}.home-budget-empty>span{color:var(--primary);font-size:11px;font-weight:850}
-.movement-active-filters{display:flex;align-items:center;gap:7px;margin:-3px 0 11px;overflow-x:auto;padding:2px 1px 4px;scrollbar-width:none}.movement-active-filters::-webkit-scrollbar{display:none}.movement-active-filters button{flex:0 0 auto;min-height:36px;display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid color-mix(in srgb,var(--primary) 24%,var(--line));border-radius:999px;background:color-mix(in srgb,var(--primary) 7%,var(--surface));color:var(--text);font-size:10px}.movement-active-filters button>b{color:var(--primary);font-size:15px;line-height:1}.movement-active-filters .movement-reset-shortcut{border-color:transparent;background:transparent;color:var(--primary);font-weight:850}.movement-results{transition:opacity .16s ease}.movement-results.is-updating{opacity:.58;pointer-events:none}
-.donut-category-icon{width:22px;height:22px;display:grid;place-items:center;overflow:hidden;border-radius:50%;background:var(--surface)}.donut-category-icon .category-color-icon{display:block;width:22px!important;height:22px!important;object-fit:contain}.donut-category-icon .category-color-fallback{width:20px!important;height:20px!important;color:var(--primary)}
-@media(max-width:390px){.new-transaction-sheet .entry-card-embedded>.save-btn,.transaction-edit-actions .save-btn,.transaction-edit-actions .async-button{min-height:46px;height:46px;padding-top:9px;padding-bottom:9px}.home-budget-open{font-size:10px}}
-
-
-/* Qoomia V4.1.5 navigation redesign — Budget tab + contextual transaction FAB */
-.bottom-nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:center;justify-content:initial;gap:2px;padding:8px 7px}
-.bottom-nav>a,.bottom-nav>a:not(.nav-plus){width:100%;min-width:0;min-height:54px;justify-content:center;padding:4px 2px;border-radius:13px}
+/* Qoomia V4.1.6 — destination-based navigation and scroll-aware add movement action */
+.bottom-nav{bottom:calc(10px + env(safe-area-inset-bottom));padding-inline:8px}
+.bottom-nav>a{flex:1 1 20%;width:auto;min-width:0;gap:3px}
 .bottom-nav>a>span:last-child{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bottom-nav>a:not(.nav-plus).active{color:var(--primary)}
-.bottom-nav>a:not(.nav-plus).active .nav-tab-icon{background:color-mix(in srgb,var(--primary) 13%,var(--surface));color:var(--primary)}
-.transaction-fab{position:fixed;z-index:36;right:max(15px,env(safe-area-inset-right));bottom:calc(94px + env(safe-area-inset-bottom));min-height:48px;display:inline-flex;align-items:center;gap:9px;padding:7px 16px 7px 8px;border:1px solid color-mix(in srgb,#fff 22%,transparent);border-radius:999px;background:linear-gradient(135deg,#075E57 0%,var(--primary) 54%,var(--primary2) 120%);color:#fff;text-decoration:none;font-size:13px;font-weight:850;letter-spacing:-.08px;box-shadow:0 10px 26px rgba(6,78,59,.24),0 2px 7px rgba(6,78,59,.14);transform:translateZ(0);will-change:transform,opacity}
-.transaction-fab:hover,.transaction-fab:focus-visible{outline:0;box-shadow:0 12px 30px rgba(6,78,59,.3),0 0 0 3px color-mix(in srgb,var(--primary) 20%,transparent);transform:translateY(-1px)}
-.transaction-fab-icon{width:34px;height:34px;display:grid;place-items:center;flex:0 0 34px;border-radius:999px;background:rgba(255,255,255,.15)}
-body:has(.transaction-fab) .shell{padding-bottom:calc(164px + env(safe-area-inset-bottom))}
-.home-budget-chevron{display:grid;place-items:center;width:30px;height:30px;flex:0 0 30px;border-radius:999px;background:var(--surface2);color:var(--primary);font-size:23px;font-weight:700;line-height:1}
-@media(min-width:600px){.transaction-fab{right:calc((100vw - 560px)/2 + 16px)}}
-@media(max-width:430px){.bottom-nav{gap:0;padding-right:4px;padding-left:4px}.bottom-nav>a,.bottom-nav>a:not(.nav-plus){font-size:9px}.nav-tab-icon{width:31px}.transaction-fab{right:max(12px,env(safe-area-inset-right));bottom:calc(89px + env(safe-area-inset-bottom));min-height:46px;padding:6px 14px 6px 7px;font-size:12px}.transaction-fab-icon{width:32px;height:32px;flex-basis:32px}body:has(.transaction-fab) .shell{padding-bottom:calc(156px + env(safe-area-inset-bottom))}}
-@media(prefers-reduced-motion:no-preference){.transaction-fab{animation:qoomia-fab-arrive .42s cubic-bezier(.2,.8,.2,1) .16s both}@keyframes qoomia-fab-arrive{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}}
-@media(prefers-reduced-motion:reduce){.transaction-fab{animation:none;transition:none}}
+.floating-add-movement{position:fixed;z-index:29;right:max(16px,calc((100vw - 560px)/2 + 16px));bottom:calc(98px + env(safe-area-inset-bottom));height:52px;max-width:230px;display:flex;align-items:center;justify-content:center;gap:9px;padding:0 19px 0 14px;border-radius:999px;color:#fff;text-decoration:none;background:linear-gradient(135deg,var(--primary),var(--primary2));box-shadow:0 12px 28px rgba(15,118,110,.34);overflow:hidden;white-space:nowrap;animation:floating-add-enter .34s cubic-bezier(.2,.8,.2,1) both;transition:max-width .24s cubic-bezier(.2,.8,.2,1),width .24s cubic-bezier(.2,.8,.2,1),padding .24s cubic-bezier(.2,.8,.2,1),transform .16s ease,box-shadow .16s ease}
+.floating-add-movement:hover{box-shadow:0 15px 32px rgba(15,118,110,.42)}
+.floating-add-movement:active{transform:scale(.95)}
+.floating-add-icon{width:27px;height:27px;display:grid;place-items:center;flex:0 0 27px;transition:transform .24s cubic-bezier(.2,.8,.2,1)}
+.floating-add-label{max-width:170px;overflow:hidden;opacity:1;font-weight:800;transition:max-width .2s ease,opacity .15s ease,margin .2s ease}
+.floating-add-movement.is-collapsed{width:52px;max-width:52px;padding:0;gap:0}
+.floating-add-movement.is-collapsed .floating-add-label{max-width:0;opacity:0;margin:0}
+.floating-add-movement.is-collapsed .floating-add-icon{transform:rotate(90deg)}
+body:has(.floating-add-movement) .shell{padding-bottom:174px}
+@keyframes floating-add-enter{from{opacity:0;transform:translateY(12px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+/* Qoomia V4.1.6 — list/calendar switch for transactions */
+.movements-head{align-items:flex-start}
+.movement-view-toggle{display:flex;align-items:center;gap:4px;padding:4px;border:1px solid var(--line);border-radius:15px;background:var(--surface)}
+.movement-view-toggle button{min-height:38px;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 10px;border-radius:11px;background:transparent;color:var(--muted);box-shadow:none}
+.movement-view-toggle button.active{background:var(--surface2);color:var(--primary)}
+.transaction-calendar{padding:14px;margin-top:12px;overflow:hidden}
+.calendar-toolbar{display:grid;grid-template-columns:42px 1fr 42px;align-items:center;gap:8px;margin-bottom:14px}
+.calendar-toolbar>div{text-align:center;min-width:0}
+.calendar-toolbar h2{text-transform:capitalize}
+.calendar-toolbar small{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.calendar-toolbar button{width:42px;height:42px;padding:0;display:grid;place-items:center;background:var(--surface2);color:var(--primary)}
+.calendar-toolbar button:last-child svg{transform:rotate(180deg)}
+.calendar-weekdays,.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.calendar-weekdays{margin-bottom:5px}
+.calendar-weekdays span{text-align:center;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase}
+.calendar-grid{gap:4px}
+.calendar-grid button{position:relative;min-width:0;height:62px;padding:5px 3px;border:1px solid transparent;border-radius:11px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;background:transparent;color:var(--text);font-weight:700;box-shadow:none;overflow:hidden}
+.calendar-grid button:hover:not(:disabled){background:var(--surface2)}
+.calendar-grid button.selected{border-color:var(--primary);background:var(--surface2);box-shadow:inset 0 0 0 1px var(--primary)}
+.calendar-grid button.outside{opacity:.22}
+.calendar-grid button:disabled{cursor:default}
+.calendar-day-number{font-size:12px;line-height:20px}
+.calendar-day-total{display:block;width:100%;font-size:8px;line-height:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.calendar-day-dot{width:5px;height:5px;border-radius:50%;margin-top:2px;background:var(--primary)}
+.calendar-day-detail{margin:15px -14px -14px;padding:15px 14px 4px;border-top:1px solid var(--line);background:var(--surface)}
+.calendar-day-transactions{margin-top:5px}
+.calendar-day-transactions .transaction{width:100%;background:transparent;color:var(--text);border-radius:0;text-align:left}
+.calendar-day-empty{margin:13px 0 16px;text-align:center;font-size:13px}
+.calendar-overflow{margin:11px 0 0;color:var(--red);font-size:12px;text-align:center}
+
+@media(max-width:520px){
+  .movements-head{align-items:stretch;flex-direction:column}
+  .movement-view-toggle{width:100%;display:grid;grid-template-columns:1fr 1fr}
+  .movement-view-toggle button{width:100%}
+  .calendar-toolbar small{display:none}
+}
+@media(max-width:390px){
+  .bottom-nav>a{font-size:9px}
+  .bottom-nav .nav-tab-icon{width:30px}
+  .transaction-calendar{padding-inline:9px}
+  .calendar-grid{gap:2px}
+  .calendar-grid button{height:58px;padding-inline:1px}
+  .calendar-day-total{font-size:7px}
+  .calendar-day-detail{margin-inline:-9px;padding-inline:9px}
+}
+@media(prefers-reduced-motion:reduce){
+  .floating-add-movement,.floating-add-icon,.floating-add-label{animation:none!important;transition:none!important}
+}

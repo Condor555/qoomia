@@ -24,8 +24,7 @@ export async function GET(req:Request){
     const start=url.searchParams.get('start')||'';
     const end=url.searchParams.get('end')||'';
     const page=Math.max(1,Number(url.searchParams.get('page')||1));
-    const requestedSize=Number(url.searchParams.get('size')||50);
-    const size=Math.min(50,Math.max(1,Number.isFinite(requestedSize)?Math.floor(requestedSize):50));
+    const size=Math.min(500,Math.max(1,Number(url.searchParams.get('size')||30)));
     let query=sb.from('transactions').select('*',{count:'exact'}).eq('space_id',spaceId).order('date',{ascending:false}).order('created_at',{ascending:false}).range((page-1)*size,page*size-1);
     if(q)query=query.ilike('note',`%${q}%`);
     if(author)query=query.eq('created_by',author);
