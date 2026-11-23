@@ -4,6 +4,7 @@ import LanguageProvider from '../components/LanguageProvider';
 import Nav from '../components/Nav';
 import ThemeProvider from '../components/ThemeProvider';
 import ToastProvider from '../components/ToastProvider';
+import TransactionFab from '../components/TransactionFab';
 import './globals.css';
 
 const siteUrl=process.env.NEXT_PUBLIC_SITE_URL||'https://qoomia.vercel.app';
@@ -28,5 +29,5 @@ export const viewport:Viewport={
 };
 
 export default function Layout({children,modal}:{children:React.ReactNode;modal:React.ReactNode}){
-  return <html lang="it" suppressHydrationWarning><body><ThemeProvider/><LanguageProvider><ToastProvider><main className="shell"><AppHeader/>{children}</main><Nav/>{modal}</ToastProvider></LanguageProvider></body></html>;
+  return <html lang="it" suppressHydrationWarning><body><ThemeProvider/><LanguageProvider><ToastProvider><main className="shell"><AppHeader/>{children}</main><TransactionFab/><Nav/>{modal}</ToastProvider></LanguageProvider></body></html>;
 }

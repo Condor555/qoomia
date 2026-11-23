@@ -85,7 +85,6 @@ export default function Budget(){
   async function removeMacro(){if(!data?.canEdit||!editor||data.macros.length<2)return;const item=data.macros.find(macro=>macro.id===editor.id);if(!item)return;const fallback=data.macros.find(macro=>macro.id!==item.id&&macro.name==='Altro')||data.macros.find(macro=>macro.id!==item.id);if(!fallback)return;setSaving(true);setMessage('');try{const query=`?spaceId=${encodeURIComponent(data.spaceId)}&id=${encodeURIComponent(item.id)}&fallbackId=${encodeURIComponent(fallback.id)}`;await requestMacro('DELETE',undefined,query);setConfirmMacroDelete(false);setEditor(null);setMessage(t('budget.macroDeleted'));await load(data.spaceId)}catch(reason:unknown){setMessage(reason instanceof Error?reason.message:t('budget.macroOperationError'))}finally{setSaving(false)}}
 
   return <>
-    <nav className="subpage-breadcrumb" aria-label={t('budget.breadcrumb')}><Link href="/statistiche" className="back-link budget-back"><span aria-hidden="true"><Icon name="chevronLeft" size={18}/></span>{t('budget.back')}</Link></nav>
     <header className="page-head budget-head"><div><h1>{t('budget.title')}</h1><p>{t('budget.subtitle')}</p></div><MonthPicker value={month} onChange={setMonth}/></header>
     {message&&<div className="notice" role="status">{message}</div>}
     {loading&&<div className="empty-state surface budget-loading" role="status"><b>{t('budget.loading')}</b><small>{t('budget.loadingHelp')}</small></div>}

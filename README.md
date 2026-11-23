@@ -6,7 +6,7 @@
 
 **Dai senso alle tue spese, in privato o in famiglia.**
 
-[![Versione](https://img.shields.io/badge/versione-4.1.5-0F766E?style=flat-square)](#stato-del-progetto)
+[![Versione](https://img.shields.io/badge/versione-4.1.6-0F766E?style=flat-square)](#stato-del-progetto)
 [![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3FCF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com/)
@@ -43,10 +43,12 @@ I pilastri dell'esperienza sono **Spazi Privati e Condivisi**, **Macro Budget e 
 - import CSV compatibile con intestazioni italiane e inglesi;
 - export CSV.
 
-### Esperienza V4.1.5
+### Esperienza V4.1.6
 
 - hotfix iPhone 16: SpacePicker come vero popover ancorato al trigger (sotto o sopra secondo lo spazio disponibile), CTA movimento compatta e adattiva alla tastiera, conferma modifiche più leggibile e grabber rimosso dalle sheet con chiusura X;
-- card Budget Home interamente tappabile, con accesso immediato e chevron discreto senza aggiungere una tab principale;
+- navigazione principale Home · Movimenti · Budget · Statistiche · Impostazioni, con Budget come destinazione autonoma e stato attivo turchese;
+- pulsante contestuale “Aggiungi movimento” flottante solo in Home e Movimenti, collegato all’AdaptiveSheet esistente;
+- card Budget Home interamente tappabile, mantenuta come riepilogo rapido con chevron discreto;
 - ricerca Movimenti con reset automatico alla cancellazione e chip dei filtri rimovibili singolarmente;
 - donut Statistiche con label esterne basate sulla stessa pipeline `CategoryColorIcon`/Icons8 locale e legenda completa icona, categoria, importo e percentuale;
 - componenti condivisi per skeleton, errori inline, stati vuoti, toast e pulsanti asincroni, senza falsi valori zero durante il caricamento;
@@ -198,7 +200,7 @@ Verificare sempre i termini delle rispettive licenze prima di distribuire o modi
 
 ## Stato del progetto
 
-**Versione corrente: V4.1.5 UX Consistency.**
+**Versione corrente: V4.1.6 Budget Navigation & Transaction FAB.**
 
 Sono implementati multiutente, Spazi Privati e Condivisi, movimenti, categorie per tipo e spazio, Budget con rollover, ricorrenze, statistiche, Obiettivi di risparmio, import/export CSV, i18n e PWA.
 

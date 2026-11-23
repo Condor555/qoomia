@@ -112,8 +112,8 @@ export default function Home(){
       <section className={`money-card surface${stats?'':' is-loading'}`}><header><span>{t('common.expenses')}</span><Icon name="arrowDown" size={16}/></header><strong className="red">{stats?currency(stats.expense):<Skeleton width="96px" height="22px"/>}</strong></section>
     </div>
 
-    <Link href="/budget" className={`section surface home-budget-summary home-budget-link${stats?.budget.status?` ${stats.budget.status}`:''}`} aria-label="Apri Budget del mese">
-      <div className="section-title"><div><h2>Budget del mese</h2><small>{stats?stats.budget.amount?'Controllo del piano mensile':'Nessun budget configurato':'Caricamento budget'}</small></div><span className="home-budget-open">{stats?.budget.amount?'Apri':'Configura'} <b aria-hidden="true">›</b></span></div>
+    <Link href="/budget" className={`section surface home-budget-summary home-budget-link${stats?.budget.status?` ${stats.budget.status}`:''}`} aria-label={stats?.budget.amount?'Apri Budget del mese':'Configura Budget del mese'}>
+      <div className="section-title"><div><h2>Budget del mese</h2><small>{stats?stats.budget.amount?'Controllo del piano mensile':'Tocca per configurarlo':'Caricamento budget'}</small></div><span className="home-budget-chevron" aria-hidden="true">›</span></div>
       {stats?<>{stats.budget.amount>0?<><div className="home-budget-values"><span><small>Speso</small><b>{currency(stats.budget.spent)}</b></span><span><small>Disponibile</small><b className={stats.budget.available<0?'red':''}>{currency(stats.budget.available)}</b></span><strong>{stats.budget.percentage}%</strong></div><div className={`budget-progress ${stats.budget.status}`}><span style={{width:`${Math.min(100,stats.budget.percentage)}%`}}/></div>{stats.budget.projectedOverage>0&&<p className="home-budget-warning">Rischio superamento: {currency(stats.budget.projectedOverage)}</p>}</>:<div className="home-budget-empty"><p>Imposta un limite mensile per controllare subito spesa e residuo.</p><span>Configura ora</span></div>}</>:<><Skeleton width="48%" height="16px"/><Skeleton className="home-budget-skeleton"/></>}
     </Link>
 

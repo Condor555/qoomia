@@ -8,7 +8,7 @@ import {useI18n} from './LanguageProvider';
 
 type NavigationTab = {
   href: string;
-  label: 'nav.home'|'nav.movements'|'nav.statistics'|'nav.settings';
+  label: 'nav.home'|'nav.movements'|'nav.budget'|'nav.statistics'|'nav.settings';
   icon: IconName | 'movements';
   isActive: (pathname: string) => boolean;
 };
@@ -28,14 +28,18 @@ const navigationTabs: NavigationTab[] = [
       pathname === '/movimenti' || pathname.startsWith('/movimenti/'),
   },
   {
+    href: '/budget',
+    label: 'nav.budget',
+    icon: 'wallet',
+    isActive: (pathname) =>
+      pathname === '/budget' || pathname.startsWith('/budget/'),
+  },
+  {
     href: '/statistiche',
     label: 'nav.statistics',
     icon: 'chart',
     isActive: (pathname) =>
-      pathname === '/statistiche' ||
-      pathname.startsWith('/statistiche/') ||
-      pathname === '/budget' ||
-      pathname.startsWith('/budget/'),
+      pathname === '/statistiche' || pathname.startsWith('/statistiche/'),
   },
   {
     href: '/account',
@@ -87,17 +91,7 @@ export default function Nav() {
 
   return (
     <nav className="bottom-nav" aria-label={t('nav.main')}>
-      {navigationTabs.slice(0, 2).map(renderTab)}
-
-      <Link
-        className="nav-plus"
-        href="/nuovo"
-        aria-label={t('nav.newTransaction')}
-      >
-        <Icon name="plus" size={28} />
-      </Link>
-
-      {navigationTabs.slice(2).map(renderTab)}
+      {navigationTabs.map(renderTab)}
     </nav>
   );
 }
