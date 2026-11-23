@@ -395,7 +395,7 @@ html[data-theme="dark"] .space-picker-trigger,html[data-theme="dark"] .space-pic
 @media(max-width:520px){
   .app-space-bar{margin-bottom:9px}
   .space-picker-compact{max-width:220px}
-  .space-picker-compact .space-picker-list{position:fixed;top:auto;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));width:auto;min-width:0;max-height:min(320px,55vh);overflow:auto}
+  
   .recurring-section-head{align-items:flex-start;gap:10px;flex-wrap:wrap}
   .recurring-space-picker{margin-left:auto}
   .space-picker-destination .space-picker-list{min-width:0}
@@ -559,7 +559,7 @@ html[data-theme="dark"] .space-picker-trigger,html[data-theme="dark"] .space-pic
 
 /* Qoomia V4.1.1 — UX follow-up */
 .account-custom-space-picker{width:100%;max-width:none;margin:10px 0 13px;z-index:45}.account-custom-space-picker .space-picker-trigger{width:100%;min-height:48px;border-radius:15px;padding:8px 11px}.account-custom-space-picker .space-picker-list{left:0;right:auto;width:100%}.category-editor-actions{display:grid;gap:8px;margin-top:14px}.category-editor-actions>button{width:100%;min-height:48px;margin:0}.category-editor-actions .category-save-button{background:var(--primary);color:#fff}.category-editor-actions .delete-btn{background:#c94f57;color:#fff}.category-editor-actions+.merge-box{margin-top:16px}.goals-back{margin-bottom:14px}.goal-history-item{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 4px;border:0;border-top:1px solid var(--line);border-radius:0;background:transparent;color:var(--text);text-align:left}.goal-history-item:first-child{border-top:0}.goal-history-item:disabled{cursor:default;opacity:1}.goal-history-item.editable{cursor:pointer}.goal-history-item.editable:hover,.goal-history-item.editable:focus-visible{outline:0;background:var(--surface2);border-radius:12px;padding-left:10px;padding-right:10px}.goal-history-item>span{min-width:0}.goal-history-item b,.goal-history-item small{display:block}.goal-history-item small{margin-top:3px;color:var(--muted)}.goal-history-item p{margin:5px 0 0;color:var(--muted);font-size:12px}.goal-history-item>strong{flex:0 0 auto;color:var(--primary);font-size:11px}.goal-contribution-modal>.delete-btn{width:100%;margin-top:8px}.goal-contribution-modal>.save-btn+.delete-btn{margin-top:8px}
-@media(max-width:430px){.account-custom-space-picker .space-picker-list{position:fixed;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));width:auto;max-height:min(320px,55vh)}.category-editor-actions{margin-top:12px}.goals-back{margin-bottom:12px}.goal-history-item{min-height:48px}}
+@media(max-width:430px){.category-editor-actions{margin-top:12px}.goals-back{margin-bottom:12px}.goal-history-item{min-height:48px}}
 
 @media(max-width:430px){.back-link{min-height:44px}.transaction-close{width:44px;height:44px;min-width:44px;min-height:44px;padding:0}}
 
@@ -900,7 +900,7 @@ button{font-weight:650}
 .sheet-discard-card{width:min(100%,400px);padding:24px 20px 20px;border-radius:24px;box-shadow:0 26px 70px rgba(0,0,0,.28)}
 .sheet-discard-card h3{font-size:22px;line-height:1.15;letter-spacing:-.35px}.sheet-discard-card p{max-width:310px;margin:10px auto 20px;font-size:14px;line-height:1.5}.sheet-discard-card>div{grid-template-columns:minmax(0,1.28fr) minmax(104px,.82fr);gap:10px}.sheet-discard-card button{min-height:52px;padding:10px 12px;font-size:13px;line-height:1.2}.sheet-discard-card .secondary{white-space:nowrap}
 @media(max-width:520px){
-  .space-picker-compact .space-picker-list{z-index:380;top:auto;right:max(12px,env(safe-area-inset-right));bottom:calc(98px + env(safe-area-inset-bottom));left:max(12px,env(safe-area-inset-left));width:auto;min-width:0;max-height:min(300px,calc(var(--visual-viewport-height,100dvh) - 160px));overflow:auto;overscroll-behavior:contain;border-radius:18px;box-shadow:0 22px 60px rgba(0,0,0,.28)}
+  
   .space-picker.is-open{z-index:380}.app-space-bar:has(.space-picker.is-open){z-index:380}
   .adaptive-sheet,.adaptive-sheet-compact,.adaptive-sheet-medium,.adaptive-sheet-large,.adaptive-sheet-full{max-height:min(92dvh,calc(var(--sheet-viewport-height,100dvh) - 8px))}
   .adaptive-sheet-grabber{width:36px;height:4px;margin:8px auto 1px;background:rgba(120,120,128,.34)}
@@ -910,3 +910,35 @@ button{font-weight:650}
 .category-donut-wrap{height:270px;overflow:visible}.category-donut-wrap .recharts-wrapper,.category-donut-wrap svg{overflow:visible}.donut-category-label image{pointer-events:none}.category-donut-wrap .donut-center{transform:scale(.92)}
 
 .entry-card:not(.entry-card-embedded).composer-keyboard-open{padding-bottom:84px}.entry-card:not(.entry-card-embedded).composer-keyboard-open>.save-btn{position:fixed;z-index:210;right:max(13px,env(safe-area-inset-right));bottom:calc(var(--composer-keyboard-inset,0px) + 10px);left:max(13px,env(safe-area-inset-left));width:auto;max-width:534px;margin:0 auto;box-shadow:0 12px 34px rgba(15,118,110,.3)}
+
+/* Qoomia V4.1.5 definitive SpacePicker — trigger-anchored portal popover */
+.space-picker-popover{
+  position:fixed;
+  z-index:460;
+  min-width:0;
+  margin:0;
+  overflow-x:hidden;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding:6px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:var(--surface);
+  color:var(--text);
+  box-shadow:0 18px 48px rgba(13,18,37,.28);
+  -webkit-overflow-scrolling:touch;
+  transform-origin:center top;
+}
+.space-picker-popover.is-above{transform-origin:center bottom}
+.space-picker-popover.is-positioning{position:fixed;left:-10000px;top:-10000px;visibility:hidden;pointer-events:none}
+.space-picker-popover .space-picker-option{min-height:48px}
+html[data-theme="dark"] .space-picker-popover{color-scheme:dark;box-shadow:0 22px 56px rgba(0,0,0,.48)}
+@media(prefers-reduced-motion:no-preference){
+  .space-picker-popover:not(.is-positioning){animation:qoomia-space-popover-in .14s ease-out both}
+  @keyframes qoomia-space-popover-in{from{opacity:0;transform:translateY(-3px) scale(.985)}to{opacity:1;transform:none}}
+  .space-picker-popover.is-above:not(.is-positioning){animation-name:qoomia-space-popover-above-in}
+  @keyframes qoomia-space-popover-above-in{from{opacity:0;transform:translateY(3px) scale(.985)}to{opacity:1;transform:none}}
+}
+@media(prefers-reduced-motion:reduce){.space-picker-popover{animation:none}}
+
+:root{--q-safe-left:env(safe-area-inset-left,0px);--q-safe-right:env(safe-area-inset-right,0px);--q-safe-top:env(safe-area-inset-top,0px);--q-safe-bottom:env(safe-area-inset-bottom,0px)}
