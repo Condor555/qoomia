@@ -3,8 +3,11 @@
 import {useEffect,useRef,useState} from 'react';
 import AmountExpressionInput from './AmountExpressionInput';
 import CategoryIcon from './CategoryIcon';
+import CategoryPickerSheet from './CategoryPickerSheet';
 import DateInput from './DateInput';
 import SpacePicker,{type SpacePickerOption} from './SpacePicker';
+import {AsyncButton,InlineError,Skeleton} from './UXFeedback';
+import {useToast} from './ToastProvider';
 import {amountForSave} from '../lib/amount-expression';
 import {useI18n} from './LanguageProvider';
 
@@ -16,6 +19,7 @@ type NewTransactionComposerProps={embedded?:boolean;onSaved?:()=>void;onDirtyCha
 
 export default function NewTransactionComposer({embedded=false,onSaved,onDirtyChange}:NewTransactionComposerProps){
   const {currency,t}=useI18n();
+  const {showToast}=useToast();
   const [amount,setAmount]=useState('');
   const [note,setNote]=useState('');
   const [category,setCategory]=useState('');
@@ -34,6 +38,7 @@ export default function NewTransactionComposer({embedded=false,onSaved,onDirtyCh
   const [suggestionsOpen,setSuggestionsOpen]=useState(false);
   const [suggestionsBusy,setSuggestionsBusy]=useState(false);
   const [activeSuggestion,setActiveSuggestion]=useState(0);
+  const [categoryPickerOpen,setCategoryPickerOpen]=useState(false);
   const destinationRequestRef=useRef(0);
   const suggestionRequestRef=useRef(0);
   const suppressAutocompleteRef=useRef(false);
@@ -187,15 +192,14 @@ export default function NewTransactionComposer({embedded=false,onSaved,onDirtyCh
           setMessage(`Movimento salvato, ma ricorrenza non creata: ${recurringResult.error||'errore sconosciuto'}`);return;
         }
       }
-      setMessage(t('new.saved'));
       setAmount('');setNote('');setCategory('');setSuggestions([]);setSuggestionsOpen(false);setRecurring(false);
+      showToast({message:t('new.saved'),tone:'success'});
       onSaved?.();
     }catch{setMessage('Errore di connessione.');}
     finally{setBusy(false);}
   }
 
   const selectedCategory=categories.find(item=>item.name===category);
-  const visibleCategories=categories.filter(item=>item.kind===kind);
   const amountPreview=amountForSave(amount);
   function chooseKind(next:Kind){if(next===kind)return;setKind(next);setCategory('');setSuggestions([]);setSuggestionsOpen(false);suggestionRequestRef.current++;}
 
@@ -206,12 +210,13 @@ export default function NewTransactionComposer({embedded=false,onSaved,onDirtyCh
       <div className="segmented"><button type="button" className={kind==='expense'?'active':''} onClick={()=>chooseKind('expense')}>{t('common.expense')}</button><button type="button" className={kind==='income'?'active':''} onClick={()=>chooseKind('income')}>{t('common.income')}</button></div>
       <AmountExpressionInput className="amount-input-wrap" value={amount} onChange={setAmount} ariaLabel={t('new.amount')}/>
       <div className="field autocomplete-field"><label htmlFor="transaction-note">{t('common.description')}</label><input id="transaction-note" value={note} autoComplete="off" aria-autocomplete="list" aria-expanded={suggestionsOpen} aria-controls={suggestionsOpen?'transaction-note-suggestions':undefined} onFocus={()=>{if(suggestions.length)setSuggestionsOpen(true)}} onKeyDown={noteKeys} onChange={event=>changeNote(event.target.value)} placeholder={t('new.example')}/>{suggestionsBusy&&<span className="autocomplete-busy" aria-live="polite">{t('new.searching')}</span>}{suggestionsOpen&&suggestions.length>0&&<div id="transaction-note-suggestions" className="autocomplete-list" role="listbox" aria-label={t('common.description')}>{suggestions.map((suggestion,index)=><button ref={node=>{suggestionRefs.current[index]=node}} key={suggestion.note.toLocaleLowerCase()} type="button" role="option" aria-selected={index===activeSuggestion} tabIndex={index===activeSuggestion?0:-1} onMouseDown={event=>event.preventDefault()} onMouseEnter={()=>setActiveSuggestion(index)} onKeyDown={event=>suggestionKeys(event,index)} onClick={()=>selectSuggestion(suggestion)}><span><b>{suggestion.note}</b><small>{suggestion.category||t('new.categoryUnavailable')} · {suggestion.frequency===1?t('new.usedOnce'):t('new.usedMany',{count:suggestion.frequency})}</small></span><strong>↵</strong></button>)}</div>}</div>
-      <div className="field"><label>{kind==='income'?t('new.incomeCategory'):t('new.expenseCategory')}</label><div className="category-picker"><CategoryIcon name={category||t('common.category')} icon={selectedCategory?.icon} color={selectedCategory?.color}/><select value={category} disabled={loadingSpace} onChange={event=>setCategory(event.target.value)}><option value="">{loadingSpace?t('new.loadingCategories'):visibleCategories.length?t('new.selectCategory'):t('new.noCategories')}</option>{visibleCategories.map(item=><option key={item.name} value={item.name}>{item.name}</option>)}</select></div></div>
+      <div className="field"><label>{kind==='income'?t('new.incomeCategory'):t('new.expenseCategory')}</label>{loadingSpace?<div className="category-picker-trigger-shell"><Skeleton className="ui-skeleton-avatar"/><Skeleton className="ui-skeleton-line wide"/></div>:<button type="button" className="category-picker-trigger" onClick={()=>setCategoryPickerOpen(true)} disabled={!spaceId}><CategoryIcon name={category||t('common.category')} icon={selectedCategory?.icon||undefined} color={selectedCategory?.color||undefined}/><span><small>{category?kind==='income'?t('new.incomeCategory'):t('new.expenseCategory'):t('new.selectCategory')}</small><strong>{category||t('new.selectCategory')}</strong></span><b aria-hidden="true">›</b></button>}</div>
       <div className="two-col transaction-meta-grid"><div className="field transaction-date-field"><label>{t('common.date')}</label><DateInput value={date} onChange={setDate} ariaLabel={t('common.date')}/></div><div className="field transaction-account-field"><label>{t('new.account')}</label><input value={account} readOnly aria-readonly="true" title={account}/></div></div>
       <label className="toggle-card"><span><b>{t('new.recurring')}</b><small>{t('new.sameSpace')}</small></span><input type="checkbox" checked={recurring} onChange={event=>setRecurring(event.target.checked)}/></label>
       {recurring&&<select value={frequency} onChange={event=>setFrequency(event.target.value)}><option value="weekly">{t('new.weekly')}</option><option value="monthly">{t('new.monthly')}</option><option value="yearly">{t('new.yearly')}</option></select>}
-      <button className="save-btn" disabled={busy||loadingSpace||!spaceId} onClick={save}>{busy?t('common.saving'):`${t('common.save')}${amountPreview!==null?` ${currency(amountPreview)}`:''}`}</button>
-      {message&&<div className="notice" role="status">{message}</div>}
+      <AsyncButton className="save-btn" busy={busy} busyLabel={t('common.saving')} disabled={loadingSpace||!spaceId} onClick={save}>{`${t('common.save')}${amountPreview!==null?` ${currency(amountPreview)}`:''}`}</AsyncButton>
+      {message&&<InlineError message={message}/>}
     </section>
+    <CategoryPickerSheet open={categoryPickerOpen} onClose={()=>setCategoryPickerOpen(false)} categories={categories} value={category} kind={kind} onKindChange={chooseKind} onChange={setCategory} spaceId={spaceId} loading={loadingSpace}/>
   </>;
 }

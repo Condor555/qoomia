@@ -1,0 +1,145 @@
+{
+  "version": "4.1.5",
+  "name": "UX Consistency",
+  "baseline": "Qoomia V4.1.4 final (AdaptiveSheet + floating iPhone composer + DateInput fix + performance)",
+  "supabase_changes": false,
+  "installation": "Copy all files to the repository root preserving paths. No SQL to run.",
+  "validation": {
+    "typescript_syntax_files": 103,
+    "typescript_syntax_diagnostics": 0,
+    "relative_imports_missing": 0,
+    "css_braces_balanced": true,
+    "media_queries_before": 55,
+    "media_queries_after": 53,
+    "coarse_pointer_blocks_before": 3,
+    "coarse_pointer_blocks_after": 1,
+    "production_build": "not run: npm registry returned HTTP 403 in the execution environment"
+  },
+  "files": [
+    {
+      "path": "README.md",
+      "status": "modified",
+      "sha256": "9057f9c0695708431899151608ce3a26593f83ae6f6919af889c03ebcb853ea7"
+    },
+    {
+      "path": "app/@modal/(.)nuovo/page.tsx",
+      "status": "preserved-v4.1.4",
+      "sha256": "821fc76cc316df00f462dd481d386eaac55df5edaf9defa5f8c2d4d6e5fa352f"
+    },
+    {
+      "path": "app/@modal/default.tsx",
+      "status": "preserved-v4.1.4",
+      "sha256": "e2f14f53e9aadaab3172da19f518e962ce22334f999792eb3d4cdbffe3f09899"
+    },
+    {
+      "path": "app/account/categorie/page.tsx",
+      "status": "modified",
+      "sha256": "7ee63d679315e009e41cac1592506e3fc4534e112960c4cf217a123e417ae963"
+    },
+    {
+      "path": "app/account/informazioni/page.tsx",
+      "status": "modified",
+      "sha256": "e1998f5446d7f7e274d2909df474d227f5c95aed737e5ae80abc63d2b9ebe512"
+    },
+    {
+      "path": "app/api/categories/usage/route.ts",
+      "status": "new",
+      "sha256": "d2f72833e4a3efba4e4c3b30f4f73a926578d788ed7a94e8f0e065cd0fd54fcf"
+    },
+    {
+      "path": "app/api/stats/route.ts",
+      "status": "modified",
+      "sha256": "a0383e100aff868db1c0ef5b25daac9fd6bd338e9454b7228e5e077ad091c82f"
+    },
+    {
+      "path": "app/api/transactions/route.ts",
+      "status": "modified",
+      "sha256": "5ababeb7abd00ea927bd57223caa1c560549e55dd7e7a34bbaa2f806af83896f"
+    },
+    {
+      "path": "app/budget/page.tsx",
+      "status": "modified",
+      "sha256": "30fc06336855c7648d998c5a460d8bd6f583639a7ec331fa88624200e06fe72b"
+    },
+    {
+      "path": "app/globals.css",
+      "status": "modified",
+      "sha256": "71e54d10ff9c893827116249c647f1a200792169f1f5e19b61570286980afa65"
+    },
+    {
+      "path": "app/layout.tsx",
+      "status": "modified",
+      "sha256": "252ebab79ad6b49ae71a29cca28a6529c3295f77c498b1776e25b28bb2585239"
+    },
+    {
+      "path": "app/movimenti/page.tsx",
+      "status": "modified",
+      "sha256": "d2a5b47d2e879d3eac7eebb33567c5b8d2e51ae01cf5df8cffe749f2a1b24585"
+    },
+    {
+      "path": "app/nuovo/page.tsx",
+      "status": "preserved-v4.1.4",
+      "sha256": "7917ed266f4fb666d150b77d798a70483944e66e3e2eb30e0fae82b173951b16"
+    },
+    {
+      "path": "app/obiettivi/page.tsx",
+      "status": "modified",
+      "sha256": "f1266e480b343136f8a42592ebe51333b8b70c58440c392b05c054ab200c2bdf"
+    },
+    {
+      "path": "app/page.tsx",
+      "status": "modified",
+      "sha256": "c13b96d0e87651fc3c459f45e4c4348ecac4531e08f7a8d5d2a39dd2f640a883"
+    },
+    {
+      "path": "app/statistiche/page.tsx",
+      "status": "modified",
+      "sha256": "55c812bf6547512ef4104394162c175b2d9230c64b4204d847936ae98246f8cd"
+    },
+    {
+      "path": "components/AdaptiveSheet.tsx",
+      "status": "modified",
+      "sha256": "1da1e5ce9851cf5a85974a7aff8b8124437279c21c3d2be3a66cf784d3f3d8f2"
+    },
+    {
+      "path": "components/CategoryPickerSheet.tsx",
+      "status": "new",
+      "sha256": "cc5cf59c23994d9a6980a5fc4d196ad7a49aae2ff9e4067d9be307f93e2c196e"
+    },
+    {
+      "path": "components/DateInput.tsx",
+      "status": "preserved-v4.1.4",
+      "sha256": "7da49dab1257d36e276b203b92ae0e1e578c526c654057fc62ffdb2f01e94a3f"
+    },
+    {
+      "path": "components/Nav.tsx",
+      "status": "preserved-v4.1.4",
+      "sha256": "7a40f78637bce82807fb9e7ab443acadc3acbca3b30a845bf32095017f64150c"
+    },
+    {
+      "path": "components/NewTransactionComposer.tsx",
+      "status": "modified",
+      "sha256": "e8edda4f9b7955058532ad0ff9b4549469a027d008dc94cad3e3ed3e690b1014"
+    },
+    {
+      "path": "components/ToastProvider.tsx",
+      "status": "new",
+      "sha256": "338b23b30ef04bc4bc1e14a1f9aa5286b67db8dfbf5fb4a7b41e01ccc2f3a3f3"
+    },
+    {
+      "path": "components/UXFeedback.tsx",
+      "status": "new",
+      "sha256": "1be87ca5771615c7e567d0795e74da1d85d75ad4f9c245ffc6531b59fc950b0e"
+    },
+    {
+      "path": "package-lock.json",
+      "status": "modified",
+      "sha256": "69a50b0d7cac0b6e6e665ab815523aa790bd5a6f382ae6631b9828de5bdd6bc7"
+    },
+    {
+      "path": "package.json",
+      "status": "modified",
+      "sha256": "0e166077117ae7b7e0cf29e7e3f6071a689013fbdd3247c7e9dca539b26850d0"
+    }
+  ]
+}

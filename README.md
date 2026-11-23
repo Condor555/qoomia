@@ -6,7 +6,7 @@
 
 **Dai senso alle tue spese, in privato o in famiglia.**
 
-[![Versione](https://img.shields.io/badge/versione-4.1.4-0F766E?style=flat-square)](#stato-del-progetto)
+[![Versione](https://img.shields.io/badge/versione-4.1.5-0F766E?style=flat-square)](#stato-del-progetto)
 [![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3FCF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com/)
@@ -42,6 +42,16 @@ I pilastri dell'esperienza sono **Spazi Privati e Condivisi**, **Macro Budget e 
 - catalogo locale di icone categoria con ricerca e suggerimenti;
 - import CSV compatibile con intestazioni italiane e inglesi;
 - export CSV.
+
+### Esperienza V4.1.5
+
+- componenti condivisi per skeleton, errori inline, stati vuoti, toast e pulsanti asincroni, senza falsi valori zero durante il caricamento;
+- barra Cerca movimenti con filtri immediati raccolti in `AdaptiveSheet` e indicatore dei filtri attivi;
+- detail, modifica, selezione categoria, categorie, ricorrenze, obiettivi, Budget e conferme uniformati con `AdaptiveSheet`;
+- Category Picker con ricerca, categorie recenti/frequenti e icone Icons8 Color locali;
+- Home focalizzata su saldo, flussi, Budget, movimenti recenti, obiettivi e categorie principali;
+- report per categoria con icone e collegamento ai Movimenti già filtrati;
+- CSS iPhone/PWA consolidato mantenendo lo sheet flottante e il DateInput V4.1.4.
 
 ### Esperienza V4.1.4
 
@@ -184,7 +194,7 @@ Verificare sempre i termini delle rispettive licenze prima di distribuire o modi
 
 ## Stato del progetto
 
-**Versione corrente: V4.1.4 UX Foundation & Performance.**
+**Versione corrente: V4.1.5 UX Consistency.**
 
 Sono implementati multiutente, Spazi Privati e Condivisi, movimenti, categorie per tipo e spazio, Budget con rollover, ricorrenze, statistiche, Obiettivi di risparmio, import/export CSV, i18n e PWA.
 

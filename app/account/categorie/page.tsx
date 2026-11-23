@@ -2,9 +2,12 @@
 
 import { useEffect, useRef, useState } from 'react';
 import BackToAccount from '../../../components/BackToAccount';
+import AdaptiveSheet from '../../../components/AdaptiveSheet';
+import ConfirmDialog from '../../../components/ConfirmDialog';
 import IconCatalogPicker from '../../../components/IconCatalogPicker';
 import CategoryIcon from '../../../components/CategoryIcon';
 import SpacePicker,{type SpacePickerOption} from '../../../components/SpacePicker';
+import {InlineError} from '../../../components/UXFeedback';
 import {
   colorChoices,
   inferredCategoryStyle,
@@ -34,6 +37,8 @@ export default function Categorie() {
   const [color, setColor] = useState(colorChoices[0]);
 
   const [editing, setEditing] = useState<Cat | null>(null);
+  const [creating,setCreating]=useState(false);
+  const [confirmDelete,setConfirmDelete]=useState(false);
   const [originalName, setOriginalName] = useState('');
   const [target, setTarget] = useState('');
 
@@ -86,6 +91,7 @@ export default function Categorie() {
     setName('');
     setIcon('tag');
     setColor(colorChoices[0]);
+    setCreating(false);
     setMsg('');
     void load(nextSpaceId);
   }
@@ -142,6 +148,7 @@ export default function Categorie() {
     setName('');
     setIcon('tag');
     setColor(colorChoices[0]);
+    setCreating(false);
 
     load(spaceId);
   }
@@ -268,6 +275,7 @@ export default function Categorie() {
     setOriginalName('');
     setTarget('');
   }
+  function closeCreate(){setCreating(false);setName('');setIcon('tag');setColor(colorChoices[0]);setMsg('')}
 
   const selectedSpace=spaces.find(space=>space.id===spaceId);
 
@@ -301,54 +309,8 @@ export default function Categorie() {
       </div>
 
       <div id={`categories-${tab}-panel`} role="tabpanel" aria-labelledby={`categories-${tab}-tab`}>
-      <section className="settings-card surface">
-        <h2>Crea categoria di {tab==='income'?'entrata':'spesa'}</h2>
-
-        <input
-          value={name}
-          onChange={(e) => changeName(e.target.value)}
-          placeholder="Nome categoria"
-        />
-
-        <label className="picker-label">
-          Icona
-        </label>
-
-        <IconCatalogPicker value={icon} onChange={setIcon} suggestFor={name} />
-
-        <label className="picker-label">
-          Colore
-        </label>
-
-        <div className="color-picker">
-          {colorChoices.map((item) => (
-            <button
-              key={item}
-              type="button"
-              aria-label={`Colore ${item}`}
-              className={color === item ? 'selected' : ''}
-              style={{
-                background: item,
-              }}
-              onClick={() => setColor(item)}
-            />
-          ))}
-        </div>
-
-        <button
-          className="create-cat"
-          disabled={!spaceId||loadingCategories}
-          onClick={createCategory}
-        >
-          Crea categoria
-        </button>
-
-        {msg && !editing && (
-          <div className="notice">
-            {msg}
-          </div>
-        )}
-      </section>
+      <div className="category-primary-action"><button type="button" disabled={!spaceId||loadingCategories} onClick={()=>{setCreating(true);setMsg('')}}>+ Nuova categoria</button></div>
+      {msg&&!editing&&!creating&&<div className="notice" role="status">{msg}</div>}
 
       <section className="settings-card surface">
         <h2>Categorie di {tab==='income'?'entrata':'uscita'}</h2>
@@ -388,10 +350,13 @@ export default function Categorie() {
       </section>
       </div>
 
+      <AdaptiveSheet open={creating} onClose={closeCreate} title="Nuova categoria" eyebrow={tab==='income'?'Entrate':'Uscite'} size="large" dirty={Boolean(name.trim())} className="category-editor-sheet">
+        <div className="category-editor-form"><label className="picker-label">Nome</label><input value={name} onChange={(e)=>changeName(e.target.value)} placeholder="Nome categoria" autoFocus/><label className="picker-label">Icona</label><IconCatalogPicker value={icon} onChange={setIcon} suggestFor={name}/><label className="picker-label">Colore</label><div className="color-picker">{colorChoices.map(item=><button key={item} type="button" aria-label={`Colore ${item}`} className={color===item?'selected':''} style={{background:item}} onClick={()=>setColor(item)}/>)}</div>{msg&&<InlineError message={msg}/>}<button className="save-btn" disabled={!spaceId||loadingCategories} onClick={createCategory}>Crea categoria</button></div>
+      </AdaptiveSheet>
+
       {editing && (
-        <div className="modal">
-          <div className="modal-card surface">
-            <h2>Modifica categoria</h2>
+        <AdaptiveSheet open onClose={closeEditor} title="Modifica categoria" eyebrow={originalName} size="large" className="category-editor-sheet">
+          <div className="category-editor-form">
 
             <label className="picker-label">
               Nome
@@ -447,11 +412,7 @@ export default function Categorie() {
               ))}
             </div>
 
-            {msg && (
-              <div className="notice">
-                {msg}
-              </div>
-            )}
+            {msg&&<InlineError message={msg}/>} 
 
             <div className="category-editor-actions">
               <button className="category-save-button" onClick={saveCategory}>
@@ -459,7 +420,7 @@ export default function Categorie() {
               </button>
               <button
                 className="delete-btn"
-                onClick={removeCategory}
+                onClick={()=>setConfirmDelete(true)}
               >
                 Elimina categoria
               </button>
@@ -504,15 +465,12 @@ export default function Categorie() {
               </button>
             </div>
 
-            <button
-              className="secondary"
-              onClick={closeEditor}
-            >
-              Annulla
-            </button>
           </div>
-        </div>
+        </AdaptiveSheet>
       )}
+      <ConfirmDialog open={confirmDelete} title="Eliminare la categoria?" message={editing?`La categoria “${editing.name}” verrà eliminata. Se contiene movimenti, Qoomia ti chiederà prima dove migrarli.`:''} confirmLabel="Elimina categoria" destructive onClose={()=>setConfirmDelete(false)} onConfirm={async()=>{setConfirmDelete(false);await removeCategory()}}/>
     </>
   );
 }
+
+

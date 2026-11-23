@@ -19,6 +19,7 @@ type AdaptiveSheetProps={
   discardMessage?:string;
   className?:string;
   showHeader?:boolean;
+  restoreScroll?:boolean;
 };
 
 const focusable='a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
@@ -26,11 +27,12 @@ const focusable='a[href],button:not([disabled]),input:not([disabled]),select:not
 export default function AdaptiveSheet({
   open,onClose,title,eyebrow,children,size='large',busy=false,dirty=false,
   closeLabel='Chiudi',discardTitle='Scartare le modifiche?',
-  discardMessage='Le modifiche non salvate andranno perse.',className='',showHeader=true,
+  discardMessage='Le modifiche non salvate andranno perse.',className='',showHeader=true,restoreScroll=true,
 }:AdaptiveSheetProps){
   const titleId=useId();
   const panelRef=useRef<HTMLDivElement|null>(null);
   const returnFocusRef=useRef<HTMLElement|null>(null);
+  const scrollPositionRef=useRef(0);
   const [mounted,setMounted]=useState(false);
   const [confirmDiscard,setConfirmDiscard]=useState(false);
 
@@ -45,6 +47,7 @@ export default function AdaptiveSheet({
   useEffect(()=>{
     if(!open||!mounted)return;
     returnFocusRef.current=document.activeElement instanceof HTMLElement?document.activeElement:null;
+    scrollPositionRef.current=window.scrollY;
     const shell=document.querySelector<HTMLElement>('.shell');
     const nav=document.querySelector<HTMLElement>('.bottom-nav');
     const previousOverflow=document.body.style.overflow;
@@ -65,13 +68,17 @@ export default function AdaptiveSheet({
       document.body.style.overflow=previousOverflow;
       if(shell)shell.inert=Boolean(previousShellInert);
       if(nav)nav.inert=Boolean(previousNavInert);
+      if(restoreScroll)window.requestAnimationFrame(()=>window.scrollTo({top:scrollPositionRef.current,left:0,behavior:'auto'}));
       returnFocusRef.current?.focus({preventScroll:true});
     };
-  },[open,mounted]);
+  },[open,mounted,restoreScroll]);
 
   useEffect(()=>{
     if(!open)return;
     function onKeyDown(event:KeyboardEvent){
+      const backdrops=document.querySelectorAll<HTMLElement>('.adaptive-sheet-backdrop');
+      const topmost=backdrops[backdrops.length-1];
+      if(!topmost||!topmost.contains(panelRef.current))return;
       if(event.key==='Escape'){
         event.preventDefault();
         if(confirmDiscard)setConfirmDiscard(false);else requestClose();
