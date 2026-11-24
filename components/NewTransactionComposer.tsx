@@ -10,6 +10,7 @@ import {AsyncButton,InlineError,Skeleton} from './UXFeedback';
 import {useToast} from './ToastProvider';
 import {invalidateClientJson} from '../lib/client-json-cache';
 import {amountForSave} from '../lib/amount-expression';
+import {hapticFeedback} from '../lib/haptics';
 import {useI18n} from './LanguageProvider';
 
 type Category={name:string;kind:'expense'|'income';icon?:string|null;color?:string|null};
@@ -206,6 +207,7 @@ export default function NewTransactionComposer({embedded=false,onSaved,onDirtyCh
       }
       invalidateClientJson('/api/transactions','/api/stats','/api/budgets');
       setAmount('');setNote('');setCategory('');setSuggestions([]);setSuggestionsOpen(false);setRecurring(false);
+      hapticFeedback('success');
       showToast({message:t('new.saved'),tone:'success'});
       onSaved?.();
     }catch{setMessage('Errore di connessione.');}

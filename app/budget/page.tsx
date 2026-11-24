@@ -13,6 +13,7 @@ import {onActiveSpaceChanged} from '../../lib/active-space-client';
 import {amountForSave} from '../../lib/amount-expression';
 import {useSharedMonth} from '../../lib/selected-period-client';
 import {cachedJson,invalidateClientJson} from '../../lib/client-json-cache';
+import {EmptyState,InlineError,SkeletonRows} from '../../components/UXFeedback';
 
 const numeric=(value:string)=>{const parsed=Number(value.replace(',','.'));return Number.isFinite(parsed)?parsed:null};
 const moneyInput=(value:number)=>value?String(Math.round(value*100)/100).replace('.',','):'';
@@ -89,9 +90,9 @@ export default function Budget(){
   return <>
     <header className="page-head budget-head"><div><h1>{t('budget.title')}</h1><p>{t('budget.subtitle')}</p></div><MonthPicker value={month} onChange={setMonth}/></header>
     {message&&<div className="notice" role="status">{message}</div>}
-    {loading&&<div className="empty-state surface budget-loading" role="status"><b>{t('budget.loading')}</b><small>{t('budget.loadingHelp')}</small></div>}
-    {!loading&&!data&&loadError&&<section className="empty-state surface budget-load-error" role="alert"><span className="empty-state-icon"><Icon name="category" size={25}/></span><b>{t('budget.loadErrorTitle')}</b><p>{loadError}</p><button type="button" onClick={()=>void load(spaceId||undefined)}>{t('budget.retry')}</button></section>}
-    {data&&!data.hasBudgetPlan&&!initializing&&<section className="empty-state surface budget-empty"><span className="empty-state-icon"><Icon name="chart" size={25}/></span><b>{t('budget.emptyTitle')}</b><p>{t(data.canEdit?'budget.emptyOwner':'budget.emptyMember')}</p>{data.canEdit&&<button type="button" onClick={()=>setInitializing(true)}>{t('budget.configure')}</button>}</section>}
+    {loading&&<section className="surface budget-loading-polish" aria-label={t('budget.loading')}><SkeletonRows rows={4}/></section>}
+    {!loading&&!data&&loadError&&<InlineError className="budget-load-error" message={loadError} retryLabel={t('budget.retry')} onRetry={()=>void load(spaceId||undefined)}/>} 
+    {data&&!data.hasBudgetPlan&&!initializing&&<EmptyState className="budget-empty" title={t('budget.emptyTitle')} description={t(data.canEdit?'budget.emptyOwner':'budget.emptyMember')} icon="chart" action={data.canEdit?<button type="button" onClick={()=>setInitializing(true)}>{t('budget.configure')}</button>:undefined}/>} 
     {data&&(data.hasBudgetPlan||initializing)&&<>
       {initializing&&!data.hasBudgetPlan&&<button type="button" className="secondary budget-cancel-setup" onClick={()=>setInitializing(false)}>{t('budget.cancelSetup')}</button>}
       <section className={`budget-hero macro-budget-hero surface ${activeStatus}`}>

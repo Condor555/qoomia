@@ -47,12 +47,12 @@ assert(migration.includes('create index if not exists'),'La migration performanc
 
 const pkg=JSON.parse(pkgText);
 const lock=JSON.parse(lockText);
-assert.equal(pkg.version,'4.1.6');
-assert.equal(lock.version,'4.1.6');
-assert.equal(lock.packages[''].version,'4.1.6');
+assert.equal(pkg.version,'4.1.8');
+assert.equal(lock.version,'4.1.8');
+assert.equal(lock.packages[''].version,'4.1.8');
 assert(pkg.devDependencies?.['@types/react-dom'],'@types/react-dom deve essere presente nelle devDependencies.');
 assert(lock.packages?.['node_modules/@types/react-dom'],'@types/react-dom deve essere presente nel lockfile.');
-assert.equal(pkg.scripts.test,'node scripts/verify-v4.1.6.mjs');
+assert.equal(pkg.scripts.test,'node scripts/verify-v4.1.6.mjs && node scripts/verify-v4.1.8.mjs');
 
 const i18nResult=ts.transpileModule(i18n,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ES2022},reportDiagnostics:true,fileName:'lib/i18n.ts'});
 assert.equal((i18nResult.diagnostics||[]).filter(item=>item.category===ts.DiagnosticCategory.Error).length,0,'lib/i18n.ts contiene errori sintattici.');
