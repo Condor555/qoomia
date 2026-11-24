@@ -2,6 +2,7 @@
 
 import {useEffect,useId,useRef,useState,type CSSProperties,type ReactNode} from 'react';
 import {createPortal} from 'react-dom';
+import {XIcon} from '@phosphor-icons/react/ssr';
 
 type SheetSize='compact'|'medium'|'large'|'full';
 
@@ -129,7 +130,7 @@ export default function AdaptiveSheet({
     <div className={`adaptive-sheet-backdrop${viewport.keyboard>80?' keyboard-open':''}`} style={{'--sheet-viewport-top':`${viewport.top}px`,'--sheet-viewport-height':viewport.height?`${viewport.height}px`:'100dvh','--sheet-keyboard-inset':`${viewport.keyboard}px`} as CSSProperties} role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)requestClose()}}>
       <div ref={panelRef} className={`adaptive-sheet adaptive-sheet-${size} surface ${className}`.trim()} role="dialog" aria-modal="true" aria-labelledby={titleId} tabIndex={-1}>
         {showGrabber&&<span className="adaptive-sheet-grabber" aria-hidden="true"/>}
-        {showHeader&&<header className="adaptive-sheet-header"><div>{eyebrow&&<small>{eyebrow}</small>}<h2 id={titleId}>{title}</h2></div><button type="button" className="sheet-close" aria-label={closeLabel} disabled={busy} onClick={requestClose}>×</button></header>}
+        {showHeader&&<header className="adaptive-sheet-header"><div>{eyebrow&&<small>{eyebrow}</small>}<h2 id={titleId}>{title}</h2></div><button type="button" className="sheet-close" aria-label={closeLabel} disabled={busy} onClick={requestClose}><XIcon size={18} weight="regular" aria-hidden="true"/></button></header>}
         {!showHeader&&<h2 id={titleId} className="sr-only">{title}</h2>}
         <div className="adaptive-sheet-content">{children}</div>
         {confirmDiscard&&<div className="sheet-discard-layer" role="alertdialog" aria-modal="true" aria-labelledby={`${titleId}-discard-title`}><div className="sheet-discard-card surface"><span aria-hidden="true">!</span><h3 id={`${titleId}-discard-title`}>{discardTitle}</h3><p>{discardMessage}</p><div><button type="button" className="secondary" onClick={()=>setConfirmDiscard(false)}>Continua a modificare</button><button type="button" className="delete-btn" onClick={()=>{setConfirmDiscard(false);onClose()}}>Scarta</button></div></div></div>}
