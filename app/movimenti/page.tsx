@@ -90,6 +90,7 @@ export default function Movimenti(){
   const [viewMode,setViewMode]=useState<ViewMode>('list');
   const [calendarMonth,setCalendarMonth]=useState(currentMonthKey);
   const [selectedDay,setSelectedDay]=useState(localDateKey);
+  const [filtersOpen,setFiltersOpen]=useState(false);
 
   const [editing,setEditing]=useState<Transaction|null>(null);
   const [modalView,setModalView]=useState<ModalView>('detail');
@@ -162,8 +163,11 @@ export default function Movimenti(){
   }),[]);
 
   function changeRange(range:DateRange){setPeriodStart(range.start);setPeriodEnd(range.end);setPage(1)}
-  const hasFilters=Boolean(q||periodStart||periodEnd||author||categoryFilter||kindFilter);
-  function clearFilters(){setQ('');setDebouncedQ('');setPeriodStart('');setPeriodEnd('');setAuthor('');setCategoryFilter('');setKindFilter('');setPage(1)}
+  const activeFilterCount=[Boolean(periodStart||periodEnd),Boolean(author),Boolean(categoryFilter),Boolean(kindFilter)].filter(Boolean).length;
+  const hasFilters=Boolean(q.trim()||activeFilterCount);
+  function changeSearch(value:string){setQ(value);if(!value.trim()){setDebouncedQ('');setPage(1);setError('')}}
+  function clearFilters(){setPeriodStart('');setPeriodEnd('');setAuthor('');setCategoryFilter('');setKindFilter('');setPage(1);setError('')}
+  function clearAllFilters(){changeSearch('');clearFilters()}
   function refresh(){invalidateClientJson('/api/transactions','/api/stats','/api/budgets');setReloadToken(value=>value+1)}
 
   const groups=useMemo(()=>rows.reduce<Record<string,Transaction[]>>((all,row)=>{
@@ -297,18 +301,12 @@ export default function Movimenti(){
 
   return <>
     <header className="page-head movements-head"><div><h1>{t('movements.title')}</h1><p>{loading?t('movements.updating'):count===1?t('movements.one'):t('movements.many',{count})}</p></div><div className="movement-view-toggle" role="group" aria-label={t('movements.title')}><button type="button" className={viewMode==='list'?'active':''} aria-pressed={viewMode==='list'} onClick={()=>setMode('list')}><Icon name="list" size={18}/><span>{t('movements.listView')}</span></button><button type="button" className={viewMode==='calendar'?'active':''} aria-pressed={viewMode==='calendar'} onClick={()=>setMode('calendar')}><Icon name="calendar" size={18}/><span>{t('movements.calendarView')}</span></button></div></header>
-    <div className="search-box surface"><Icon name="search" size={19}/><input value={q} onChange={event=>setQ(event.target.value)} placeholder={t('movements.search')} aria-label={t('movements.search')}/>{q&&<button type="button" className="search-clear" aria-label={t('movements.clearFilters')} onClick={()=>{setQ('');setDebouncedQ('');setPage(1)}}>×</button>}</div>
-    <div className="live-filter-bar">
-      {viewMode==='list'&&<DateRangePicker start={periodStart} end={periodEnd} onChange={changeRange}/>}
-      <MovementFilterDropdown label={t('movements.category')} value={categoryFilter} options={categoryOptions} onChange={value=>{setCategoryFilter(value);setPage(1)}}/>
-      <MovementFilterDropdown label={t('movements.type')} value={kindFilter} options={kindOptions} onChange={value=>{setKindFilter(value);setPage(1)}}/>
-      {hasFilters&&<button type="button" className="clear-filters" onClick={clearFilters}>{t('movements.clearFilters')}</button>}
-    </div>
-    {members.length>1&&<div className="author-filter" aria-label={t('movements.by')}><span>{t('movements.by')}</span><div><button type="button" className={!author?'active':''} aria-pressed={!author} onClick={()=>{setAuthor('');setPage(1)}}>{t('movements.all')}</button>{members.map(member=><button type="button" key={member.userId} className={author===member.userId?'active':''} aria-pressed={author===member.userId} onClick={()=>{setAuthor(member.userId);setPage(1)}}>{member.name}</button>)}</div></div>}
+    <div className="movement-search-toolbar"><div className="search-box surface"><Icon name="search" size={19}/><input value={q} onChange={event=>changeSearch(event.target.value)} placeholder={t('movements.search')} aria-label={t('movements.search')}/>{q&&<button type="button" className="search-clear" aria-label="Cancella ricerca" onClick={()=>changeSearch('')}>×</button>}</div><button type="button" className={`movement-filter-button${activeFilterCount?' active':''}`} aria-label={activeFilterCount?`Filtri, ${activeFilterCount} attivi`:'Apri filtri'} aria-haspopup="dialog" onClick={()=>setFiltersOpen(true)}><Icon name="more" size={22}/>{activeFilterCount>0&&<span aria-hidden="true">{activeFilterCount}</span>}</button></div>
+    {activeFilterCount>0&&<div className="movement-active-filters" aria-label="Filtri attivi">{(periodStart||periodEnd)&&<button type="button" onClick={()=>changeRange({start:'',end:''})}><span>Periodo</span><b aria-hidden="true">×</b></button>}{categoryFilter&&<button type="button" onClick={()=>{setCategoryFilter('');setPage(1)}}><span>{categoryFilter}</span><b aria-hidden="true">×</b></button>}{kindFilter&&<button type="button" onClick={()=>{setKindFilter('');setPage(1)}}><span>{kindFilter==='expense'?'Uscite':'Entrate'}</span><b aria-hidden="true">×</b></button>}{author&&<button type="button" onClick={()=>{setAuthor('');setPage(1)}}><span>{members.find(member=>member.userId===author)?.name||'Autore'}</span><b aria-hidden="true">×</b></button>}<button type="button" className="movement-reset-shortcut" onClick={clearFilters}>Azzera</button></div>}
     {error&&<div className="auth-error" role="alert">{error}</div>}
     {viewMode==='list'&&<>
       {loading&&!rows.length&&<SkeletonRows rows={5} className="movements-loading"/>}
-      {!loading&&!error&&!rows.length&&<EmptyState title={t('movements.empty')} description={t('movements.emptyHelp')} icon="list" action={hasFilters?<button type="button" className="secondary" onClick={clearFilters}>{t('movements.clearFilters')}</button>:<Link href="/nuovo">Aggiungi movimento</Link>}/>} 
+      {!loading&&!error&&!rows.length&&<EmptyState title={t('movements.empty')} description={t('movements.emptyHelp')} icon="list" action={hasFilters?<button type="button" className="secondary" onClick={clearAllFilters}>{t('movements.clearFilters')}</button>:<Link href="/nuovo">Aggiungi movimento</Link>}/>} 
       {Object.entries(groups).map(([day,list])=>{const dayTotal=list.reduce((sum,row)=>sum+Number(row.amount),0);return <section className="day day-ledger" key={day}><div className="day-heading"><div className="day-date"><small>{t('movements.day')}</small><h3>{formatDate(day,{weekday:'long',day:'numeric',month:'short',year:'numeric'})}</h3></div><div className="day-total"><small>{t('movements.dayTotal')}</small><strong className={dayTotal>0?'green':dayTotal<0?'red':'muted'}>{dayTotal>0?'+ ':''}{currency(dayTotal)}</strong></div></div><div className="tx-card day-transactions surface">{list.map(transactionButton)}</div></section>})}
       <div className="pager"><button disabled={page===1||loading} onClick={()=>setPage(value=>Math.max(1,value-1))}>{t('movements.previous')}</button><span>{page}</span><button disabled={page*30>=count||loading} onClick={()=>setPage(value=>value+1)}>{t('movements.next')}</button></div>
     </>}
@@ -365,5 +363,13 @@ export default function Movimenti(){
         <div className="transaction-confirm-actions"><button type="button" className="secondary" disabled={busy} onClick={()=>{setModalView('detail');setModalMsg('')}}>Annulla</button><button type="button" className="delete-btn" disabled={busy} onClick={remove}>{busy?'Eliminazione…':'Elimina definitivamente'}</button></div>
       </section>}
     </AdaptiveSheet>}
+    <AdaptiveSheet open={filtersOpen} onClose={()=>setFiltersOpen(false)} title="Filtri" eyebrow="Movimenti" size="medium" className="movement-filters-sheet"><div className="movement-filter-sheet-content">
+      {viewMode==='list'&&<section className="movement-filter-group"><h3>Periodo</h3><DateRangePicker start={periodStart} end={periodEnd} onChange={changeRange}/></section>}
+      <section className="movement-filter-group"><h3>Categoria</h3><MovementFilterDropdown label={t('movements.category')} value={categoryFilter} options={categoryOptions} onChange={value=>{setCategoryFilter(value);setPage(1)}}/></section>
+      <section className="movement-filter-group"><h3>Tipo</h3><MovementFilterDropdown label={t('movements.type')} value={kindFilter} options={kindOptions} onChange={value=>{setKindFilter(value);setPage(1)}}/></section>
+      {members.length>1&&<section className="movement-filter-group"><h3>{t('movements.by')}</h3><div className="filter-author-chips"><button type="button" className={!author?'active':''} aria-pressed={!author} onClick={()=>{setAuthor('');setPage(1)}}>{t('movements.all')}</button>{members.map(member=><button type="button" key={member.userId} className={author===member.userId?'active':''} aria-pressed={author===member.userId} onClick={()=>{setAuthor(member.userId);setPage(1)}}>{member.name}</button>)}</div></section>}
+      <div className="movement-filter-status" role="status">{activeFilterCount?`${activeFilterCount} ${activeFilterCount===1?'filtro attivo':'filtri attivi'} · aggiornamento immediato`:'Nessun filtro attivo'}</div>
+      <button type="button" className="clear-filters-sheet" disabled={!activeFilterCount} onClick={clearFilters}>Azzera filtri</button>
+    </div></AdaptiveSheet>
   </>;
 }
