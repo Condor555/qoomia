@@ -3,6 +3,7 @@ import AppHeader from '../components/AppHeader';
 import LanguageProvider from '../components/LanguageProvider';
 import Nav from '../components/Nav';
 import FloatingAddMovement from '../components/FloatingAddMovement';
+import PwaInstallPrompt from '../components/PwaInstallPrompt';
 import ThemeProvider from '../components/ThemeProvider';
 import ToastProvider from '../components/ToastProvider';
 import './globals.css';
@@ -15,6 +16,7 @@ export const metadata:Metadata={
   title:{default:'Qoomia',template:'%s · Qoomia'},
   description:'Dai senso alle tue spese, in privato o in famiglia.',
   manifest:'/manifest.webmanifest',
+  appleWebApp:{capable:true,statusBarStyle:'black-translucent',title:'Qoomia'},
   icons:{icon:[{url:'/icon.svg',type:'image/svg+xml'},{url:'/favicon.ico',sizes:'any'}],apple:[{url:'/apple-icon.png',sizes:'180x180',type:'image/png'}]},
   alternates:{canonical:'/'},
   openGraph:{type:'website',locale:'it_IT',url:'/',siteName:'Qoomia',title:'Qoomia — Spese, Budget e Famiglia',description:'Dai senso alle tue spese, in privato o in famiglia.',images:[{url:'/icons/qoomia-v4-1-512.png',width:512,height:512,alt:'Qoomia'}]},
@@ -29,5 +31,5 @@ export const viewport:Viewport={
 };
 
 export default function Layout({children,modal}:{children:React.ReactNode;modal:React.ReactNode}){
-  return <html lang="it" suppressHydrationWarning><body><ThemeProvider/><LanguageProvider><ToastProvider><main className="shell"><AppHeader/>{children}</main><FloatingAddMovement/><Nav/>{modal}</ToastProvider></LanguageProvider></body></html>;
+  return <html lang="it" suppressHydrationWarning><body><ThemeProvider/><LanguageProvider><ToastProvider><main className="shell"><AppHeader/>{children}</main><PwaInstallPrompt/><FloatingAddMovement/><Nav/>{modal}</ToastProvider></LanguageProvider></body></html>;
 }
