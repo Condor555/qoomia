@@ -1260,23 +1260,23 @@ html[data-theme="dark"] .floating-add-movement{background:linear-gradient(135deg
 @media(prefers-reduced-motion:reduce){.pwa-install-card{animation:none}}
 
 
-/* Qoomia V4.1.8 — conservative final UX polish */
-.monthly-insight-card{position:relative;display:grid;grid-template-columns:42px minmax(0,1fr) 16px;align-items:center;gap:12px;margin:0 0 14px;padding:14px 15px;color:var(--text);text-decoration:none;border:1px solid color-mix(in srgb,var(--primary) 17%,var(--line));overflow:hidden;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
-.monthly-insight-card::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--primary2)}
+/* Qoomia V4.1.8b — conservative Home cleanup. Keep one light, prioritized insight. */
+.monthly-insight-card{position:relative;display:grid;grid-template-columns:36px minmax(0,1fr) 14px;align-items:center;gap:11px;margin:24px 0 18px;padding:12px 14px;color:var(--text);text-decoration:none;background:color-mix(in srgb,var(--surface) 94%,var(--primary) 6%);border:1px solid color-mix(in srgb,var(--line) 62%,transparent);box-shadow:none;overflow:hidden;transition:background-color .18s ease,border-color .18s ease}
+.monthly-insight-card::before{content:"";position:absolute;inset:9px auto 9px 0;width:2px;border-radius:0 2px 2px 0;background:var(--primary2)}
 .monthly-insight-card.attention::before{background:#E3AD16}.monthly-insight-card.positive::before{background:var(--green)}
 .monthly-insight-card.category-insight::before{background:var(--primary2)}
-.monthly-insight-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:14px;color:var(--primary);background:color-mix(in srgb,var(--primary) 11%,var(--surface));overflow:hidden}
+.monthly-insight-icon{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;color:var(--primary);background:color-mix(in srgb,var(--primary) 9%,var(--surface));overflow:hidden}
 .monthly-insight-card.attention .monthly-insight-icon{color:#A56B00;background:rgba(227,173,22,.12)}
 .monthly-insight-card.category-insight .monthly-insight-icon{background:transparent;color:inherit}
-.monthly-insight-card.category-insight .monthly-insight-icon>.category-icon{flex:0 0 42px}
+.monthly-insight-card.category-insight .monthly-insight-icon>.category-icon{flex:0 0 36px}
 .monthly-insight-copy{display:grid;gap:3px;min-width:0}.monthly-insight-copy small{color:var(--primary);font-size:11px;font-weight:850;letter-spacing:.06em;text-transform:uppercase}.monthly-insight-copy strong{font-size:17px;line-height:1.25;letter-spacing:-.2px}.monthly-insight-copy>span{font-size:13px;line-height:1.42}
-.monthly-insight-chevron{align-self:center;justify-self:end;color:var(--muted);font-size:24px;line-height:1}.monthly-insight-card.is-loading{min-height:98px}.monthly-insight-card.is-loading .monthly-insight-icon{background:var(--surface2)}
+.monthly-insight-chevron{align-self:center;justify-self:end;color:color-mix(in srgb,var(--muted) 78%,transparent);font-size:22px;line-height:1}.monthly-insight-card.is-loading{min-height:82px}.monthly-insight-card.is-loading .monthly-insight-icon{background:var(--surface2)}
 .transaction-sheet .adaptive-sheet-content{padding-top:4px}.transaction-sheet .transaction-hero{margin-top:2px}.transaction-sheet .transaction-actions,.transaction-sheet .transaction-edit-actions,.transaction-sheet .transaction-confirm-actions{padding-bottom:max(10px,env(safe-area-inset-bottom))}
 .budget-loading-polish,.goals-loading-polish{padding:14px 16px;margin-top:14px}.movements-loading{margin-top:14px;padding:14px 16px;border:1px solid var(--line);border-radius:18px;background:var(--surface)}
 .ui-empty-state .ui-empty-action>a{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 15px;border-radius:13px;background:var(--primary);color:#fff;text-decoration:none;font-size:13px;font-weight:800}
 button,a,.transaction-button,.macro-compact-row{-webkit-tap-highlight-color:transparent}.transaction-button,.macro-compact-row,.home-recent-row,.home-goal-row{transition:transform .18s ease,background-color .18s ease,border-color .18s ease}
-@media(hover:hover){.monthly-insight-card:hover{transform:translateY(-1px);border-color:color-mix(in srgb,var(--primary) 38%,var(--line));box-shadow:0 12px 32px rgba(6,78,59,.1)}.transaction-button:hover,.home-recent-row:hover,.home-goal-row:hover{background:color-mix(in srgb,var(--primary) 5%,transparent)}}
+@media(hover:hover){.monthly-insight-card:hover{background:color-mix(in srgb,var(--surface) 90%,var(--primary) 10%);border-color:color-mix(in srgb,var(--primary) 24%,var(--line))}.transaction-button:hover,.home-recent-row:hover,.home-goal-row:hover{background:color-mix(in srgb,var(--primary) 5%,transparent)}}
 @media(hover:none){button:active,a:active,.transaction-button:active,.macro-compact-row:active{transform:scale(.985)}}
 @media(prefers-reduced-motion:reduce){.monthly-insight-card,.transaction-button,.macro-compact-row,.home-recent-row,.home-goal-row{transition:none!important}button:active,a:active,.transaction-button:active,.macro-compact-row:active{transform:none}}
-@media(max-width:600px){.monthly-insight-card{margin-bottom:12px;padding:13px;grid-template-columns:42px minmax(0,1fr) 14px}.monthly-insight-icon{width:42px;height:42px}.transaction-sheet.adaptive-sheet-large{max-height:94dvh}.transaction-sheet .adaptive-sheet-content{padding-bottom:max(18px,env(safe-area-inset-bottom))}}
+@media(max-width:600px){.monthly-insight-card{margin-top:20px;margin-bottom:16px;padding:12px 13px;grid-template-columns:36px minmax(0,1fr) 13px}.monthly-insight-icon{width:36px;height:36px}.transaction-sheet.adaptive-sheet-large{max-height:94dvh}.transaction-sheet .adaptive-sheet-content{padding-bottom:max(18px,env(safe-area-inset-bottom))}}
 @media(display-mode:standalone){.monthly-insight-card:first-of-type{scroll-margin-top:max(76px,calc(env(safe-area-inset-top) + 58px))}.adaptive-sheet-header{padding-top:max(15px,env(safe-area-inset-top))}}

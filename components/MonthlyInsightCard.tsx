@@ -62,11 +62,13 @@ function insightFor(stats:InsightStats,currency:(value:number)=>string):Insight{
 }
 
 export default function MonthlyInsightCard({stats,currency}:Props){
-  if(!stats)return <section className="monthly-insight-card surface is-loading" aria-busy="true" aria-label="Caricamento insight"><span className="monthly-insight-icon"><Skeleton width="22px" height="22px"/></span><div><Skeleton width="104px" height="11px"/><Skeleton width="72%" height="20px"/><Skeleton width="92%" height="13px"/></div></section>;
+  // Home contract (V4.1.9+): this surface renders one prioritized insight only.
+  // Additional analyses belong to the dedicated Insights area, never to extra Home cards.
+  if(!stats)return <section className="monthly-insight-card surface is-loading" aria-busy="true" aria-label="Caricamento insight"><span className="monthly-insight-icon"><Skeleton width="20px" height="20px"/></span><div><Skeleton width="104px" height="11px"/><Skeleton width="72%" height="20px"/><Skeleton width="92%" height="13px"/></div></section>;
   const insight=insightFor(stats,currency);
   const icon=insight.icon.kind==='category'
-    ?<CategoryIcon name={insight.icon.name} icon={insight.icon.icon} color={insight.icon.color} size={42}/>
-    :<Icon name={insight.icon.kind==='budget'?'wallet':'chart'} size={21}/>;
+    ?<CategoryIcon name={insight.icon.name} icon={insight.icon.icon} color={insight.icon.color} size={36}/>
+    :<Icon name={insight.icon.kind==='budget'?'wallet':'chart'} size={19}/>;
   return <Link href={insight.href} prefetch className={`monthly-insight-card surface ${insight.tone} ${insight.icon.kind}-insight`} aria-label={`${insight.title}. Apri il dettaglio`}>
     <span className="monthly-insight-icon" aria-hidden="true">{icon}</span>
     <span className="monthly-insight-copy"><small>Insight del mese</small><strong>{insight.title}</strong><span>{insight.description}</span></span>
