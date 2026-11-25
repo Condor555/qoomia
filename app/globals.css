@@ -1301,21 +1301,26 @@ button,a,.transaction-button,.macro-compact-row{-webkit-tap-highlight-color:tran
 .insights-overview-glyph.budget{color:#b7791f}.insights-overview-glyph.projection{color:#5b7bd5}
 .insights-overview-note{margin:0;padding:11px 18px 15px;color:var(--muted);font-size:10px;line-height:1.4}
 @media(max-width:520px){.insights-overview{margin-bottom:18px}.insights-overview-head{padding:16px 15px 10px}.insights-overview-primary{margin:0 10px 7px}.insights-overview-list{padding:0 15px}.insights-overview-note{padding:10px 15px 14px}}
-/* Qoomia V4.2 — Backup, Privacy & Portabilità. */
-.data-section-card{padding:0;overflow:hidden;margin-bottom:16px}
-.data-section-title{display:grid;grid-template-columns:40px minmax(0,1fr);gap:12px;align-items:center;padding:17px 17px 13px}
-.data-section-title>span{display:grid;place-items:center;width:40px;height:40px;border-radius:13px;background:var(--surface2);color:var(--primary);border:1px solid var(--line)}
-.data-section-title h2{font-size:16px;margin:0 0 3px}.data-section-title p{font-size:12px;color:var(--muted);margin:0;line-height:1.4}
-.data-action-list{padding:0 17px 5px;border-top:1px solid var(--line)}
-.data-download-button{display:flex;align-items:center;justify-content:center;gap:8px;margin:2px 17px 11px;text-decoration:none}
-.data-section-card>.settings-help{padding:0 17px 15px;margin:0;line-height:1.5}
-.restore-card{padding-bottom:17px}.restore-card>.picker-label,.restore-card>.import-file-input,.restore-card>select,.restore-card>.account-space-picker,.restore-card>.save-btn,.restore-card>.notice{margin-left:17px;margin-right:17px;width:calc(100% - 34px)}
-.restore-card>select{padding:12px;border-radius:12px;background:var(--surface2);border:1px solid var(--line);color:var(--text)}
-.restore-card>.save-btn{margin-top:15px}.restore-card>.notice{margin-top:12px}
-.data-danger-zone{padding:0;overflow:hidden;border-color:color-mix(in srgb,var(--red) 35%,var(--line));margin-top:18px}
-.data-danger-zone>summary{display:grid;grid-template-columns:40px minmax(0,1fr) 20px;gap:12px;align-items:center;padding:16px;cursor:pointer;list-style:none}.data-danger-zone>summary::-webkit-details-marker{display:none}
-.data-danger-zone>summary>span{display:grid;place-items:center;width:40px;height:40px;border-radius:13px;color:var(--red);background:color-mix(in srgb,var(--red) 8%,var(--surface));border:1px solid color-mix(in srgb,var(--red) 25%,var(--line))}
-.data-danger-zone>summary b,.data-danger-zone>summary small{display:block}.data-danger-zone>summary small{color:var(--muted);font-size:11px;margin-top:3px}.data-danger-zone>summary>strong{color:var(--muted);font-size:20px;transition:transform .2s ease}.data-danger-zone[open]>summary>strong{transform:rotate(180deg)}
-.data-danger-content{border-top:1px solid var(--line);padding:16px}.data-danger-content p{color:var(--muted);font-size:12px;line-height:1.55;margin:0 0 10px}.data-danger-content input{width:100%;background:var(--surface2);border:1px solid var(--line);color:var(--text)}
-.data-delete-button{width:100%;margin-top:14px}.data-delete-button:disabled{opacity:.45;cursor:not-allowed}
-@media(max-width:520px){.data-section-title{padding:15px 14px 12px}.data-action-list{padding:0 14px 4px}.data-download-button{margin-left:14px;margin-right:14px}.data-section-card>.settings-help{padding-left:14px;padding-right:14px}.restore-card>.picker-label,.restore-card>.import-file-input,.restore-card>select,.restore-card>.account-space-picker,.restore-card>.save-btn,.restore-card>.notice{margin-left:14px;margin-right:14px;width:calc(100% - 28px)}}
+
+
+/* Qoomia V4.2 — Dati e privacy semplificati. */
+#qoomia-insights,#stats-categories,#stats-trend,#stats-budget{scroll-margin-top:86px}
+.insights-overview-primary em,.insights-overview-row em{display:block;margin-top:6px;color:var(--primary);font-size:10px;font-style:normal;font-weight:800;letter-spacing:.02em}
+.insights-overview-primary.attention em{color:#b7791f}
+.insights-overview-primary:not(.is-actionable),.insights-overview-row:not(.is-actionable){grid-template-columns:38px minmax(0,1fr);cursor:default}
+.insights-overview-row:not(.is-actionable){grid-template-columns:34px minmax(0,1fr)}
+.insights-overview .is-actionable:focus-visible{outline:3px solid color-mix(in srgb,var(--primary) 35%,transparent);outline-offset:2px}
+.data-hub{overflow:hidden;padding:0}
+.data-hub-row{display:grid;grid-template-columns:42px minmax(0,1fr) 16px;align-items:center;gap:12px;width:100%;padding:16px;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;color:var(--text);text-align:left;cursor:pointer}
+.data-hub-row:last-child{border-bottom:0}.data-hub-row:hover{background:color-mix(in srgb,var(--surface2) 62%,transparent)}.data-hub-row:focus-visible{outline:3px solid color-mix(in srgb,var(--primary) 32%,transparent);outline-offset:-3px}
+.data-hub-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:var(--surface2);color:var(--primary);border:1px solid var(--line)}
+.data-hub-row>span:nth-child(2){min-width:0}.data-hub-row b,.data-hub-row small{display:block}.data-hub-row b{font-size:14px;margin-bottom:3px}.data-hub-row small{color:var(--muted);font-size:11px;line-height:1.4}.data-hub-row>strong{color:var(--muted);font-size:23px;font-weight:400}
+.data-hub-row.danger-row .data-hub-icon{color:var(--red);background:color-mix(in srgb,var(--red) 7%,var(--surface));border-color:color-mix(in srgb,var(--red) 23%,var(--line))}
+.data-privacy-note{display:flex;align-items:flex-start;gap:8px;margin:13px 4px 0;color:var(--muted);font-size:11px;line-height:1.45}.data-privacy-note svg{flex:0 0 auto;margin-top:1px;color:var(--primary)}
+.data-tool-sheet .adaptive-sheet-content{padding-top:0}.data-sheet-intro{padding:2px 2px 12px}.data-sheet-intro p,.data-sheet-section>p{margin:0;color:var(--muted);font-size:12px;line-height:1.55}.data-sheet-intro p+p{margin-top:8px}
+.data-sheet-actions{border-top:1px solid var(--line)}.data-sheet-action{display:grid;grid-template-columns:40px minmax(0,1fr) 16px;align-items:center;gap:11px;padding:14px 2px;color:var(--text);text-decoration:none;border-bottom:1px solid var(--line)}.data-sheet-action:last-child{border-bottom:0}
+.data-sheet-action>span{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--surface2);color:var(--primary);border:1px solid var(--line)}.data-sheet-action b,.data-sheet-action small{display:block}.data-sheet-action b{font-size:13px;margin-bottom:3px}.data-sheet-action small{color:var(--muted);font-size:11px;line-height:1.4}.data-sheet-action>strong{color:var(--muted);font-size:20px;font-weight:500}
+.data-sheet-section{padding:4px 2px 18px}.data-sheet-section h3{font-size:15px;margin:0 0 5px}.data-sheet-download{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:13px;text-decoration:none}.data-sheet-section>small{display:block;margin-top:8px;color:var(--muted);font-size:10px;text-align:center}
+.data-recovery-section{padding-top:18px;border-top:1px solid var(--line)}.data-recovery-section .import-file-input{width:100%;margin-top:0}.data-recovery-section select{width:100%;padding:12px;border-radius:12px;background:var(--surface2);border:1px solid var(--line);color:var(--text)}.data-recovery-section>.save-btn{width:100%;margin-top:15px}.data-recovery-section>.notice{margin-top:12px}
+.delete-account-sheet input{width:100%;background:var(--surface2);border:1px solid var(--line);color:var(--text)}.danger-intro{padding:2px 0 8px}.data-delete-button{width:100%;margin-top:15px}.data-delete-button:disabled{opacity:.45;cursor:not-allowed}
+@media(max-width:520px){#qoomia-insights,#stats-categories,#stats-trend,#stats-budget{scroll-margin-top:72px}.data-hub-row{padding:14px}.data-privacy-note{margin-top:12px}.backup-tool-sheet .adaptive-sheet-content{padding-bottom:calc(18px + env(safe-area-inset-bottom))}}

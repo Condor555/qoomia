@@ -14,7 +14,7 @@ expect('Insight secondari sono righe leggere',overview.includes('insights-overvi
 expect('Drill-down usa Movimenti e Budget esistenti',engine.includes('/movimenti?')&&engine.includes("href:'/budget'"));
 expect('Nessuna nuova voce nella navigazione',!nav.match(/href:\s*['"]\/insights/));
 expect('Separazione spazio ereditata dai dati Statistiche',stats.includes("params.set('spaceId',targetSpaceId)")&&home.includes("params.set('spaceId',targetSpaceId)"));
-expect('UI formalizza assenza di AI generativa',overview.includes('senza AI generativa'));
+expect('UI spiega le destinazioni contestuali',overview.includes('Ogni osservazione apre il dettaglio più utile')&&overview.includes('insight.actionLabel'));
 expect('Stili Insights presenti',css.includes('.insights-overview{')&&css.includes('.insights-overview-row{'));
 for(const file of ['lib/qoomia-insights.ts','components/InsightsOverview.tsx','components/MonthlyInsightCard.tsx','app/page.tsx','app/statistiche/page.tsx']){const source=read(file);const result=ts.transpileModule(source,{compilerOptions:{jsx:ts.JsxEmit.Preserve,target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext},reportDiagnostics:true,fileName:file});expect(`Sintassi ${file}`,!(result.diagnostics||[]).some(d=>d.category===ts.DiagnosticCategory.Error))}
 const failures=checks.filter(item=>!item.condition);for(const item of checks)console.log(`${item.condition?'✓':'✗'} ${item.label}`);if(failures.length){console.error(`Verifica V4.1.9 fallita: ${failures.length} controllo/i.`);process.exit(1)}console.log(`Verifica V4.1.9 completata: ${checks.length} controlli superati.`);

@@ -46,7 +46,7 @@ export default function MonthlyInsightCard({stats,month,currency,locale}:Props){
   const icon=insight.icon.kind==='category'
     ?<CategoryIcon name={insight.icon.name} icon={insight.icon.icon} color={insight.icon.color} size={36}/>
     :<Icon name={insight.icon.kind==='budget'?'wallet':'chart'} size={19}/>;
-  return <Link href={insight.href} prefetch className={`monthly-insight-card surface ${insight.tone} ${insight.icon.kind}-insight`} aria-label={`${insight.title}. ${locale==='it'?'Apri il dettaglio':'Open details'}`}>
+  return <Link href="/statistiche#qoomia-insights" prefetch className={`monthly-insight-card surface ${insight.tone} ${insight.icon.kind}-insight`} aria-label={`${insight.title}. ${locale==='it'?'Apri Qoomia Insights':'Open Qoomia Insights'}`}>
     <span className="monthly-insight-icon" aria-hidden="true">{icon}</span>
     <span className="monthly-insight-copy"><small>{locale==='it'?'Insight del mese':'Monthly insight'}</small><strong>{insight.title}</strong><span>{insight.description}</span></span>
     <span className="monthly-insight-chevron" aria-hidden="true">›</span>
