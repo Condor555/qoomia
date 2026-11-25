@@ -11,15 +11,15 @@ const css=read('app/globals.css');
 
 const insightMounts=(home.match(/<MonthlyInsightCard\b/g)||[]).length;
 const moneyIndex=home.indexOf('className="money-grid"');
-const insightIndex=home.indexOf('<MonthlyInsightCard stats={stats} currency={currency}/>');
+const insightIndex=home.indexOf('<MonthlyInsightCard stats={stats}');
 const budgetIndex=home.indexOf('home-budget-summary');
 
 expect('Home mantiene un solo Insight dinamico',insightMounts===1);
 expect('Insight resta tra Entrate/Uscite e Budget',moneyIndex>=0&&moneyIndex<insightIndex&&insightIndex<budgetIndex);
 expect('Entrate/Uscite restano invariate e affiancate',home.includes("t('common.incomes')")&&home.includes("t('common.expenses')")&&home.includes('className="money-grid"'));
 expect('Budget e navigazione restano collegati alla sezione collaudata',home.includes('href="/budget"')&&home.includes('home-budget-teaser'));
-expect('Insight deriva dai dati stats esistenti senza nuove API',insight.includes('const insight=insightFor(stats,currency)')&&!insight.includes('fetch('));
-expect('Contratto V4.1.9 documentato nel componente',insight.includes('one prioritized insight only')&&insight.includes('dedicated Insights area'));
+expect('Insight deriva dai dati stats esistenti senza nuove API',insight.includes('buildQoomiaInsights')&&!insight.includes('fetch('));
+expect('Contratto V4.1.9 documentato nel componente',insight.includes('limit:1')&&read('components/InsightsOverview.tsx').includes('limit:3'));
 expect('Icona categoria ridotta a 36 px',insight.includes('size={36}')&&css.includes('grid-template-columns:36px minmax(0,1fr) 14px'));
 expect('Una sola chevron resta nel componente',insight.includes('monthly-insight-chevron')&&(insight.match(/monthly-insight-chevron/g)||[]).length===1);
 expect('Separazione desktop 24 px',css.includes('margin:24px 0 18px'));

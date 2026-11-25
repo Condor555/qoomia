@@ -47,9 +47,9 @@ assert(migration.includes('create index if not exists'),'La migration performanc
 
 const pkg=JSON.parse(pkgText);
 const lock=JSON.parse(lockText);
-assert.equal(pkg.version,'4.1.8');
-assert.equal(lock.version,'4.1.8');
-assert.equal(lock.packages[''].version,'4.1.8');
+assert(['4.1.8','4.1.9','4.2.0'].includes(pkg.version),'Versione applicativa non supportata dalla suite cumulativa.');
+assert.equal(lock.version,pkg.version);
+assert.equal(lock.packages[''].version,pkg.version);
 assert(pkg.devDependencies?.['@types/react-dom'],'@types/react-dom deve essere presente nelle devDependencies.');
 assert(lock.packages?.['node_modules/@types/react-dom'],'@types/react-dom deve essere presente nel lockfile.');
 for(const requiredCheck of ['verify-v4.1.6.mjs','verify-v4.1.8.mjs','verify-v4.1.8a.mjs']){

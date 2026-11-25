@@ -11,6 +11,7 @@ import {onActiveSpaceChanged} from '../../lib/active-space-client';
 import {useSharedMonth} from '../../lib/selected-period-client';
 import {InlineError,Skeleton,SkeletonRows} from '../../components/UXFeedback';
 import {cachedJson} from '../../lib/client-json-cache';
+import InsightsOverview from '../../components/InsightsOverview';
 
 type Category={name:string;value:number;budget:number;budgetPercentage:number;icon?:string|null;color?:string|null};
 type Author={userId:string;name:string;value:number;percentage:number};
@@ -23,7 +24,7 @@ const CategoryDonutChart=dynamic(()=>import('../../components/StatisticsCharts')
 const TrendBarChart=dynamic(()=>import('../../components/StatisticsCharts').then(module=>module.TrendBarChart),{ssr:false,loading:()=> <div className="ui-skeleton ui-skeleton-chart"/>});
 
 export default function Statistiche(){
-  const {currency,localeTag,t}=useI18n();
+  const {currency,locale,localeTag,t}=useI18n();
   const {month,setMonth}=useSharedMonth();
   const [stats,setStats]=useState<Stats|null>(null),[trends,setTrends]=useState<Trend[]>([]),[trendMonths,setTrendMonths]=useState<6|12>(6),[spaceId,setSpaceId]=useState(''),[error,setError]=useState('');
   const [expandedMacros,setExpandedMacros]=useState<Record<string,boolean>>({});
@@ -54,6 +55,7 @@ export default function Statistiche(){
   return <>
     <header className="page-head stats-head"><div><h1>{t('stats.title')}</h1><p>{t('stats.subtitle')}</p></div><MonthPicker value={month} onChange={setMonth}/></header>
     {error&&<InlineError message={error} onRetry={()=>void loadStats()}/>} 
+    {stats&&<InsightsOverview stats={stats} currency={currency} locale={locale}/>}
     <div className="analytics-kpis">
       <section className={`metric surface${stats?'':' is-loading'}`}><small>{t('common.expenses')}</small><b className="red">{stats?currency(stats.expense):<Skeleton width="88px" height="21px"/>}</b><span>{stats?comparison(stats.expenseChangePercent):<Skeleton width="110px" height="11px"/>}</span></section>
       <section className={`metric surface${stats?'':' is-loading'}`}><small>{t('common.incomes')}</small><b className="green">{stats?currency(stats.income):<Skeleton width="88px" height="21px"/>}</b><span>{stats?comparison(stats.incomeChangePercent):<Skeleton width="110px" height="11px"/>}</span></section>

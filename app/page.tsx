@@ -16,10 +16,14 @@ import {cachedJson} from '../lib/client-json-cache';
 
 type TopCategory={name:string;value:number;percentage:number;previousValue:number;changePercent:number|null;comparison:'available'|'no-previous-data';icon?:string|null;color?:string|null};
 type Stats={
+  periodStatus:'past'|'current'|'future';
   income:number;
   expense:number;
   balance:number;
   count:number;
+  previousExpense:number;
+  expenseChangePercent:number|null;
+  projectedExpense:number|null;
   dailyAverageExpense:number;
   daysConsidered:number;
   daysInMonth:number;
@@ -32,7 +36,7 @@ type RecentTransaction={id:string;date:string;category_name:string;amount:number
 type RecentCategory={name:string;icon?:string|null;color?:string|null};
 
 export default function Home(){
-  const {currency,localeTag,t}=useI18n();
+  const {currency,locale,localeTag,t}=useI18n();
   const {month,setMonth}=useSharedMonth();
   const [stats,setStats]=useState<Stats|null>(null);
   const [recent,setRecent]=useState<RecentTransaction[]>([]);
@@ -114,7 +118,7 @@ export default function Home(){
       <section className={`money-card surface${stats?'':' is-loading'}`}><header><span>{t('common.expenses')}</span><Icon name="arrowDown" size={16}/></header><strong className="red">{stats?currency(stats.expense):<Skeleton width="96px" height="22px"/>}</strong></section>
     </div>
 
-    <MonthlyInsightCard stats={stats} currency={currency}/>
+    <MonthlyInsightCard stats={stats} month={month} currency={currency} locale={locale}/>
 
     <Link href="/budget" prefetch className={`section surface home-budget-summary home-budget-link home-budget-teaser${stats?.budget.status?` ${stats.budget.status}`:''}`} aria-label="Apri Budget">
       {stats?<><div className="home-budget-teaser-row"><div><h2>Budget</h2><small>{stats.budget.amount?`${stats.budget.percentage}% utilizzato · ${currency(stats.budget.available)} disponibili`:`Budget non impostato · ${currency(stats.budget.spent)} spesi`}</small></div><span className="home-budget-teaser-spent"><small>Speso</small><strong>{currency(stats.budget.spent)}</strong></span><span className="home-budget-chevron" aria-hidden="true">›</span></div>{stats.budget.amount>0&&<div className={`budget-progress ${stats.budget.status}`}><span style={{width:`${Math.min(100,stats.budget.percentage)}%`}}/></div>}</>:<div className="home-budget-teaser-loading"><Skeleton width="38%" height="16px"/><Skeleton width="72%" height="11px"/></div>}

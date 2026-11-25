@@ -13,9 +13,9 @@ const sheet=read('components/AdaptiveSheet.tsx');
 const manifest=read('app/manifest.ts');
 const sw=read('public/sw.js');
 
-expect('versione 4.1.8',pkg.version==='4.1.8');
+expect('versione 4.1.8 o successiva',['4.1.8','4.1.9','4.2.0'].includes(pkg.version));
 expect('nessuna nuova dipendenza',Object.keys(pkg.dependencies||{}).length===9);
-expect('Insight montato in Home',home.includes('<MonthlyInsightCard stats={stats} currency={currency}/>'));
+expect('Insight montato in Home',home.includes('<MonthlyInsightCard stats={stats}'));
 expect('Insight usa dati stats esistenti',insight.includes('topCategory')&&insight.includes('budget')&&!insight.includes('fetch('));
 expect('Movimenti usa AdaptiveSheet',movements.includes('className="transaction-sheet"')&&movements.includes('dirty={editDirty}'));
 expect('Movimenti ha skeleton ed empty state',movements.includes('<SkeletonRows')&&movements.includes('<EmptyState'));

@@ -1280,3 +1280,42 @@ button,a,.transaction-button,.macro-compact-row{-webkit-tap-highlight-color:tran
 @media(prefers-reduced-motion:reduce){.monthly-insight-card,.transaction-button,.macro-compact-row,.home-recent-row,.home-goal-row{transition:none!important}button:active,a:active,.transaction-button:active,.macro-compact-row:active{transform:none}}
 @media(max-width:600px){.monthly-insight-card{margin-top:20px;margin-bottom:16px;padding:12px 13px;grid-template-columns:36px minmax(0,1fr) 13px}.monthly-insight-icon{width:36px;height:36px}.transaction-sheet.adaptive-sheet-large{max-height:94dvh}.transaction-sheet .adaptive-sheet-content{padding-bottom:max(18px,env(safe-area-inset-bottom))}}
 @media(display-mode:standalone){.monthly-insight-card:first-of-type{scroll-margin-top:max(76px,calc(env(safe-area-inset-top) + 58px))}.adaptive-sheet-header{padding-top:max(15px,env(safe-area-inset-top))}}
+/* Qoomia V4.1.9 — un solo insight in Home, lettura progressiva in Statistiche. */
+.insights-overview{padding:0;overflow:hidden;margin-bottom:20px}
+.insights-overview-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 18px 12px}
+.insights-overview-head small{display:block;color:var(--primary2);font-size:10px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;margin-bottom:3px}
+.insights-overview-head h2{margin:0;font-size:19px}
+.insights-overview-head>span{font-size:10px;color:var(--muted);background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:5px 8px;white-space:nowrap}
+.insights-overview-primary,.insights-overview-row{display:grid;grid-template-columns:38px minmax(0,1fr) 16px;align-items:center;gap:11px;color:var(--text);text-decoration:none}
+.insights-overview-primary{margin:0 12px 8px;padding:13px 12px;border-radius:15px;background:color-mix(in srgb,var(--primary) 8%,var(--surface));border:1px solid color-mix(in srgb,var(--primary) 28%,var(--line))}
+.insights-overview-primary.attention{background:color-mix(in srgb,#f59e0b 8%,var(--surface));border-color:color-mix(in srgb,#f59e0b 30%,var(--line))}
+.insights-overview-primary.positive{background:color-mix(in srgb,var(--green) 7%,var(--surface));border-color:color-mix(in srgb,var(--green) 28%,var(--line))}
+.insights-overview-primary span,.insights-overview-row span{min-width:0}
+.insights-overview-primary b,.insights-overview-row b{display:block;font-size:14px;line-height:1.3;margin-bottom:3px}
+.insights-overview-primary small,.insights-overview-row small{display:block;color:var(--muted);font-size:12px;line-height:1.42}
+.insights-overview-primary>strong,.insights-overview-row>strong{color:var(--muted);font-size:23px;font-weight:400}
+.insights-overview-list{padding:0 18px}
+.insights-overview-row{padding:12px 0;border-bottom:1px solid var(--line)}
+.insights-overview-row:last-child{border-bottom:0}
+.insights-overview-glyph{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;color:var(--primary);background:var(--surface2);border:1px solid var(--line)}
+.insights-overview-glyph.budget{color:#b7791f}.insights-overview-glyph.projection{color:#5b7bd5}
+.insights-overview-note{margin:0;padding:11px 18px 15px;color:var(--muted);font-size:10px;line-height:1.4}
+@media(max-width:520px){.insights-overview{margin-bottom:18px}.insights-overview-head{padding:16px 15px 10px}.insights-overview-primary{margin:0 10px 7px}.insights-overview-list{padding:0 15px}.insights-overview-note{padding:10px 15px 14px}}
+/* Qoomia V4.2 — Backup, Privacy & Portabilità. */
+.data-section-card{padding:0;overflow:hidden;margin-bottom:16px}
+.data-section-title{display:grid;grid-template-columns:40px minmax(0,1fr);gap:12px;align-items:center;padding:17px 17px 13px}
+.data-section-title>span{display:grid;place-items:center;width:40px;height:40px;border-radius:13px;background:var(--surface2);color:var(--primary);border:1px solid var(--line)}
+.data-section-title h2{font-size:16px;margin:0 0 3px}.data-section-title p{font-size:12px;color:var(--muted);margin:0;line-height:1.4}
+.data-action-list{padding:0 17px 5px;border-top:1px solid var(--line)}
+.data-download-button{display:flex;align-items:center;justify-content:center;gap:8px;margin:2px 17px 11px;text-decoration:none}
+.data-section-card>.settings-help{padding:0 17px 15px;margin:0;line-height:1.5}
+.restore-card{padding-bottom:17px}.restore-card>.picker-label,.restore-card>.import-file-input,.restore-card>select,.restore-card>.account-space-picker,.restore-card>.save-btn,.restore-card>.notice{margin-left:17px;margin-right:17px;width:calc(100% - 34px)}
+.restore-card>select{padding:12px;border-radius:12px;background:var(--surface2);border:1px solid var(--line);color:var(--text)}
+.restore-card>.save-btn{margin-top:15px}.restore-card>.notice{margin-top:12px}
+.data-danger-zone{padding:0;overflow:hidden;border-color:color-mix(in srgb,var(--red) 35%,var(--line));margin-top:18px}
+.data-danger-zone>summary{display:grid;grid-template-columns:40px minmax(0,1fr) 20px;gap:12px;align-items:center;padding:16px;cursor:pointer;list-style:none}.data-danger-zone>summary::-webkit-details-marker{display:none}
+.data-danger-zone>summary>span{display:grid;place-items:center;width:40px;height:40px;border-radius:13px;color:var(--red);background:color-mix(in srgb,var(--red) 8%,var(--surface));border:1px solid color-mix(in srgb,var(--red) 25%,var(--line))}
+.data-danger-zone>summary b,.data-danger-zone>summary small{display:block}.data-danger-zone>summary small{color:var(--muted);font-size:11px;margin-top:3px}.data-danger-zone>summary>strong{color:var(--muted);font-size:20px;transition:transform .2s ease}.data-danger-zone[open]>summary>strong{transform:rotate(180deg)}
+.data-danger-content{border-top:1px solid var(--line);padding:16px}.data-danger-content p{color:var(--muted);font-size:12px;line-height:1.55;margin:0 0 10px}.data-danger-content input{width:100%;background:var(--surface2);border:1px solid var(--line);color:var(--text)}
+.data-delete-button{width:100%;margin-top:14px}.data-delete-button:disabled{opacity:.45;cursor:not-allowed}
+@media(max-width:520px){.data-section-title{padding:15px 14px 12px}.data-action-list{padding:0 14px 4px}.data-download-button{margin-left:14px;margin-right:14px}.data-section-card>.settings-help{padding-left:14px;padding-right:14px}.restore-card>.picker-label,.restore-card>.import-file-input,.restore-card>select,.restore-card>.account-space-picker,.restore-card>.save-btn,.restore-card>.notice{margin-left:14px;margin-right:14px;width:calc(100% - 28px)}}
