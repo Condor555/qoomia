@@ -27,7 +27,7 @@ export const viewport:Viewport={
   initialScale:1,
   viewportFit:'cover',
   colorScheme:'light dark',
-  themeColor:[{media:'(prefers-color-scheme: light)',color:'#F4F7F6'},{media:'(prefers-color-scheme: dark)',color:'#0D1514'}],
+  themeColor:[{media:'(prefers-color-scheme: light)',color:'#F8FAFC'},{media:'(prefers-color-scheme: dark)',color:'#090D16'}],
 };
 
 export default function Layout({children,modal}:{children:React.ReactNode;modal:React.ReactNode}){

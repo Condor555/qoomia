@@ -1,8 +1,5 @@
 'use client';
-
-import Link from 'next/link';
 import {usePathname} from 'next/navigation';
-import QoomiaLogo from './QoomiaLogo';
 import SpaceSwitcher from './SpaceSwitcher';
 
 export default function AppHeader(){
@@ -19,8 +16,5 @@ export default function AppHeader(){
     pathname === '/obiettivi';
 
   if(hidden) return null;
-  return <header className="app-topbar">
-    <Link className="app-topbar-brand" href="/" aria-label="Qoomia Home"><QoomiaLogo size={34}/><strong>Qoomia</strong></Link>
-    <SpaceSwitcher/>
-  </header>;
+  return <SpaceSwitcher/>;
 }

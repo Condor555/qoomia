@@ -13,7 +13,7 @@ const sheet=read('components/AdaptiveSheet.tsx');
 const manifest=read('app/manifest.ts');
 const sw=read('public/sw.js');
 
-expect('versione 4.1.8 o successiva',['4.1.8','4.1.9'].includes(pkg.version)||pkg.version.startsWith('4.2.')||pkg.version.startsWith('4.3.'));
+expect('versione 4.1.8 o successiva',['4.1.8','4.1.9'].includes(pkg.version)||pkg.version.startsWith('4.2.'));
 expect('nessuna nuova dipendenza',Object.keys(pkg.dependencies||{}).length===9);
 expect('Insight montato in Home',home.includes('<MonthlyInsightCard stats={stats}'));
 expect('Insight usa dati stats esistenti',insight.includes('topCategory')&&insight.includes('budget')&&!insight.includes('fetch('));
