@@ -4,7 +4,6 @@ export type IconCatalogEntry={
 const normalize=(value:string)=>value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('it').trim();
 const words=(value:string)=>normalize(value).split(/[^a-z0-9]+/).filter(Boolean);
 const icon=(id:string,label:string,englishLabel:string,group:string,keywords:string):IconCatalogEntry=>({id,label,englishLabel,asset:`/icons/categories/${id}.png`,group,keywords:words(`${label} ${englishLabel} ${id} ${keywords}`)});
-const icons8=(id:string,label:string,englishLabel:string,group:string,asset:string,keywords:string):IconCatalogEntry=>({id,label,englishLabel,asset,group,keywords:words(`${label} ${englishLabel} ${id} ${keywords}`)});
 const brand=(id:string,label:string,file:string,keywords:string):IconCatalogEntry=>({id:`brand:${id}`,label,englishLabel:label,asset:`/icons/brands/${file}.png`,group:'Brand',brand:true,keywords:words(`${label} ${id} ${keywords}`)});
 
 /** Qoomia V4.1.3: catalogo locale Icons8 Color PNG 96x96. */
@@ -64,9 +63,10 @@ export const categoryIconCatalog:IconCatalogEntry[]=[
   icon('gym','Palestra','Dumbbell','Shopping e tempo libero','palestra fitness allenamento'),
   icon('gaming','Videogiochi','Game controller','Shopping e tempo libero','gaming videogiochi console'),
   icon('books','Libri','Book','Shopping e tempo libero','libri cultura lettura'),
+  icon('education','Educazione','Graduation cap','Shopping e tempo libero','educazione scuola universita formazione studio diploma cappello universitario'),
   icon('pets','Animali','Paw','Shopping e tempo libero','animali cane gatto veterinario'),
-  icons8('barber','Barbiere','Scissors and comb','Shopping e tempo libero','https://img.icons8.com/cute-color/96/scissors-and-comb.png','barbiere parrucchiere taglio capelli forbici pettine'),
-  icons8('entertainment','Divertimento','Confetti','Shopping e tempo libero','https://img.icons8.com/color/96/confetti.png','divertimento svago festa evento confetti'),
+  icon('barber','Barbiere','Scissors and comb','Shopping e tempo libero','barbiere parrucchiere taglio capelli forbici pettine'),
+  icon('entertainment','Divertimento','Confetti','Shopping e tempo libero','divertimento svago festa evento confetti'),
 
   icon('beach-umbrella','Mare','Beach umbrella','Viaggi e famiglia','mare spiaggia lido ombrellone balneare'),
   icon('beach','Spiaggia','Beach','Viaggi e famiglia','spiaggia mare'),
@@ -117,10 +117,10 @@ export const legacyIconAliases:Record<string,string>={
   'cart':'grocery-store','shopping-cart':'grocery-store','cart-shopping':'grocery-store','food':'food','fork-knife':'restaurant','utensils':'restaurant',
   'mug-hot':'coffee','gas-pump':'gas-station','square-parking':'parking','plane':'airplane','airplane-take-off':'airplane',
   'bag':'shopping','bag-shopping':'shopping','handbag':'shopping','clapperboard':'cinema','film-slate':'cinema','movie':'cinema',
-  'gamepad':'gaming','game-controller':'gaming','paw':'pets','paw-print':'pets','dumbbell':'gym','futbol':'football','soccer-ball':'football','scissors':'barber','comb':'barber','party':'entertainment','confetti':'entertainment',
+  'gamepad':'gaming','game-controller':'gaming','paw':'pets','paw-print':'pets','dumbbell':'gym','futbol':'football','soccer-ball':'football','scissors':'barber','comb':'barber','scissors-and-comb':'barber','party':'entertainment','confetti':'entertainment',
   'wallet':'wallet','bank':'wallet','building-columns':'wallet','refund':'refund','other-income':'income','store':'sales-income','piggy-bank':'savings',
   'money-bill-wave':'salary','money':'cash','money-bill':'cash','heart':'couple','users':'family','users-three':'family','baby':'child',
-  'stethoscope':'doctor','pills':'pill','tooth':'dentist','receipt':'payment','repeat':'payment','tag':'tag'
+  'stethoscope':'doctor','pills':'pill','tooth':'dentist','receipt':'payment','repeat':'payment','book':'books','graduation-cap':'education','school':'education','university':'education','student':'education','tag':'tag'
 };
 export function normalizeIconId(id?:string|null){
   if(!id)return 'tag';
@@ -138,7 +138,7 @@ const preferredSuggestions:[RegExp,string[]][]=[
   [/mare|spiaggia|lido|ombrellone/i,['beach-umbrella','beach']],[/matrimonio|nozze|fedi/i,['wedding']],[/moglie|marito|compagna|compagno|coppia/i,['couple']],
   [/supermercato|spesa|alimentari/i,['grocery-store']],[/benzina|diesel|carburante|gpl/i,['gas-station']],[/manutenzione auto|officina|tagliando/i,['car-service']],
   [/ristorante|pranzo|cena/i,['restaurant']],[/bar|caffe|colazione/i,['coffee']],[/stipendio|salario/i,['salary']],[/pensione/i,['pension']],
-  [/rimbor/i,['refund']],[/risparm/i,['savings']],[/investiment|interess|rendit/i,['investment']],[/regal/i,['gift']],[/barbiere|parrucchiere/i,['barber']],[/divertimento|svago|festa|evento/i,['entertainment']],
+  [/rimbor/i,['refund']],[/risparm/i,['savings']],[/investiment|interess|rendit/i,['investment']],[/regal/i,['gift']],[/barbiere|parrucchiere/i,['barber']],[/divertimento|svago|festa|evento/i,['entertainment']],[/scuola|universit|educazione|formazione|studio/i,['education']],
 ];
 export function suggestIconsForCategory(name:string,limit=8){
   const clean=normalize(name);if(!clean)return [];

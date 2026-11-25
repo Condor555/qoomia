@@ -75,7 +75,7 @@ const rules:Rule[]=[
   {match:/teatro|spettacolo/i,style:color('cinema','#E45858')},
   {match:/divertimento|evento|svago|festa/i,style:color('entertainment','#F17D45')},
 
-  {match:/scuola|universit|educazione|formazione/i,style:color('books','#438FDF')},
+  {match:/scuola|universit|educazione|formazione/i,style:color('education','#438FDF')},
   {match:/libri|cultura|lettura/i,style:color('books','#8B6BC9')},
   {match:/famiglia|parenti|family/i,style:color('family','#EF6C91')},
   {match:/figli|bambin|infanzia/i,style:color('child','#ED7896')},
@@ -120,6 +120,7 @@ export function categoryStyle(name:string,custom?:Partial<CategoryStyle>|null):C
   if(/moglie|compagna/i.test(name)&&['heart','tag','users-three'].includes(normalizedCustom))customIcon=inferred.icon;
   if(/barbiere|parrucchiere/i.test(name)&&['shopping','tag'].includes(normalizedCustom))customIcon=inferred.icon;
   if(/divertimento|evento|svago|festa/i.test(name)&&['cinema','tag'].includes(normalizedCustom))customIcon=inferred.icon;
+  if(/scuola|universit|educazione|formazione/i.test(name)&&['books','tag'].includes(normalizedCustom))customIcon=inferred.icon;
   const resolvedCustom=normalizeIconId(customIcon);
   const resolvedIcon=resolvedCustom!=='tag'?resolvedCustom:inferred.icon;
   return {icon:normalizeIconId(resolvedIcon),color:custom?.color||inferred.color};

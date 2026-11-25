@@ -1,14 +1,16 @@
 {
-  "version": "4.2.1",
-  "strategy": "Categories and brands use allow-listed Icons8 assets. UI/navigation uses Phosphor.",
+  "version": "4.2.2",
+  "strategy": "Categories and brands use allow-listed local assets. UI/navigation uses Phosphor.",
   "categoriesPath": "public/icons/categories/",
   "brandsPath": "public/icons/brands/",
   "fallback": "Phosphor Tag",
-  "runtimeExternalIconCalls": true,
-  "approvedRuntimeAssets": {
-    "barber": "https://img.icons8.com/cute-color/96/scissors-and-comb.png",
-    "entertainment": "https://img.icons8.com/color/96/confetti.png"
-  },
+  "runtimeExternalIconCalls": false,
+  "approvedRuntimeAssets": {},
+  "qoomiaLocalCategoryAssets": [
+    "barber",
+    "education",
+    "entertainment"
+  ],
   "legacyRemoved": [
     "public/icons/color/",
     "lib/category-icon-catalog-data.ts",
