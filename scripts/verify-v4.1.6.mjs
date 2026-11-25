@@ -47,7 +47,7 @@ assert(migration.includes('create index if not exists'),'La migration performanc
 
 const pkg=JSON.parse(pkgText);
 const lock=JSON.parse(lockText);
-assert(['4.1.8','4.1.9'].includes(pkg.version)||pkg.version.startsWith('4.2.'),'Versione applicativa non supportata dalla suite cumulativa.');
+assert(['4.1.8','4.1.9'].includes(pkg.version)||pkg.version.startsWith('4.2.')||pkg.version.startsWith('4.3.'),'Versione applicativa non supportata dalla suite cumulativa.');
 assert.equal(lock.version,pkg.version);
 assert.equal(lock.packages[''].version,pkg.version);
 assert(pkg.devDependencies?.['@types/react-dom'],'@types/react-dom deve essere presente nelle devDependencies.');

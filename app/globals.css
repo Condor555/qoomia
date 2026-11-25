@@ -1325,3 +1325,161 @@ button,a,.transaction-button,.macro-compact-row{-webkit-tap-highlight-color:tran
 .data-recovery-section{padding-top:18px;border-top:1px solid var(--line)}.data-recovery-section .import-file-input{width:100%;margin-top:0}.data-recovery-section select{width:100%;padding:12px;border-radius:12px;background:var(--surface2);border:1px solid var(--line);color:var(--text)}.data-recovery-section>.save-btn{width:100%;margin-top:15px}.data-recovery-section>.notice{margin-top:12px}
 .delete-account-sheet input{width:100%;background:var(--surface2);border:1px solid var(--line);color:var(--text)}.danger-intro{padding:2px 0 8px}.data-delete-button{width:100%;margin-top:15px}.data-delete-button:disabled{opacity:.45;cursor:not-allowed}
 @media(max-width:520px){#qoomia-insights,#stats-categories,#stats-trend,#stats-budget{scroll-margin-top:72px}.data-hub-row{padding:14px}.data-privacy-note{margin-top:12px}.backup-tool-sheet .adaptive-sheet-content{padding-bottom:calc(18px + env(safe-area-inset-bottom))}}
+
+
+/* Qoomia V4.3 — Figma visual language mapped onto the real Next.js application. */
+:root{
+  --bg:#F4F7F6;
+  --surface:#FFFFFF;
+  --surface2:#F7F9F8;
+  --surface-elevated:#F1F7F5;
+  --text:#17211F;
+  --muted:#71807C;
+  --line:#DDE8E5;
+  --brand-deep:#075A53;
+  --brand:#08766D;
+  --brand-accent:#10A99B;
+  --primary:#08766D;
+  --primary2:#10A99B;
+  --green:#078A75;
+  --red:#C84D57;
+  --shadow:0 18px 50px rgba(27,64,58,.08);
+  --q-nav:#123C38;
+}
+html[data-theme="dark"]{
+  --bg:#0D1514;
+  --surface:#15201E;
+  --surface2:#1A2826;
+  --surface-elevated:#20302D;
+  --text:#EDF5F2;
+  --muted:#9AA9A5;
+  --line:#2B403B;
+  --primary:#35C7B8;
+  --primary2:#10A99B;
+  --green:#45D2B8;
+  --red:#FB7A86;
+  --shadow:0 18px 50px rgba(0,0,0,.24);
+  --q-nav:#0B2926;
+}
+body{font-family:Manrope,Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.surface{border-color:var(--line);border-radius:20px;box-shadow:var(--shadow)}
+button,input,select,textarea{font-family:inherit}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid color-mix(in srgb,var(--primary) 28%,transparent);outline-offset:2px}
+.app-topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:62px;margin-bottom:22px}
+.app-topbar-brand{display:flex;align-items:center;gap:9px;color:var(--text);text-decoration:none;font-size:16px;font-weight:850;letter-spacing:-.35px}
+.app-topbar-brand .qoomia-logo{border-radius:10px}
+.app-topbar .app-space-bar{width:auto;margin:0}
+.app-topbar .space-picker-compact{max-width:min(300px,100%)}
+.nav-brand-lockup,.nav-clarity-card{display:none}
+.home-hero-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(290px,.85fr);gap:18px;align-items:stretch}
+.home-hero-grid .balance-card{position:relative;min-height:244px;padding:25px 27px;overflow:hidden;border-radius:22px;background:linear-gradient(135deg,#075A53 0%,#087B70 58%,#10A99B 100%);box-shadow:0 22px 46px color-mix(in srgb,var(--primary) 24%,transparent)}
+.home-hero-grid .balance-card::after{content:"";position:absolute;width:250px;height:250px;right:-110px;top:-130px;border:1px solid rgba(255,255,255,.12);border-radius:50%;box-shadow:0 0 0 45px rgba(255,255,255,.025),0 0 0 90px rgba(255,255,255,.025);pointer-events:none}
+.home-hero-grid .balance-card>header,.home-hero-grid .balance-card>strong,.home-hero-grid .balance-flows,.home-hero-grid .balance-average{position:relative;z-index:1}
+.home-hero-grid .balance-card>header{justify-content:space-between}
+.home-hero-grid .balance-card>header>span{display:flex;align-items:center;gap:8px}
+.home-hero-grid .balance-card>strong{margin-top:19px;font-size:clamp(32px,4vw,44px);letter-spacing:-1.7px}
+.balance-flows{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:14px;color:rgba(255,255,255,.75)}
+.balance-flows>span{display:grid;grid-template-columns:auto auto;align-items:center;gap:2px 6px}
+.balance-flows svg{grid-row:1/3}
+.balance-flows small{font-size:9px}
+.balance-flows b{font-size:12px;font-variant-numeric:tabular-nums}
+.home-hero-grid .balance-average{margin-top:auto;padding-top:14px}
+.home-budget-link{display:flex;flex-direction:column;justify-content:center;min-height:244px;margin-top:0;padding:23px;color:var(--text);text-decoration:none}
+.home-budget-card-head{display:grid;grid-template-columns:42px minmax(0,1fr) 24px;align-items:center;gap:11px}
+.home-budget-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;color:var(--primary);background:color-mix(in srgb,var(--primary) 10%,var(--surface))}
+.home-budget-card-head small{display:block;color:var(--muted);font-size:8px;font-weight:850;letter-spacing:.08em}
+.home-budget-card-head h2{margin:4px 0 0;font-size:15px}
+.home-budget-chevron{justify-self:end;color:var(--muted);font-size:25px;font-weight:400}
+.home-budget-values{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:29px}
+.home-budget-values small,.home-budget-values strong{display:block}
+.home-budget-values small{color:var(--muted);font-size:9px}
+.home-budget-values strong{margin-top:4px;font-size:18px;letter-spacing:-.4px}
+.home-budget-link .budget-progress{height:7px;margin-top:18px}
+.home-budget-link>p{margin:9px 0 0;color:var(--muted);font-size:9px;line-height:1.45}
+.home-budget-link>p strong{color:var(--primary)}
+.monthly-insight-card{border-radius:16px}
+.home-dashboard-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(310px,.85fr);gap:18px;align-items:start}
+.home-dashboard-grid>.section{height:100%;margin-top:0;padding:22px}
+.home-dashboard-grid .section-title a,.home-categories .section-title a{color:var(--primary);font-size:11px;font-weight:800;text-decoration:none}
+.home-recent-row{grid-template-columns:42px minmax(0,1fr) auto;padding:11px 0}
+.home-recent-row>span{min-width:0}
+.home-recent-row b,.home-recent-row small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.home-recent-row>strong{white-space:nowrap;font-variant-numeric:tabular-nums}
+.home-categories .category-row{padding:10px 0;border-bottom:1px solid var(--line)}
+.home-categories .category-row:last-child{border-bottom:0}
+.home-saving-goals{margin-top:18px}
+.page-head h1{letter-spacing:-1px}
+
+@media(min-width:861px){
+  body:has(.bottom-nav){padding-left:252px}
+  body:has(.bottom-nav) .shell{width:min(100%,1180px);margin:0 auto;padding:36px 42px 120px}
+  .bottom-nav{position:fixed;z-index:50;inset:0 auto 0 0;transform:none;width:252px;max-width:none;height:100dvh;padding:28px 22px 22px;border:0;border-radius:0;background:var(--q-nav);box-shadow:none;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:6px;color:#E7F4F0}
+  .bottom-nav>a{width:100%;min-height:46px;padding:11px 14px;border-radius:12px;display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:13px;color:#A9C2BD;font-size:13px;font-weight:650;text-align:left}
+  .bottom-nav>a:not(.nav-brand-lockup):hover{color:#fff;background:rgba(255,255,255,.06)}
+  .bottom-nav>a:not(.nav-brand-lockup).active{color:#fff;background:rgba(255,255,255,.11);box-shadow:inset 3px 0 #33C7B7}
+  .bottom-nav>a:not(.nav-brand-lockup).active .nav-tab-icon{color:#fff;background:transparent}
+  .bottom-nav .nav-tab-icon{width:24px;height:24px;border-radius:0;color:inherit;background:transparent}
+  .bottom-nav .nav-brand-lockup{display:flex;min-height:52px;margin:0 0 22px;padding:0 10px;color:#fff;font-size:21px;font-weight:850;letter-spacing:-.55px}
+  .nav-brand-lockup .qoomia-logo{border-radius:11px}
+  .nav-clarity-card{display:block;margin-top:auto;padding:17px;border:1px solid rgba(255,255,255,.09);border-radius:16px;background:linear-gradient(145deg,rgba(29,156,142,.24),rgba(255,255,255,.04))}
+  .nav-clarity-card>span{width:34px;height:34px;display:grid;place-items:center;margin-bottom:13px;border-radius:10px;color:#113D38;background:#6DD9CC}
+  .nav-clarity-card strong{font-size:13px;line-height:1.5}
+  .nav-clarity-card p{margin:8px 0 0;color:#94B2AC;font-size:10px;line-height:1.55}
+  .app-topbar{position:sticky;top:0;z-index:28;min-height:78px;margin:-36px -42px 30px;padding:0 42px;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+  .app-topbar-brand{display:none}
+  .app-topbar .app-space-bar{margin-left:auto}
+  .floating-add-movement{right:30px;bottom:28px}
+  .pwa-install-card{right:30px}
+  .page-head{margin-bottom:26px}
+  .section{padding:20px}
+  .analytics-kpis{grid-template-columns:repeat(4,1fr)}
+  .metric-grid{grid-template-columns:repeat(2,1fr)}
+  .profile-menu,.settings-list{display:grid;grid-template-columns:1fr 1fr;column-gap:24px;padding:10px 22px}
+  .profile-menu-row:nth-last-child(-n+2),.settings-list>.setting-choice:nth-last-child(-n+2){border-bottom:0}
+}
+
+@media(max-width:1000px) and (min-width:861px){
+  body:has(.bottom-nav) .shell{padding-right:26px;padding-left:26px}
+  .app-topbar{margin-right:-26px;margin-left:-26px;padding-right:26px;padding-left:26px}
+  .home-hero-grid,.home-dashboard-grid{grid-template-columns:1fr}
+  .home-budget-link{min-height:210px}
+}
+
+@media(max-width:860px){
+  body{padding-left:0}
+  .nav-brand-lockup,.nav-clarity-card{display:none!important}
+  .app-topbar{min-height:52px;margin-bottom:16px}
+  .app-topbar .app-space-bar{width:auto;margin:0}
+  .app-topbar .space-picker-compact{width:max-content;max-width:min(225px,60vw)}
+  .home-hero-grid,.home-dashboard-grid{grid-template-columns:1fr}
+  .home-dashboard-grid{gap:13px}
+  .home-hero-grid .balance-card{min-height:230px}
+  .home-budget-link{min-height:auto}
+}
+
+@media(max-width:430px){
+  .app-topbar{min-height:48px;margin-bottom:14px}
+  .app-topbar-brand{font-size:15px}
+  .app-topbar-brand .qoomia-logo{width:31px;height:31px}
+  .app-topbar .space-picker-trigger-copy small{display:none}
+  .app-topbar .space-picker-compact .space-picker-trigger{padding:5px 8px}
+  .home-hero-grid{gap:13px}
+  .home-hero-grid .balance-card{min-height:222px;padding:21px}
+  .home-hero-grid .balance-card>strong{font-size:34px}
+  .balance-flows{gap:9px 16px}
+  .home-budget-link{padding:19px}
+  .home-budget-values{margin-top:24px}
+  .home-dashboard-grid>.section{padding:18px}
+  .home-recent-row{grid-template-columns:40px minmax(0,1fr) auto;gap:9px}
+}
+
+@media(max-width:370px){
+  .app-topbar-brand strong{display:none}
+  .app-topbar .space-picker-compact{max-width:230px}
+  .balance-flows{align-items:flex-start;flex-direction:column;gap:7px}
+  .home-hero-grid .balance-card{min-height:252px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .bottom-nav>a,.home-budget-link,.home-dashboard-grid a{transition:none!important}
+}
