@@ -73,7 +73,7 @@ const rules:Rule[]=[
   {match:/musica|concerto/i,style:color('music','#8B6BC9')},
   {match:/videogio|gaming|console/i,style:color('gaming','#655CE8')},
   {match:/teatro|spettacolo/i,style:color('cinema','#E45858')},
-  {match:/divertimento|evento/i,style:color('cinema','#F17D45')},
+  {match:/divertimento|evento|svago|festa/i,style:color('entertainment','#F17D45')},
 
   {match:/scuola|universit|educazione|formazione/i,style:color('books','#438FDF')},
   {match:/libri|cultura|lettura/i,style:color('books','#8B6BC9')},
@@ -101,7 +101,7 @@ const rules:Rule[]=[
   {match:/regal/i,style:color('gift','#E3AD16')},
   {match:/ordini online|pacch|spedizion/i,style:color('shopping','#9655F0')},
   {match:/acquisti online|acquisti|shopping|abbigliamento/i,style:color('shopping','#9655F0')},
-  {match:/barbiere|parrucchiere/i,style:color('shopping','#E39C34')},
+  {match:/barbiere|parrucchiere/i,style:color('barber','#E39C34')},
   {match:/altra spesa|altro|varie/i,style:color('tag','#68738C')},
 ];
 
@@ -118,11 +118,11 @@ export function categoryStyle(name:string,custom?:Partial<CategoryStyle>|null):C
   if(/mare|spiaggia|lido|ombrellone|balneare/i.test(name)&&['airplane','tag'].includes(normalizedCustom))customIcon=inferred.icon;
   if(/matrimonio|nozze|fedi|wedding/i.test(name)&&['heart','tag'].includes(normalizedCustom))customIcon=inferred.icon;
   if(/moglie|compagna/i.test(name)&&['heart','tag','users-three'].includes(normalizedCustom))customIcon=inferred.icon;
+  if(/barbiere|parrucchiere/i.test(name)&&['shopping','tag'].includes(normalizedCustom))customIcon=inferred.icon;
+  if(/divertimento|evento|svago|festa/i.test(name)&&['cinema','tag'].includes(normalizedCustom))customIcon=inferred.icon;
   const resolvedCustom=normalizeIconId(customIcon);
   const resolvedIcon=resolvedCustom!=='tag'?resolvedCustom:inferred.icon;
   return {icon:normalizeIconId(resolvedIcon),color:custom?.color||inferred.color};
 }
 
 export const colorChoices=['#5477F5','#4F77D8','#655CE8','#8A5CF6','#9655F0','#D55E80','#DB4B8B','#E85F86','#E45858','#F17D45','#E99B35','#D97706','#E3AD16','#35A96B','#2F9E75','#5BA88D','#3E9AA8','#2E9BC6','#68738C','#111827'];
-
-

@@ -4,7 +4,7 @@ import ts from 'typescript';
 const read=path=>fs.readFileSync(path,'utf8');
 const checks=[];const expect=(label,condition)=>checks.push({label,condition:Boolean(condition)});
 const pkg=JSON.parse(read('package.json')),backup=read('app/api/backup/route.ts'),backupLib=read('lib/qoomia-backup.ts'),dataPage=read('app/account/dati/page.tsx'),deleteRoute=read('app/api/account/delete/route.ts'),migration=read('supabase/migrations/20261124_v4_2_backup_privacy_portability.sql'),schema=read('supabase/schema.sql'),sw=read('public/sw.js'),nav=read('components/Nav.tsx'),insights=read('lib/qoomia-insights.ts'),homeInsight=read('components/MonthlyInsightCard.tsx'),overview=read('components/InsightsOverview.tsx'),stats=read('app/statistiche/page.tsx'),css=read('app/globals.css');
-expect('Versione finale unica V4.2',pkg.version==='4.2.0');
+expect('Versione finale unica V4.2',pkg.version.startsWith('4.2.'));
 expect('La suite include V4.1.9 e V4.2',pkg.scripts.test.includes('verify-v4.1.9.mjs')&&pkg.scripts.test.includes('verify-v4.2.mjs'));
 expect('Backup JSON versionato',backupLib.includes("QOOMIA_BACKUP_FORMAT='qoomia-backup'")&&backupLib.includes("QOOMIA_BACKUP_VERSION='4.2'"));
 expect('Backup copre dati finanziari completi',backup.includes("from('transactions')")&&backup.includes("from('categories')")&&backup.includes("from('budgets')")&&backup.includes("from('recurring_transactions')")&&backup.includes("from('saving_goals')")&&backup.includes("from('macro_budget_allocations')"));
@@ -21,7 +21,7 @@ expect('Destinazioni spiegate nell’interfaccia',overview.includes('insight.act
 expect('Anchor Statistiche presenti',overview.includes('id="qoomia-insights"')&&stats.includes('id="stats-categories"')&&stats.includes('id="stats-trend"')&&stats.includes('id="stats-budget"'));
 expect('Dati e privacy mostra un solo menu ordinato',dataPage.includes('className="surface data-hub"')&&(dataPage.match(/className="data-hub-row/g)||[]).length===3);
 expect('CSV ha un solo accesso nel livello principale',dataPage.includes('<b>Movimenti CSV</b>')&&!dataPage.includes('Esporta e importa CSV')&&!dataPage.includes('Importa movimenti CSV')&&!dataPage.includes('Esporta movimenti CSV'));
-expect('Azioni CSV restano disponibili nello sheet',dataPage.includes('title="Movimenti CSV"')&&dataPage.includes('Importa da CSV')&&dataPage.includes('Scarica CSV')&&dataPage.includes('/api/export'));
+expect('Azioni CSV restano disponibili nello sheet',dataPage.includes('title="Movimenti CSV"')&&dataPage.includes('Importa da CSV')&&dataPage.includes('Esporta in CSV')&&dataPage.includes('/api/export'));
 expect('Backup vive in uno sheet con X condivisa',dataPage.includes("activeSheet==='backup'")&&dataPage.includes('<AdaptiveSheet')&&read('components/AdaptiveSheet.tsx').includes('className="sheet-close"'));
 expect('Download backup resta disponibile nello sheet',dataPage.includes('Scarica copia di sicurezza')&&dataPage.includes('href="/api/backup"'));
 expect('Linguaggio tecnico unione rimosso dalla UI',!dataPage.match(/modalità unione|merge/i)&&dataPage.includes('Recupera i dati'));

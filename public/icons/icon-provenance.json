@@ -1,10 +1,14 @@
 {
-  "version": "4.1.3",
-  "strategy": "Categories and brands use local Icons8 Color PNG assets. UI/navigation uses Phosphor.",
+  "version": "4.2.1",
+  "strategy": "Categories and brands use allow-listed Icons8 assets. UI/navigation uses Phosphor.",
   "categoriesPath": "public/icons/categories/",
   "brandsPath": "public/icons/brands/",
   "fallback": "Phosphor Tag",
-  "runtimeExternalIconCalls": false,
+  "runtimeExternalIconCalls": true,
+  "approvedRuntimeAssets": {
+    "barber": "https://img.icons8.com/cute-color/96/scissors-and-comb.png",
+    "entertainment": "https://img.icons8.com/color/96/confetti.png"
+  },
   "legacyRemoved": [
     "public/icons/color/",
     "lib/category-icon-catalog-data.ts",

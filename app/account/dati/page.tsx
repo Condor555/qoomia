@@ -75,10 +75,10 @@ export default function Dati(){
 
     <section className="surface data-hub" aria-label="Gestione dati">
       <button type="button" className="data-hub-row" onClick={()=>setActiveSheet('csv')}>
-        <span className="data-hub-icon"><Icon name="upload"/></span><span><b>Movimenti CSV</b><small>Importa o scarica i movimenti</small></span><strong aria-hidden="true">›</strong>
+        <span className="data-hub-icon data-hub-transfer-icon"><Icon name="upload" size={16}/><Icon name="download" size={16}/></span><span><b>Movimenti CSV</b><small>Importa ed esporta i tuoi movimenti</small></span><strong aria-hidden="true">›</strong>
       </button>
       <button type="button" className="data-hub-row" onClick={()=>setActiveSheet('backup')}>
-        <span className="data-hub-icon"><Icon name="wallet"/></span><span><b>Backup Qoomia</b><small>Scarica una copia o recupera i dati</small></span><strong aria-hidden="true">›</strong>
+        <span className="data-hub-icon"><Icon name="backup"/></span><span><b>Backup Qoomia</b><small>Scarica una copia o recupera i dati</small></span><strong aria-hidden="true">›</strong>
       </button>
       <button type="button" className="data-hub-row danger-row" onClick={()=>setActiveSheet('delete')}>
         <span className="data-hub-icon"><Icon name="logout"/></span><span><b>Elimina account e dati</b><small>Azione definitiva protetta da conferma</small></span><strong aria-hidden="true">›</strong>
@@ -91,8 +91,8 @@ export default function Dati(){
     <AdaptiveSheet open={activeSheet==='csv'} onClose={()=>setActiveSheet(null)} title="Movimenti CSV" eyebrow="Dati e privacy" size="compact" className="data-tool-sheet" showGrabber>
       <div className="data-sheet-intro"><p>Usa il formato CSV per spostare i soli movimenti tra Qoomia, Money Lover e un foglio di calcolo.</p></div>
       <div className="data-sheet-actions">
-        <Link className="data-sheet-action" href="/importa"><span><Icon name="download"/></span><div><b>Importa da CSV</b><small>Aggiungi movimenti da un file compatibile</small></div><strong aria-hidden="true">›</strong></Link>
-        <a className="data-sheet-action" href="/api/export" download><span><Icon name="upload"/></span><div><b>Scarica CSV</b><small>Esporta i movimenti in un file leggibile</small></div><strong aria-hidden="true">↓</strong></a>
+        <Link className="data-sheet-action" href="/importa"><span><Icon name="download"/></span><div><b>Importa da CSV</b><small>Aggiungi movimenti da un file compatibile</small></div><strong aria-hidden="true">↓</strong></Link>
+        <a className="data-sheet-action" href="/api/export" download><span><Icon name="upload"/></span><div><b>Esporta in CSV</b><small>Scarica i movimenti in un file leggibile</small></div><strong aria-hidden="true">↑</strong></a>
       </div>
     </AdaptiveSheet>
 
@@ -101,7 +101,6 @@ export default function Dati(){
         <h3>Salva una copia completa</h3>
         <p>Comprende movimenti, categorie, Budget, ricorrenze e obiettivi degli spazi di cui sei owner.</p>
         <a className="save-btn data-sheet-download" href="/api/backup" download><Icon name="download" size={18}/> Scarica copia di sicurezza</a>
-        <small>Al termine puoi chiudere questa schermata con la X in alto.</small>
       </section>
       <section className="data-sheet-section data-recovery-section">
         <h3>Recupera i dati da una copia</h3>
