@@ -6,7 +6,7 @@ import {buildSmartFinanceForecast,type SmartFinanceRecurring,type SmartFinanceTr
 
 type StatsTransactionRow={amount:number|string;category_name:string;date:string;created_by?:string|null;note?:string|null;source?:string|null};
 type ProfileRow={user_id:string;display_name:string|null};
-type CategoryMetaRow={name:string;icon:string|null;color:string|null};
+type CategoryMetaRow={name:string;icon:string|null;color:string|null;kind?:'expense'|'income'|null};
 
 function monthBounds(month:string){
   const [year,monthNumber]=month.split('-').map(Number);const start=`${year}-${String(monthNumber).padStart(2,'0')}-01`;const nextDate=new Date(Date.UTC(year,monthNumber,1));const end=nextDate.toISOString().slice(0,10);const previousDate=new Date(Date.UTC(year,monthNumber-2,1));const previous=`${previousDate.getUTCFullYear()}-${String(previousDate.getUTCMonth()+1).padStart(2,'0')}`;return {year,monthNumber,start,end,previous};
@@ -23,7 +23,7 @@ export async function GET(req:Request){
       sb.from('transactions').select('amount,category_name').eq('space_id',spaceId).gte('date',previousBounds.start).lt('date',previousBounds.end),
       loadMacroBudgetSnapshot(sb,spaceId,month),
       loadSavingGoals(sb,spaceId,user.id),
-      sb.from('categories').select('name,icon,color').eq('space_id',spaceId),
+      sb.from('categories').select('name,icon,color,kind').eq('space_id',spaceId),
       sb.from('transactions').select('amount,category_name,date,note,source').eq('space_id',spaceId).gte('date',historyStart).lt('date',bounds.start).order('date'),
       sb.from('recurring_transactions').select('id,note,category_name,amount,next_run,frequency,interval_count,active').eq('space_id',spaceId).eq('active',true),
     ]);
@@ -42,7 +42,10 @@ export async function GET(req:Request){
     const pace=monthPace(month);const {daysInMonth,daysConsidered}=pace;const dailyAverageExpense=daysConsidered>0?roundMoney(expense/daysConsidered):0;
     const projectedExpense=pace.isCurrent&&daysConsidered>0?roundMoney(expense/daysConsidered*daysInMonth):null;
     const periodStatus=pace.isPast?'past':pace.isFuture?'future':'current';
-    const smartFinance=periodStatus==='current'?buildSmartFinanceForecast({month,today,current:rows as SmartFinanceTransaction[],history:(historyRows||[]) as SmartFinanceTransaction[],recurring:(recurringRows||[]) as SmartFinanceRecurring[]}):null;
+    const smartFinance=periodStatus==='current'?buildSmartFinanceForecast({
+      month,today,current:rows as SmartFinanceTransaction[],history:(historyRows||[]) as SmartFinanceTransaction[],
+      recurring:((recurringRows||[]) as SmartFinanceRecurring[]).map(rule=>({...rule,categoryKind:categoryMeta.get(rule.category_name)?.kind||null})),
+    }):null;
     const activeSavingGoals:SavingGoalSummary[]=savingGoals.filter((goal:SavingGoalSummary)=>goal.status==='active').slice(0,4);
     return NextResponse.json({
       month,periodStatus,income,expense,balance:income-expense,count:rows.length,previousIncome,previousExpense,
