@@ -1,7 +1,7 @@
 import {timingSafeEqual} from 'node:crypto';
 import {NextResponse} from 'next/server';
 import webPush from 'web-push';
-import {createClient} from '../../../../../lib/supabase/server';
+import {createClient} from '../../../../lib/supabase/server';
 
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
