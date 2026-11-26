@@ -4,7 +4,6 @@ import Link from 'next/link';
 import {usePathname} from 'next/navigation';
 import {ArrowsDownUpIcon} from '@phosphor-icons/react/ssr';
 import Icon, {type IconName} from './Icon';
-import QoomiaLogo from './QoomiaLogo';
 import {useI18n} from './LanguageProvider';
 import {cachedJson} from '../lib/client-json-cache';
 import {useSharedMonth} from '../lib/selected-period-client';
@@ -113,16 +112,7 @@ export default function Nav() {
 
   return (
     <nav className="bottom-nav" aria-label={t('nav.main')}>
-      <Link className="nav-brand-lockup" href="/" aria-label="Qoomia Home">
-        <QoomiaLogo size={36}/>
-        <strong>Qoomia</strong>
-      </Link>
       {navigationTabs.map(renderTab)}
-      <div className="nav-clarity-card" aria-hidden="true">
-        <span><Icon name="chart" size={18}/></span>
-        <strong>Le tue finanze,<br/>sempre più chiare.</strong>
-        <p>Dati reali, budget e obiettivi nello spazio che scegli.</p>
-      </div>
     </nav>
   );
 }
