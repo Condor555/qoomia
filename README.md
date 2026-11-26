@@ -1,235 +1,254 @@
 <div align="center">
 
-<img src="./public/icons/qoomia-v4-1.svg" alt="Logo Qoomia" width="112" height="112" />
+# Qoomia
 
-# 🟢 Qoomia
+**Finanze personali e familiari, finalmente leggibili.**
 
-**Dai senso alle tue spese, in privato o in famiglia.**
+Smart Finance, budget, movimenti, ricorrenze, obiettivi e statistiche in una PWA moderna.
 
-[![Versione](https://img.shields.io/badge/versione-4.1.6-0F766E?style=flat-square)](#stato-del-progetto)
-[![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3FCF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com/)
-[![Vercel](https://img.shields.io/badge/Deploy-Vercel-000000?style=flat-square&logo=vercel)](https://vercel.com/)
+[![Version](https://img.shields.io/badge/version-4.3.2-0F766E?style=flat-square)](#stato-del-progetto)
+[![Next.js](https://img.shields.io/badge/Next.js-15.5.29-111827?style=flat-square&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com/)
+[![Vercel](https://img.shields.io/badge/Deploy-Vercel-000000?style=flat-square&logo=vercel&logoColor=white)](https://vercel.com/)
+[![PWA](https://img.shields.io/badge/PWA-installabile-E76F51?style=flat-square&logo=pwa&logoColor=white)](#pwa-e-notifiche)
+
+[Apri Qoomia](https://qoomia.vercel.app) · [Funzionalità](#funzionalità) · [Configurazione](#configurazione) · [Deploy](#deploy-su-vercel)
 
 </div>
 
-**Qoomia** è una web app mobile-first per gestire finanze personali e condivise. Il nome nasce dall'unione di **Quota** — Budget, impegni programmati e rollover — e **Mia** — uno spazio finanziario personale, chiaro e su misura.
+---
 
-Permette di registrare entrate e uscite, organizzare categorie e ricorrenze, pianificare il Budget e consultare statistiche in **Spazi Privati** o **Spazi Condivisi** con partner e famiglia.
+## Cos'è Qoomia
 
-I pilastri dell'esperienza sono **Spazi Privati e Condivisi**, **Macro Budget e Rollover** e **Chiarezza Immediata** nell'inserimento e nella lettura dei dati.
+Qoomia è un'applicazione web per gestire le finanze quotidiane in uno spazio **Personale** o **Famiglia**. Riunisce registrazione dei movimenti, budget, obiettivi, ricorrenze, analisi e previsioni in un'interfaccia mobile-first, installabile come PWA.
 
-## Funzionalità implementate
+La versione **V4.3.2** introduce un flusso Smart Finance più trasparente, il riconoscimento delle entrate future e un sistema affidabile di auto-post delle ricorrenze con notifiche push.
 
-### Spazi e account
+> [!IMPORTANT]
+> Smart Finance produce stime basate sui dati disponibili: non è consulenza finanziaria e non garantisce il saldo effettivo futuro.
 
-- autenticazione email/password con Supabase Auth;
-- onboarding e profilo utente;
-- Spazio Privato per ogni account;
-- Spazi Condivisi con ruoli owner/member e codice invito;
-- selezione dello spazio coerente tra Home, Movimenti, Statistiche, Budget e Categorie;
-- temi chiaro, scuro e automatico;
-- interfaccia Italiano/English con preferenza persistita.
+## Funzionalità
 
-### Movimenti e categorie
+| Area | Cosa offre |
+| --- | --- |
+| **Smart Finance** | Stima del saldo di fine mese con composizione chiara di saldo attuale, entrate attese e uscite previste. |
+| **Entrate future** | Riconoscimento da ricorrenze e, in assenza di una ricorrenza utile, dallo storico recente. |
+| **Qoomia Insights** | Indicatori sintetici, lettura dell'andamento e messaggi contestuali sui dati finanziari. |
+| **Personale / Famiglia** | Gestione dei dati nel contesto attivo, con passaggio tra spazio personale e familiare. |
+| **Budget** | Limiti di spesa, avanzamento e controllo per categoria. |
+| **Movimenti** | Registro di entrate e uscite con data, categoria, importo e descrizione. |
+| **Ricorrenze** | Scadenze ripetute, registrazione automatica, recupero degli arretrati e prevenzione dei duplicati. |
+| **Notifiche** | Push per gli eventi abilitati, inclusa la registrazione dei movimenti ricorrenti. |
+| **Statistiche** | Riepiloghi, composizione per categoria, grafici e accesso ai dettagli Smart Finance. |
+| **Obiettivi** | Monitoraggio separato dei traguardi di risparmio. |
+| **CSV** | Importazione ed esportazione per trasferire o analizzare i movimenti. |
+| **Backup** | Esportazione e ripristino dei dati per continuità operativa. |
+| **PWA** | Esperienza mobile-first, installazione sul dispositivo e supporto alle notifiche web. |
+| **Tema e accessibilità** | Light e dark mode, focus visibile, target touch adeguati e rispetto di `prefers-reduced-motion`. |
 
-- entrate, uscite e trasferimenti;
-- descrizione, importo, data, categoria e spazio di destinazione;
-- ricerca, paginazione e filtri per periodo, categoria, autore e tipo;
-- modifica ed eliminazione con conferma;
-- categorie distinte per **Uscite/Entrate** e per spazio;
-- catalogo locale di icone categoria con ricerca e suggerimenti;
-- import CSV compatibile con intestazioni italiane e inglesi;
-- export CSV.
+## Smart Finance in V4.3.2
 
-### Esperienza V4.1.6
+La previsione di fine mese segue questa logica:
 
-- hotfix iPhone 16: SpacePicker come vero popover ancorato al trigger (sotto o sopra secondo lo spazio disponibile), CTA movimento compatta e adattiva alla tastiera, conferma modifiche più leggibile e grabber rimosso dalle sheet con chiusura X;
-- navigazione principale Home · Movimenti · Budget · Statistiche · Impostazioni, con Budget come destinazione autonoma e stato attivo turchese;
-- pulsante contestuale “Aggiungi movimento” flottante solo in Home e Movimenti, collegato all’AdaptiveSheet esistente;
-- card Budget Home interamente tappabile, mantenuta come riepilogo rapido con chevron discreto;
-- ricerca Movimenti con reset automatico alla cancellazione e chip dei filtri rimovibili singolarmente;
-- donut Statistiche con label esterne basate sulla stessa pipeline `CategoryColorIcon`/Icons8 locale e legenda completa icona, categoria, importo e percentuale;
-- componenti condivisi per skeleton, errori inline, stati vuoti, toast e pulsanti asincroni, senza falsi valori zero durante il caricamento;
-- barra Cerca movimenti con filtri immediati raccolti in `AdaptiveSheet` e indicatore dei filtri attivi;
-- detail, modifica, selezione categoria, categorie, ricorrenze, obiettivi, Budget e conferme uniformati con `AdaptiveSheet`;
-- Category Picker con ricerca, categorie recenti/frequenti e icone Icons8 Color locali;
-- Home focalizzata su saldo, flussi, Budget, movimenti recenti, obiettivi e categorie principali;
-- report per categoria con icone e collegamento ai Movimenti già filtrati;
-- CSS iPhone/PWA consolidato mantenendo lo sheet flottante e il DateInput V4.1.4;
-- `ToastProvider` collocato nel layout condiviso: `/nuovo`, la route modale e il prerender Next.js usano lo stesso contesto senza errori.
+```text
+saldo attuale
++ entrate programmate
++ entrate abituali riconosciute
+− uscite programmate
+− spesa variabile stimata
+= saldo previsto di fine mese
+```
 
-### Esperienza V4.1.4
+### Riconoscimento delle entrate future
 
-- `AdaptiveSheet` condivisa con focus trap, Escape, ripristino del focus, blocco dello sfondo e presentazione adattiva mobile/desktop;
-- “Nuovo movimento” aperto come compose sheet tramite route intercettata, mantenendo `/nuovo` come pagina completa per URL diretto e refresh;
-- conferme distruttive coerenti al posto di `confirm()` e form di rinomina al posto di `prompt()`;
-- valori non ancora caricati mostrati come skeleton/“—”, senza falsi zeri;
-- caricamento differito del grafico Home e rendering diretto delle icone locali senza doppio preload;
-- nuovi indici PostgreSQL per lista, filtri e ricerca testuale dei movimenti.
+Qoomia cerca prima le **entrate ricorrenti future**. Se non trova una ricorrenza utilizzabile, valuta lo storico recente e può riconoscere un'entrata abituale quando:
 
-### Budget e pianificazione
+- compare in almeno **3 degli ultimi 4 mesi**;
+- gli importi restano sufficientemente coerenti, con variazione entro il **20%**;
+- la cadenza è compatibile, comprese le variazioni tipiche di fine mese e dei weekend;
+- non è già stata ricevuta o conteggiata da un'altra fonte.
 
-- limite mensile per spazio;
-- distribuzione percentuale in categorie Budget;
-- impegni ricorrenti, spesa discrezionale e residuo disponibile;
-- rollover opzionale;
-- impegni programmati separati dal budget allocato: riducono il budget discrezionale complessivo ma non diventano il budget di una categoria;
-- percentuale di utilizzo mostrata soltanto quando esiste un budget allocato;
-- soglie di utilizzo e proiezione del mese;
-- permessi di modifica coerenti con il ruolo nello spazio;
-- stato vuoto, errore recuperabile e timeout per evitare caricamenti infiniti.
+La sezione **Verifica entrate future** rende visibili origine, data prevista, inclusione o esclusione ed eventuale motivazione. I dettagli tecnici restano raccolti nella sezione espandibile **Come è calcolato**.
 
-### Ricorrenze e statistiche
+## Ricorrenze, auto-post e notifiche
 
-- un solo motore Ricorrenze per regole settimanali, mensili o annuali;
-- **Ricorrenza** per movimenti periodici in entrata o uscita; **Abbonamento** per servizi continuativi sempre trattati come uscita, preservando eventuali casi legacy;
-- lista delle regole in primo piano e form **Nuova ricorrenza** aperto solo su richiesta;
-- costo mensile/annuale equivalente degli abbonamenti;
-- calendario delle scadenze e conferma dei pagamenti;
-- conferma atomica che crea una sola transazione nello stesso spazio e impedisce duplicati;
-- saldo, entrate, uscite e media giornaliera;
-- andamento a 6/12 mesi;
-- categorie principali, fonti di entrata e ripartizione per autore negli spazi condivisi.
+Le ricorrenze vengono elaborate lato server:
 
-### Obiettivi di risparmio V4.1
+1. Vercel Cron richiama la route protetta dedicata;
+2. il server individua le scadenze da registrare;
+3. ogni occorrenza è identificata dalla coppia ricorrenza/data per evitare duplicati;
+4. il movimento viene creato nello spazio corretto;
+5. se l'opzione è attiva, viene inviata la notifica push;
+6. aprendo **Ricorrenze**, l'app può recuperare subito eventuali scadenze arretrate senza attendere il ciclo successivo.
 
-- obiettivi associati allo Spazio Privato o a uno Spazio Condiviso;
-- target, importo accumulato, residuo, scadenza opzionale, icona e colore;
-- contributi con data, nota e attribuzione dell'autore;
-- contributo mensile e settimanale suggerito quando è presente una scadenza futura;
-- configurazione riservata a owner/creatore e contributi consentiti ai membri;
-- accantonamenti separati dalle transazioni: non sono uscite e non alterano Budget o Statistiche.
+Gli errori di invio push non annullano un movimento già registrato.
 
 ## Stack
 
-| Area | Tecnologia |
-|---|---|
-| Framework | Next.js 15, React 19, App Router |
-| Linguaggio | TypeScript |
-| Database e autenticazione | Supabase PostgreSQL + Supabase Auth |
-| Sicurezza dati | Row Level Security |
-| Grafici | Recharts |
-| Validazione | Zod |
-| Import CSV | Papa Parse |
-| Icone UI | Phosphor Icons |
-| Icone categorie e brand | Icons8 Color locali + fallback Phosphor Tag |
-| Deploy | Vercel o piattaforma compatibile con Next.js |
+- **Frontend e API:** Next.js 15.5.29, React e TypeScript
+- **Database e autenticazione:** Supabase / PostgreSQL
+- **Hosting e job pianificati:** Vercel e Vercel Cron
+- **Push:** Web Push con chiavi VAPID
+- **Distribuzione:** Progressive Web App
+- **UI:** CSS applicativo, responsive design e icone Phosphor
 
-## Avvio locale
+## Requisiti
 
-### Requisiti
+- Git
+- Node.js compatibile con Next.js 15; consigliato **Node.js 20 LTS**
+- npm
+- un progetto Supabase
+- un progetto Vercel per deploy, Cron e notifiche in produzione
 
-- Node.js 20 o superiore;
-- npm;
-- un progetto Supabase;
-- Git.
+## Avvio rapido
 
 ```bash
 git clone https://github.com/Condor555/qoomia.git
 cd qoomia
-npm install
-```
-
-Creare `.env.local` senza versionarlo:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-NEXT_PUBLIC_SITE_URL=
-```
-
-Non inserire mai chiavi `service_role` o altri segreti in variabili `NEXT_PUBLIC_*`.
-
-### Database
-
-Per una nuova installazione eseguire `supabase/schema.sql` nel SQL Editor di Supabase.
-
-Per un'istanza esistente applicare soltanto le migration necessarie, nell'ordine documentato nella cartella `supabase/migrations/`. La release corrente include, tra le altre:
-
-- `20261119_v3_6_multiuser.sql`;
-- `20261119_v3_7_v3_9.sql`;
-- `20261120_v3_9_3_macro_budgets.sql`;
-- `20261120_v3_9_3_category_kinds_hotfix.sql`;
-- `20261120_v3_9_4_user_language.sql`.
-- `20261120_v4_1_savings_goals.sql`.
-- `20261120_v4_1_1_ux_icon_cleanup.sql`.
-- `20261123_v4_1_4_performance.sql`.
-
-Avviare quindi l'ambiente di sviluppo:
-
-```bash
+npm ci
 npm run dev
 ```
 
-## Deploy
+Apri `http://localhost:3000`.
 
-1. collegare la repository alla piattaforma di deploy;
-2. configurare le tre variabili d'ambiente indicate sopra;
-3. configurare in Supabase Auth il Site URL e i callback `/auth/callback` del proprio dominio;
-4. eseguire i controlli di release;
-5. pubblicare soltanto dopo una build riuscita.
+Prima dell'avvio configura le variabili d'ambiente e applica le migration Supabase come descritto di seguito.
+
+## Configurazione
+
+### Variabili d'ambiente
+
+Inserisci i valori reali soltanto in `.env.local` per lo sviluppo e nelle **Environment Variables** del progetto Vercel. Non salvare mai credenziali nel repository.
+
+| Variabile | Scopo | Visibilità consigliata |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | URL del progetto Supabase | Client; Production e, se usata, Preview |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Chiave pubblica anon di Supabase | Client; Production e, se usata, Preview |
+| `SUPABASE_SERVICE_ROLE_KEY` | Operazioni server-side privilegiate, incluso l'auto-post | **Server only**; Production |
+| `CRON_SECRET` | Protezione della route richiamata dal Cron | **Server only**; Production |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Sottoscrizione del browser alle notifiche push | Client; Production e, se usata, Preview |
+| `VAPID_PRIVATE_KEY` | Firma server-side dei messaggi Web Push | **Server only**; Production |
+| `VAPID_SUBJECT` | Identità di contatto del mittente Web Push | **Server only**; Production |
+
+> [!CAUTION]
+> Le variabili con prefisso `NEXT_PUBLIC_` sono esposte al browser. Non usare mai quel prefisso per `SUPABASE_SERVICE_ROLE_KEY`, `CRON_SECRET` o `VAPID_PRIVATE_KEY`.
+
+Le chiavi VAPID pubblica e privata devono essere generate come **un'unica coppia coerente**. È possibile generarle con:
 
 ```bash
-npm test
-npm run audit:icons
-npm run build
+npx web-push generate-vapid-keys --json
 ```
 
-## Sicurezza e privacy
+Conserva la chiave privata esclusivamente tra i secret server-side. La rotazione delle chiavi richiede una nuova sottoscrizione dei dispositivi.
 
-- le tabelle applicative sono protette tramite RLS;
-- l'accesso ai dati è vincolato alla membership dello spazio;
-- gli spazi personali sono isolati tra utenti;
-- gli spazi condivisi applicano ruoli e permessi server-side;
-- le query dati sono filtrate per `space_id`;
-- la repository non deve contenere dati finanziari, chiavi, email o configurazioni di istanze reali.
+### Database Supabase
 
-Prima di un utilizzo pubblico sono raccomandati backup, revisione delle policy, test con account separati e monitoraggio degli errori.
+1. Crea o seleziona il progetto Supabase.
+2. Apri **SQL Editor**.
+3. Esegui le migration presenti in `supabase/migrations` nell'ordine previsto dal progetto.
+4. Per V4.3.2 verifica che sia stata applicata anche:
 
-## Icone e attribuzioni
+```text
+supabase/migrations/20261126_v4_3_2_autopost_smart_finance.sql
+```
 
-- le icone funzionali dell'interfaccia usano [Phosphor Icons](https://phosphoricons.com/);
-- categorie e brand usano asset Icons8 Color salvati localmente in `public/icons/categories/` e `public/icons/brands/`;
-- l’interfaccia e la navigazione usano Phosphor Icons;
-- ogni identificatore non presente nel catalogo locale usa il fallback Phosphor Tag;
-- nessuna API di icone viene chiamata a runtime;
-- l’attribuzione Icons8 è mantenuta nel progetto e va rispettata secondo la licenza applicabile.
+5. Mantieni attive e verifica le policy di accesso ai dati prima di usare l'app in produzione.
+6. Crea un backup prima di applicare migration a un database già popolato.
 
-Verificare sempre i termini delle rispettive licenze prima di distribuire o modificare gli asset.
+La migration V4.3.2 abilita il flusso server-side necessario per auto-post e Smart Finance ed è progettata per essere rieseguibile senza creare movimenti duplicati.
 
-## Stato del progetto
+## Sviluppo locale
 
-**Versione corrente: V4.1.6 Budget Navigation & Transaction FAB.**
+```bash
+# server di sviluppo
+npm run dev
 
-Sono implementati multiutente, Spazi Privati e Condivisi, movimenti, categorie per tipo e spazio, Budget con rollover, ricorrenze, statistiche, Obiettivi di risparmio, import/export CSV, i18n e PWA.
+# build di produzione
+npm run build
 
-### Roadmap
+# avvio della build locale
+npm run start
+```
 
-Le seguenti funzioni sono pianificate e **non sono disponibili nella release corrente**:
+Esegui sempre `npm run build` prima di pubblicare modifiche a logica finanziaria, route API, ricorrenze o notifiche.
 
-- **V4.2 / futura release:** Backup e portabilità guidata, sezione Privacy ed eliminazione sicura di account e dati nel rispetto degli spazi condivisi;
-- Conti/Portafogli multipli;
-- Debiti e crediti.
+## Deploy su Vercel
+
+1. Importa la repository in Vercel.
+2. Mantieni il framework rilevato come **Next.js**.
+3. Aggiungi tutte le variabili della tabella precedente, rispettando la separazione tra valori pubblici e secret server-side.
+4. Verifica che `SUPABASE_SERVICE_ROLE_KEY`, `CRON_SECRET` e `VAPID_PRIVATE_KEY` non siano esposti alle Preview se non strettamente necessario.
+5. Esegui il deploy e attendi lo stato **Ready**.
+6. Controlla che il Cron configurato in `vercel.json` richiami la route di elaborazione delle ricorrenze.
+7. Esegui la checklist post-deploy.
+
+### Checklist post-deploy
+
+- [ ] Login e caricamento dello spazio attivo
+- [ ] Creazione di un movimento di prova
+- [ ] Budget e statistiche aggiornati
+- [ ] Apertura diretta di Smart Finance dalla Home
+- [ ] Entrate future incluse o motivate correttamente
+- [ ] Saldo previsto di fine mese coerente con il dettaglio
+- [ ] Auto-post di una ricorrenza senza duplicati
+- [ ] Notifica push ricevuta quando abilitata
+- [ ] Import ed export CSV
+- [ ] Backup e ripristino verificati su dati non critici
+- [ ] Installazione PWA da dispositivo supportato
+
+## PWA e notifiche
+
+Per il funzionamento completo delle notifiche servono:
+
+- HTTPS, fornito automaticamente da Vercel;
+- una coppia VAPID valida;
+- permesso notifiche concesso dall'utente;
+- una sottoscrizione push registrata dal dispositivo;
+- l'opzione di notifica desiderata attiva in Qoomia.
+
+Su dispositivi mobili installa Qoomia dalla funzione **Aggiungi alla schermata Home** del browser supportato. Le capacità PWA e Web Push possono variare in base a browser e sistema operativo.
+
+## CSV, backup e ripristino
+
+- Controlla intestazioni, formato data, separatore decimale e segno degli importi prima di importare un CSV.
+- Esegui un backup prima di importazioni estese o migration.
+- Prova il ripristino su dati non critici prima di considerare una copia come backup valido.
+- Non conservare esportazioni contenenti dati finanziari in percorsi pubblici o non protetti.
+
+## Privacy e sicurezza
+
+Qoomia tratta dati finanziari personali. In ogni installazione:
+
+- conserva chiavi privilegiate e secret soltanto lato server;
+- non inserire file `.env*`, dump, CSV o backup nel repository;
+- mantieni le policy Supabase coerenti con la separazione tra utenti e spazi;
+- limita l'accesso al progetto Supabase e all'account Vercel;
+- ruota immediatamente una credenziale esposta;
+- verifica periodicamente log, sottoscrizioni push e job pianificati;
+- comunica chiaramente agli utenti finali finalità, conservazione ed eventuale cancellazione dei dati.
 
 ## Struttura essenziale
 
 ```text
-app/                  pagine e Route Handler
-components/           componenti UI condivisi
-lib/                  logica applicativa e client Supabase
-public/icons/         asset locali e branding
-scripts/              verifiche statiche e audit
-supabase/schema.sql   schema completo
-supabase/migrations/  aggiornamenti incrementali
+app/                    pagine, layout e route API Next.js
+components/             componenti dell'interfaccia
+lib/                    logica condivisa, Smart Finance e integrazioni
+public/                 asset statici e risorse PWA
+supabase/migrations/    schema e migration del database
+vercel.json             configurazione Vercel e job pianificati
 ```
 
-## Contributi
+## Stato del progetto
 
-Issue e pull request sono benvenute. Prima di proporre una modifica:
+- **Versione corrente:** V4.3.2
+- **Stato:** funzionante in produzione
+- **Auto-post ricorrenze:** attivo
+- **Smart Finance:** riconoscimento entrate future e previsione di fine mese attivi
+- **Deploy di riferimento:** Vercel
 
-1. mantenere la separazione dei dati per spazio;
-2. non indebolire RLS o controlli server-side;
-3. aggiungere o aggiornare i test statici pertinenti;
-4. eseguire `npm test`, `npm run audit:icons` e `npm run build`.
+---
+
+<div align="center">
+
+**Qoomia V4.3.2** · Controllo quotidiano, previsioni comprensibili, dati sotto la tua gestione.
+
+</div>
