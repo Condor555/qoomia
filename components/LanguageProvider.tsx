@@ -2,6 +2,7 @@
 
 import {createContext,useCallback,useContext,useEffect,useMemo,useState} from 'react';
 import {DEFAULT_LOCALE,LOCALE_STORAGE_KEY,formatCurrency,formatDate,localeTag,normalizeLocale,translate,type Locale,type TranslationKey} from '../lib/i18n';
+import {cachedJson,primeClientJson} from '../lib/client-json-cache';
 
 type I18nContextValue={
   locale:Locale;
@@ -26,8 +27,7 @@ export default function LanguageProvider({children}:{children:React.ReactNode}){
     let live=true;
     const stored=normalizeLocale(localStorage.getItem(LOCALE_STORAGE_KEY));
     setLocaleState(stored);applyDocumentLocale(stored);
-    fetch('/api/settings/profile',{cache:'no-store'})
-      .then(async response=>response.ok?response.json():null)
+    cachedJson<{data?:{language?:string}}>('/api/settings/profile')
       .then(result=>{
         if(!live||!result?.data?.language)return;
         const serverLocale=normalizeLocale(result.data.language);
@@ -44,6 +44,7 @@ export default function LanguageProvider({children}:{children:React.ReactNode}){
     try{
       const response=await fetch('/api/settings/profile',{method:'PATCH',headers:{'content-type':'application/json'},body:JSON.stringify({language:normalized})});
       if(!response.ok)throw new Error('language-save-failed');
+      primeClientJson('/api/settings/profile',{data:{language:normalized}});
       return true;
     }catch{
       setLocaleState(previous);localStorage.setItem(LOCALE_STORAGE_KEY,previous);applyDocumentLocale(previous);return false;

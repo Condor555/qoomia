@@ -1,10 +1,10 @@
 'use client';
 
 import {useEffect,useRef,useState} from 'react';
-import {usePathname} from 'next/navigation';
 import SpacePicker,{type SpacePickerOption} from './SpacePicker';
 import {announceActiveSpace} from '../lib/active-space-client';
 import {useI18n} from './LanguageProvider';
+import {cachedJson,invalidateClientJson,primeClientJson} from '../lib/client-json-cache';
 
 type Space=SpacePickerOption;
 
@@ -16,29 +16,29 @@ export default function SpaceSwitcher(){
   const [changing,setChanging]=useState(false);
   const [error,setError]=useState('');
   const requestRef=useRef(0);
-  const pathname=usePathname();
+  const announcedRef=useRef('');
 
   useEffect(()=>{
     let live=true;
     setReady(false);
-    fetch('/api/spaces',{cache:'no-store'})
-      .then(async response=>({ok:response.ok,result:await response.json()}))
-      .then(({ok,result})=>{
-        if(!live)return;
-        if(!ok){setError(result.error||t('space.loadError'));return;}
-        const list:Space[]=result.data||[];
-        const initialSpaceId=result.activeSpaceId||list.find(space=>space.type==='personal')?.id||list[0]?.id||'';
-        setSpaces(list);
-        setActive(initialSpaceId);
-        if(initialSpaceId){
-          localStorage.setItem('active_space',initialSpaceId);
-          requestAnimationFrame(()=>announceActiveSpace(initialSpaceId));
-        }
-      })
+    const applyResult=(result:{data?:Space[];activeSpaceId?:string})=>{
+      if(!live)return;
+      const list:Space[]=result.data||[];
+      const initialSpaceId=result.activeSpaceId||list.find(space=>space.type==='personal')?.id||list[0]?.id||'';
+      setSpaces(list);
+      setActive(initialSpaceId);
+      if(initialSpaceId&&announcedRef.current!==initialSpaceId){
+        announcedRef.current=initialSpaceId;
+        localStorage.setItem('active_space',initialSpaceId);
+        requestAnimationFrame(()=>announceActiveSpace(initialSpaceId));
+      }
+    };
+    cachedJson<{data?:Space[];activeSpaceId?:string}>('/api/spaces',{onRevalidate:applyResult})
+      .then(applyResult)
       .catch(()=>{if(live)setError(t('space.loadError'))})
       .finally(()=>{if(live)setReady(true)});
     return()=>{live=false};
-  },[pathname,t]);
+  },[t]);
 
   async function choose(id:string){
     if(id===active||changing)return;
@@ -57,6 +57,11 @@ export default function SpaceSwitcher(){
       if(request!==requestRef.current)return;
       if(!response.ok){setActive(previous);setError(result.error||t('space.changeError'));return;}
       localStorage.setItem('active_space',id);
+      announcedRef.current=id;
+      // The endpoint includes activeSpaceId, so keep the shared GET cache in
+      // sync and clear data tied to the previously selected space.
+      primeClientJson('/api/spaces',{data:spaces,activeSpaceId:id});
+      invalidateClientJson('/api/stats','/api/trends','/api/transactions','/api/categories','/api/members','/api/budgets');
       announceActiveSpace(id);
     }catch{
       if(request===requestRef.current){setActive(previous);setError(t('common.connectionError'));}

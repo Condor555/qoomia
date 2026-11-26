@@ -6,6 +6,7 @@ import AdaptiveSheet from './AdaptiveSheet';
 import CategoryIcon from './CategoryIcon';
 import Icon from './Icon';
 import {EmptyState,SkeletonRows} from './UXFeedback';
+import {cachedJson} from '../lib/client-json-cache';
 
 export type PickerCategory={name:string;kind:'expense'|'income';icon?:string|null;color?:string|null};
 type Kind='expense'|'income';
@@ -31,14 +32,13 @@ export default function CategoryPickerSheet({open,onClose,categories,value,kind,
   useEffect(()=>{
     if(!open){setQuery('');return;}
     if(!spaceId){setUsage({recent:[],frequent:[]});return;}
-    const controller=new AbortController();
+    let live=true;
     setUsageLoading(true);
-    fetch(`/api/categories/usage?spaceId=${encodeURIComponent(spaceId)}&kind=${kind}`,{cache:'no-store',signal:controller.signal})
-      .then(async response=>({ok:response.ok,result:await response.json()}))
-      .then(({ok,result})=>setUsage(ok?{recent:result.recent||[],frequent:result.frequent||[]}:{recent:[],frequent:[]}))
-      .catch(error=>{if(error?.name!=='AbortError')setUsage({recent:[],frequent:[]})})
-      .finally(()=>{if(!controller.signal.aborted)setUsageLoading(false)});
-    return()=>controller.abort();
+    cachedJson<Usage>(`/api/categories/usage?spaceId=${encodeURIComponent(spaceId)}&kind=${kind}`)
+      .then(result=>{if(live)setUsage({recent:result.recent||[],frequent:result.frequent||[]})})
+      .catch(()=>{if(live)setUsage({recent:[],frequent:[]})})
+      .finally(()=>{if(live)setUsageLoading(false)});
+    return()=>{live=false};
   },[open,spaceId,kind]);
 
   const filtered=useMemo(()=>{

@@ -24,7 +24,7 @@ expect('Notifiche ricorrenze persistite e deduplicate',migration.includes("kind 
 expect('Preferenza Movimenti ricorrenti end-to-end',migration.includes('recurring_enabled')&&preferences.includes('recurringEnabled')&&preferencesUi.includes('Movimenti ricorrenti'));
 expect('Smart Finance usa ricorrenze e storico',stats.includes('buildSmartFinanceForecast')&&finance.includes("source:'recurring'")&&finance.includes("source:'history'"));
 expect('Formula saldo prevista esplicita',finance.includes('currentBalance+scheduledIncome+historicalIncome-scheduledExpense-variableExpense'));
-expect('Smart Finance visibile in Statistiche e Home',statisticsUi.includes('Previsione di fine mese')&&statisticsUi.includes('smart-finance-formula')&&homeCard.includes('Saldo previsto'));
+expect('Smart Finance visibile in Statistiche e Home',statisticsUi.includes('Previsione di fine mese')&&statisticsUi.includes('smart-finance-details')&&homeCard.includes('Saldo previsto'));
 
 for(const file of ['app/api/recurring/run/route.ts','app/api/stats/route.ts','app/api/notifications/preferences/route.ts','app/account/notifiche/page.tsx','app/statistiche/page.tsx','components/MonthlyInsightCard.tsx','lib/push-notifications.ts','lib/smart-finance.ts']){
   const result=ts.transpileModule(read(file),{compilerOptions:{jsx:ts.JsxEmit.Preserve,target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext},reportDiagnostics:true,fileName:file});

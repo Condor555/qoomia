@@ -29,56 +29,31 @@ type Stats={
   smartFinance:{projectedBalance:number;currentBalance:number;scheduledIncome:number;scheduledExpense:number;historicalIncome:number;projectedVariableExpense:number;confidence:'high'|'medium'|'low'}|null;
   topCategory:TopCategory|null;
   budget:{amount:number;spent:number;available:number;percentage:number;status:'ok'|'warning'|'over';projected:number;projectedOverage:number;commitments:number;distributable:number};
+  recentTransactions:RecentTransaction[];
 };
-type RecentTransaction={id:string;date:string;category_name:string;amount:number;note:string;author_name?:string};
-type RecentCategory={name:string;icon?:string|null;color?:string|null};
+type RecentTransaction={id:string;date:string;category_name:string;amount:number;note:string;author_name?:string;category_icon?:string|null;category_color?:string|null};
 
 export default function Home(){
   const {currency,locale,localeTag,t}=useI18n();
   const {month,setMonth}=useSharedMonth();
   const [stats,setStats]=useState<Stats|null>(null);
-  const [recent,setRecent]=useState<RecentTransaction[]>([]);
-  const [recentCategories,setRecentCategories]=useState<RecentCategory[]>([]);
-  const [recentLoading,setRecentLoading]=useState(true);
-  const [recentError,setRecentError]=useState('');
+  const [statsError,setStatsError]=useState('');
   const statsRequestRef=useRef(0);
   const statsAbortRef=useRef<AbortController|null>(null);
-  const recentRequestRef=useRef(0);
-  const recentAbortRef=useRef<AbortController|null>(null);
 
   const loadStats=useCallback(async(targetSpaceId?:string)=>{
     const request=++statsRequestRef.current;
     statsAbortRef.current?.abort();
     const controller=new AbortController();statsAbortRef.current=controller;
+    setStatsError('');
     try{
       const params=new URLSearchParams({month});
       if(targetSpaceId)params.set('spaceId',targetSpaceId);
       const url=`/api/stats?${params}`;
-      const result=await cachedJson<Stats&{error?:string}>(url,{signal:controller.signal,onRevalidate:value=>{if(request===statsRequestRef.current&&!value.error)setStats(value)}});
+      const result=await cachedJson<Stats&{error?:string}>(url,{signal:controller.signal,onRevalidate:value=>{if(request===statsRequestRef.current&&!value.error){setStats(value);setStatsError('')}}});
       if(request===statsRequestRef.current&&!result.error)setStats(result);
-    }catch(error:any){if(error?.name!=='AbortError'&&request===statsRequestRef.current)setStats(null)}
+    }catch(error:any){if(error?.name!=='AbortError'&&request===statsRequestRef.current){setStats(null);setStatsError(error?.message||'Impossibile caricare la Home.')}}
   },[month]);
-
-  const loadRecent=useCallback(async(targetSpaceId?:string)=>{
-    const request=++recentRequestRef.current;
-    recentAbortRef.current?.abort();
-    const controller=new AbortController();recentAbortRef.current=controller;
-    setRecentLoading(true);setRecentError('');
-    try{
-      const suffix=targetSpaceId?`&spaceId=${encodeURIComponent(targetSpaceId)}`:'';
-      const categorySuffix=targetSpaceId?`?spaceId=${encodeURIComponent(targetSpaceId)}`:'';
-      const transactionUrl=`/api/transactions?page=1&size=5${suffix}`,categoryUrl=`/api/categories${categorySuffix}`;
-      const [transactionResult,categoryResult]=await Promise.all([
-        cachedJson<{data?:RecentTransaction[];error?:string}>(transactionUrl,{signal:controller.signal,onRevalidate:value=>{if(request===recentRequestRef.current)setRecent(Array.isArray(value.data)?value.data.slice(0,5):[])}}),
-        cachedJson<{data?:RecentCategory[]}>(categoryUrl,{signal:controller.signal,onRevalidate:value=>{if(request===recentRequestRef.current)setRecentCategories(Array.isArray(value.data)?value.data:[])}}),
-      ]);
-      if(request!==recentRequestRef.current)return;
-      if(transactionResult.error)throw new Error(transactionResult.error||'Impossibile caricare i movimenti recenti.');
-      setRecent(Array.isArray(transactionResult.data)?transactionResult.data.slice(0,5):[]);
-      setRecentCategories(Array.isArray(categoryResult.data)?categoryResult.data:[]);
-    }catch(error:any){if(error?.name!=='AbortError'&&request===recentRequestRef.current){setRecent([]);setRecentError(error?.message||'Impossibile caricare i movimenti recenti.')}}
-    finally{if(request===recentRequestRef.current)setRecentLoading(false)}
-  },[]);
 
   useEffect(()=>{
     setStats(null);
@@ -88,20 +63,18 @@ export default function Home(){
     return()=>{window.removeEventListener('focus',onFocus);statsAbortRef.current?.abort()};
   },[loadStats]);
 
-  useEffect(()=>{void loadRecent();return()=>recentAbortRef.current?.abort()},[loadRecent]);
   useEffect(()=>onActiveSpaceChanged(spaceId=>{
     statsRequestRef.current++;
-    recentRequestRef.current++;
     statsAbortRef.current?.abort();
-    recentAbortRef.current?.abort();
     setStats(null);
-    setRecent([]);
     loadStats(spaceId);
-    loadRecent(spaceId);
-  }),[loadStats,loadRecent]);
+  }),[loadStats]);
+
+  const recent=stats?.recentTransactions||[];
 
   return <>
     <header className="page-head home-head"><div className="home-brand"><QoomiaLogo size={42}/><div><h1>Qoomia</h1><p>{t('home.subtitle')}</p></div></div><MonthPicker value={month} onChange={setMonth}/></header>
+    {statsError&&<InlineError message={statsError} onRetry={()=>void loadStats()}/>}
 
     <section className={`balance-card${stats?'':' is-loading'}`} aria-busy={!stats}>
       <header><Icon name="wallet" size={18}/><span>{t('home.monthBalance')}</span><Icon name="chart" size={20}/></header>
@@ -122,7 +95,7 @@ export default function Home(){
 
     <section className="section surface home-recent">
       <div className="section-title"><div><h2>Movimenti recenti</h2><small>Ultime operazioni nello spazio</small></div><Link href="/movimenti">Vedi tutti</Link></div>
-      {recentLoading&&!recent.length?<SkeletonRows rows={4}/>:recentError?<InlineError message={recentError} onRetry={()=>void loadRecent()}/>:recent.length?<div className="home-recent-list">{recent.map(row=>{const metadata=recentCategories.find(item=>item.name===row.category_name);return <Link href="/movimenti" className="home-recent-row" key={row.id}><CategoryIcon name={row.category_name} icon={metadata?.icon||undefined} color={metadata?.color||undefined} size={40}/><span><b>{row.note||row.category_name}</b><small>{row.category_name} · {new Intl.DateTimeFormat(localeTag,{day:'numeric',month:'short'}).format(new Date(`${row.date}T12:00:00`))}</small></span><strong className={Number(row.amount)>=0?'green':'red'}>{Number(row.amount)>=0?'+ ':''}{currency(Number(row.amount))}</strong></Link>})}</div>:<div className="home-recent-empty"><p>Nessun movimento nello spazio selezionato.</p><Link href="/nuovo">Aggiungi il primo</Link></div>}
+      {!stats&&!statsError?<SkeletonRows rows={4}/>:recent.length?<div className="home-recent-list">{recent.map(row=><Link href="/movimenti" className="home-recent-row" key={row.id}><CategoryIcon name={row.category_name} icon={row.category_icon||undefined} color={row.category_color||undefined} size={40}/><span><b>{row.note||row.category_name}</b><small>{row.category_name} · {new Intl.DateTimeFormat(localeTag,{day:'numeric',month:'short'}).format(new Date(`${row.date}T12:00:00`))}</small></span><strong className={Number(row.amount)>=0?'green':'red'}>{Number(row.amount)>=0?'+ ':''}{currency(Number(row.amount))}</strong></Link>)}</div>:<div className="home-recent-empty"><p>Nessun movimento nello spazio selezionato.</p><Link href="/nuovo">Aggiungi il primo</Link></div>}
     </section>
 
   </>;

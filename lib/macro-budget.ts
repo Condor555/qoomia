@@ -55,34 +55,58 @@ export type MacroBudgetSnapshot={
 
 type BudgetRow={category_name:string|null;amount:number|string};
 type MacroRow={id:string;name:string;color:string;sort_order:number|string;rollover_enabled:boolean};
-type CategoryRow={name:string;icon:string|null;color:string|null;kind:'expense';macro_category_id:string|null};
+type CategoryRow={name:string;icon:string|null;color:string|null;kind:'expense'|'income';macro_category_id:string|null};
 type AllocationRow={macro_category_id:string;allocation_percent:number|string;base_amount:number|string;rollover_amount:number|string};
 type BudgetTransactionRow={amount:number|string;category_name:string;recurring_id:string|null;date:string};
 type RecurringBudgetRow={id:string;amount:number|string;category_name:string;frequency:RecurrenceFrequency;interval_count:number|string;next_run:string;active:boolean};
 
-export async function loadMacroBudgetSnapshot(sb:SupabaseClient,spaceId:string,month:string):Promise<MacroBudgetSnapshot>{
+/**
+ * The statistics endpoint already needs these four datasets. Accepting them here
+ * prevents the budget calculation from issuing the same Supabase queries again.
+ * Other callers can keep omitting this argument and retain the previous behaviour.
+ */
+export type MacroBudgetPreloaded={
+  categories:CategoryRow[];
+  rows:BudgetTransactionRow[];
+  previousRows:BudgetTransactionRow[];
+  recurring:RecurringBudgetRow[];
+};
+
+export async function loadMacroBudgetSnapshot(sb:SupabaseClient,spaceId:string,month:string,preloaded?:MacroBudgetPreloaded|Promise<MacroBudgetPreloaded>):Promise<MacroBudgetSnapshot>{
   const previous=previousMonth(month);const start=monthStart(month),end=monthStart(nextMonth(month));const previousStart=monthStart(previous);
-  const [{data:budgetRows,error:budgetError},{data:macros,error:macroError},{data:categories,error:categoryError},{data:allocations,error:allocationError},{data:previousAllocations,error:previousAllocationError},{data:rows,error:rowError},{data:previousRows,error:previousRowError},{data:recurring,error:recurringError}]=await Promise.all([
-    sb.from('budgets').select('category_name,amount').eq('space_id',spaceId).eq('month',start),
-    sb.from('budget_macro_categories').select('id,name,color,sort_order,rollover_enabled').eq('space_id',spaceId).order('sort_order').order('name'),
+  const shared=preloaded?Promise.resolve(preloaded):Promise.all([
     sb.from('categories').select('name,icon,color,kind,macro_category_id').eq('space_id',spaceId).eq('kind','expense').order('name'),
-    sb.from('macro_budget_allocations').select('macro_category_id,allocation_percent,base_amount,rollover_amount').eq('space_id',spaceId).eq('month',start),
-    sb.from('macro_budget_allocations').select('macro_category_id,allocation_percent,base_amount,rollover_amount').eq('space_id',spaceId).eq('month',previousStart),
     sb.from('transactions').select('amount,category_name,recurring_id,date').eq('space_id',spaceId).gte('date',start).lt('date',end),
     sb.from('transactions').select('amount,category_name,recurring_id,date').eq('space_id',spaceId).gte('date',previousStart).lt('date',start),
     sb.from('recurring_transactions').select('id,amount,category_name,frequency,interval_count,next_run,active').eq('space_id',spaceId).eq('active',true),
+  ]).then(([categoryResult,rowResult,previousRowResult,recurringResult])=>{
+    const error=categoryResult.error||rowResult.error||previousRowResult.error||recurringResult.error;
+    if(error)throw new Error(error.message);
+    return {
+      categories:(categoryResult.data||[]) as unknown as CategoryRow[],
+      rows:(rowResult.data||[]) as unknown as BudgetTransactionRow[],
+      previousRows:(previousRowResult.data||[]) as unknown as BudgetTransactionRow[],
+      recurring:(recurringResult.data||[]) as unknown as RecurringBudgetRow[],
+    };
+  });
+  const [{data:budgetRows,error:budgetError},{data:macros,error:macroError},{data:allocations,error:allocationError},{data:previousAllocations,error:previousAllocationError},sharedRows]=await Promise.all([
+    sb.from('budgets').select('category_name,amount').eq('space_id',spaceId).eq('month',start),
+    sb.from('budget_macro_categories').select('id,name,color,sort_order,rollover_enabled').eq('space_id',spaceId).order('sort_order').order('name'),
+    sb.from('macro_budget_allocations').select('macro_category_id,allocation_percent,base_amount,rollover_amount').eq('space_id',spaceId).eq('month',start),
+    sb.from('macro_budget_allocations').select('macro_category_id,allocation_percent,base_amount,rollover_amount').eq('space_id',spaceId).eq('month',previousStart),
+    shared,
   ]);
-  const error=budgetError||macroError||categoryError||allocationError||previousAllocationError||rowError||previousRowError||recurringError;
+  const error=budgetError||macroError||allocationError||previousAllocationError;
   if(error)throw new Error(error.message);
 
   const macroList=(macros||[]) as unknown as MacroRow[];
-  const categoryList=(categories||[]) as unknown as CategoryRow[];
-  const transactionRows=(rows||[]) as unknown as BudgetTransactionRow[];
+  const categoryList=sharedRows.categories.filter(category=>category.kind==='expense');
+  const transactionRows=sharedRows.rows;
   const budgetList=(budgetRows||[]) as unknown as BudgetRow[];
   const allocationList=(allocations||[]) as unknown as AllocationRow[];
   const previousAllocationList=(previousAllocations||[]) as unknown as AllocationRow[];
-  const previousTransactionRows=(previousRows||[]) as unknown as BudgetTransactionRow[];
-  const recurringRows=(recurring||[]) as unknown as RecurringBudgetRow[];
+  const previousTransactionRows=sharedRows.previousRows;
+  const recurringRows=sharedRows.recurring;
   const otherId=macroList.find(item=>item.name==='Altro')?.id||macroList[0]?.id||null;
   const categoryMacro=new Map<string,string|null>(categoryList.map(item=>[item.name,item.macro_category_id||otherId]));
   const macroFor=(categoryName:string)=>categoryMacro.get(categoryName)||otherId;

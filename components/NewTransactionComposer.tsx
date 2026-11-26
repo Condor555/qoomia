@@ -8,7 +8,7 @@ import DateInput from './DateInput';
 import SpacePicker,{type SpacePickerOption} from './SpacePicker';
 import {AsyncButton,InlineError,Skeleton} from './UXFeedback';
 import {useToast} from './ToastProvider';
-import {invalidateClientJson} from '../lib/client-json-cache';
+import {cachedJson,invalidateClientJson} from '../lib/client-json-cache';
 import {amountForSave} from '../lib/amount-expression';
 import {hapticFeedback} from '../lib/haptics';
 import {useI18n} from './LanguageProvider';
@@ -48,10 +48,8 @@ export default function NewTransactionComposer({embedded=false,onSaved,onDirtyCh
   const suggestionRefs=useRef<Array<HTMLButtonElement|null>>([]);
 
   useEffect(()=>{
-    fetch('/api/spaces',{cache:'no-store'})
-      .then(async response=>({ok:response.ok,result:await response.json()}))
-      .then(({ok,result})=>{
-        if(!ok){setMessage(result.error||'Impossibile caricare gli spazi.');return;}
+    cachedJson<{data?:Space[];activeSpaceId?:string}>('/api/spaces')
+      .then(result=>{
         const list:Space[]=result.data||[];
         const selected=result.activeSpaceId||list.find(item=>item.type==='personal')?.id||list[0]?.id||'';
         setSpaces(list);
@@ -84,16 +82,11 @@ export default function NewTransactionComposer({embedded=false,onSaved,onDirtyCh
     setSuggestionsOpen(false);
     setMessage('');
     try{
-      const [categoryResponse,accountResponse]=await Promise.all([
-        fetch(`/api/categories?spaceId=${encodeURIComponent(targetSpaceId)}`,{cache:'no-store'}),
-        fetch(`/api/settings/account?spaceId=${encodeURIComponent(targetSpaceId)}`,{cache:'no-store'}),
+      const [categoryResult,accountResult]=await Promise.all([
+        cachedJson<{data?:Category[];error?:string}>(`/api/categories?spaceId=${encodeURIComponent(targetSpaceId)}`),
+        cachedJson<{data?:{name?:string};error?:string}>(`/api/settings/account?spaceId=${encodeURIComponent(targetSpaceId)}`),
       ]);
-      const [categoryResult,accountResult]=await Promise.all([categoryResponse.json(),accountResponse.json()]);
       if(request!==destinationRequestRef.current)return;
-      if(!categoryResponse.ok||!accountResponse.ok){
-        setMessage(categoryResult.error||accountResult.error||'Impossibile caricare lo spazio.');
-        return;
-      }
       setCategories(Array.isArray(categoryResult.data)?categoryResult.data:[]);
       setAccount(accountResult.data?.name||'Spese');
     }catch{

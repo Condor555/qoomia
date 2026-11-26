@@ -10,13 +10,13 @@ const insight=read('components/MonthlyInsightCard.tsx');
 const css=read('app/globals.css');
 
 const insightMounts=(home.match(/<MonthlyInsightCard\b/g)||[]).length;
-const moneyIndex=home.indexOf('className="money-grid"');
+const heroIndex=home.indexOf('className="money-grid"');
 const insightIndex=home.indexOf('<MonthlyInsightCard stats={stats}');
 const budgetIndex=home.indexOf('home-budget-summary');
 
 expect('Home mantiene un solo Insight dinamico',insightMounts===1);
-expect('Insight resta tra Entrate/Uscite e Budget',moneyIndex>=0&&moneyIndex<insightIndex&&insightIndex<budgetIndex);
-expect('Entrate/Uscite restano invariate e affiancate',home.includes("t('common.incomes')")&&home.includes("t('common.expenses')")&&home.includes('className="money-grid"'));
+expect('Insight segue il riepilogo finanziario e precede Budget',heroIndex>=0&&heroIndex<insightIndex&&insightIndex<budgetIndex);
+expect('Entrate/Uscite restano visibili nel riepilogo reale',home.includes("t('common.incomes')")&&home.includes("t('common.expenses')")&&home.includes('className="money-grid"'));
 expect('Budget e navigazione restano collegati alla sezione collaudata',home.includes('href="/budget"')&&home.includes('home-budget-teaser'));
 expect('Insight deriva dai dati stats esistenti senza nuove API',insight.includes('buildQoomiaInsights')&&!insight.includes('fetch('));
 expect('Contratto V4.1.9 documentato nel componente',insight.includes('limit:1')&&read('components/InsightsOverview.tsx').includes('limit:3'));
