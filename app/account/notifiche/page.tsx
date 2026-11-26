@@ -20,7 +20,7 @@ function standalone(){return window.matchMedia('(display-mode: standalone)').mat
 function isIOS(){return /iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)}
 
 export default function NotificationSettings(){
-  const {t}=useI18n();
+  const {t,locale}=useI18n();
   const [preferences,setPreferences]=useState<Preferences>(defaults);
   const [vapidKey,setVapidKey]=useState('');
   const [support,setSupport]=useState<SupportState>('checking');
@@ -97,10 +97,8 @@ export default function NotificationSettings(){
       <div className="threshold-slider" style={{'--threshold-fill':`${(principal(preferences.goalThresholds)-50)*2}%`} as CSSProperties}><output>{principal(preferences.goalThresholds)}%</output><input type="range" min="50" max="100" step="10" value={principal(preferences.goalThresholds)} disabled={!preferences.goalsEnabled} aria-label={t('notifications.goalThresholds')} aria-valuetext={`${principal(preferences.goalThresholds)}%`} onChange={event=>setThreshold('goalThresholds',Number(event.target.value))}/><div className="threshold-ticks" aria-hidden="true">{thresholds.map(value=><span key={value}>{value}</span>)}</div><small>{t('notifications.mainThreshold')}</small></div>
       <p className="notification-help">{t('notifications.familyHelp')}</p>
     </section>
-
     <section className="section surface notification-preferences">
-      <div className="section-title"><div><h2>{t('account.recurringTitle')}</h2><small>{t('account.recurringSub')}</small></div><label className="mini-switch"><input type="checkbox" checked={preferences.recurringEnabled} onChange={event=>setPreferences(current=>({...current,recurringEnabled:event.target.checked}))}/><span aria-hidden="true"/></label></div>
-      <p className="notification-help">Ricevi un avviso quando una ricorrenza viene registrata automaticamente o confermata nei Movimenti.</p>
+      <div className="section-title"><div><h2>{locale==='it'?'Movimenti ricorrenti':'Recurring transactions'}</h2><small>{locale==='it'?'Avvisa quando Qoomia registra automaticamente una ricorrenza nei Movimenti.':'Notify me when Qoomia automatically posts a recurring transaction.'}</small></div><label className="mini-switch"><input type="checkbox" checked={preferences.recurringEnabled} onChange={event=>setPreferences(current=>({...current,recurringEnabled:event.target.checked}))}/><span aria-hidden="true"/></label></div>
     </section>
     <button type="button" className="save-btn notification-save" disabled={busy} onClick={savePreferences}>{busy?t('common.saving'):t('notifications.save')}</button>
     {message&&<div className="notice" role="status">{message}</div>}

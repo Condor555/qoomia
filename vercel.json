@@ -16,8 +16,8 @@
   "crons": [
     {
       "path": "/api/recurring/run",
-      "schedule": "10 0 * * *"
+      "schedule": "15 5 * * *"
     }
-  ],
-  "installCommand": "npm install --no-audit --no-fund"
+  ]
 }
+

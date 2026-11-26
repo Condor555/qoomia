@@ -3,7 +3,7 @@ import {z} from 'zod';
 import {createClient} from '../../../../lib/supabase/server';
 
 const Threshold=z.union([z.literal(50),z.literal(60),z.literal(70),z.literal(80),z.literal(90),z.literal(100)]);
-const Preferences=z.object({enabled:z.boolean(),budgetEnabled:z.boolean(),budgetThresholds:z.array(Threshold).length(1),goalsEnabled:z.boolean(),goalThresholds:z.array(Threshold).length(1),recurringEnabled:z.boolean()});
+const Preferences=z.object({enabled:z.boolean(),budgetEnabled:z.boolean(),budgetThresholds:z.array(Threshold).length(1),goalsEnabled:z.boolean(),goalThresholds:z.array(Threshold).length(1),recurringEnabled:z.boolean().default(true)});
 const defaults={enabled:false,budgetEnabled:true,budgetThresholds:[80],goalsEnabled:true,goalThresholds:[80],recurringEnabled:true};
 const clean=(values:number[])=>{const value=values.find(item=>item===50||item===60||item===70||item===80||item===90||item===100);return [value||80]};
 

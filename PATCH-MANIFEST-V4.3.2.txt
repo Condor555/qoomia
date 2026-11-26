@@ -1,0 +1,40 @@
+QOOMIA V4.3.2 — CUMULATIVE AUTPOST + SMART FINANCE FIX
+Data: 26/11/2026
+Base: Qoomia V4.2.2 fornita dall'utente
+
+PROBLEMI CORRETTI
+1. Il Cron Vercel ora richiama una route GET protetta da CRON_SECRET.
+2. Il Cron usa SUPABASE_SERVICE_ROLE_KEY e una RPC SQL riservata a service_role: non dipende da una sessione utente.
+3. Ogni occorrenza ricorrente è idempotente: i retry non generano duplicati.
+4. Aprendo Ricorrenze viene eseguito anche un catch-up autenticato immediato delle scadenze arretrate.
+5. Dopo la creazione del movimento viene inviata la notifica dedicata, se abilitata.
+6. Smart Finance calcola il saldo previsto: saldo attuale + ricorrenze future + entrate abituali affidabili - uscite programmate - spesa variabile stimata.
+7. La schermata Statistiche mostra formula e movimenti inclusi; la Home mostra il saldo previsto.
+
+FILE MODIFICATI / NUOVI
+app/account/informazioni/page.tsx
+app/account/notifiche/page.tsx
+app/account/ricorrenze/page.tsx
+app/api/notifications/preferences/route.ts
+app/api/recurring/run/route.ts
+app/api/stats/route.ts
+app/globals.css
+app/page.tsx
+app/statistiche/page.tsx
+components/MonthlyInsightCard.tsx
+lib/push-notifications.ts
+lib/smart-finance.ts
+package.json
+package-lock.json
+scripts/verify-v4.3.2.mjs
+supabase/migrations/20261126_v4_3_2_autopost_smart_finance.sql
+vercel.json
+
+CONFIGURAZIONE RICHIESTA (già impostata secondo i passaggi precedenti)
+CRON_SECRET
+SUPABASE_SERVICE_ROLE_KEY
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY
+NEXT_PUBLIC_VAPID_PUBLIC_KEY
+VAPID_PRIVATE_KEY
+VAPID_SUBJECT

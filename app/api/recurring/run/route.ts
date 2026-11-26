@@ -1,64 +1,48 @@
 import {NextResponse} from 'next/server';
-import {createClient as createAdminClient,type SupabaseClient} from '@supabase/supabase-js';
+import {createClient as createAdminClient} from '@supabase/supabase-js';
 import {createClient} from '../../../../lib/supabase/server';
 import {addRecurringDate} from '../../../../lib/recurrence';
-import {safeEvaluateSpaceNotifications,safeNotifyRecurringPosted} from '../../../../lib/push-notifications';
+import {notifyRecurringPosted,safeEvaluateSpaceNotifications} from '../../../../lib/push-notifications';
 
+export const dynamic='force-dynamic';
 export const maxDuration=60;
 
-type RecurringRow={id:string;space_id:string;next_run:string;frequency:'weekly'|'monthly'|'yearly';interval_count:number;note:string;category_name:string;amount:number|string;currency:string};
-type RunResult={generated:number;alreadyConfirmed:number;failures:string[];changedSpaces:Set<string>};
+type GeneratedRow={recurring_id:string;transaction_id:string;space_id:string;due_date:string;amount:number|string;note:string;category_name:string;created_by:string};
+const todayInRome=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 
-function todayInRome(){
-  return new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
-}
-function adminClient(){
-  const url=process.env.NEXT_PUBLIC_SUPABASE_URL;const key=process.env.SUPABASE_SERVICE_ROLE_KEY;
+function admin(){
+  const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.SUPABASE_SERVICE_ROLE_KEY;
   if(!url||!key)return null;
   return createAdminClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
 }
-function recurringNotice(row:RecurringRow,dueDate:string){
-  return {recurringId:row.id,spaceId:row.space_id,dueDate,note:row.note,categoryName:row.category_name,amount:Number(row.amount),currency:row.currency||'EUR'};
-}
-async function finishNotifications(result:RunResult){
-  for(const spaceId of result.changedSpaces)await safeEvaluateSpaceNotifications(spaceId,['budget']);
-}
-async function runDue(sb:SupabaseClient,rows:RecurringRow[],rpcName:'confirm_recurring_payment'|'confirm_recurring_payment_for_cron'){
-  const today=todayInRome();const result:RunResult={generated:0,alreadyConfirmed:0,failures:[],changedSpaces:new Set<string>()};
-  for(const recurring of rows){
-    let due=recurring.next_run;let guard=0;
-    while(due<=today&&guard++<24){
-      const {data:confirmation,error}=await sb.rpc(rpcName,{p_recurring_id:recurring.id,p_due_date:due});
-      if(error){result.failures.push(`${recurring.id}: ${error.message}`);break}
-      if(confirmation?.status==='confirmed'){
-        result.generated++;result.changedSpaces.add(recurring.space_id);
-        await safeNotifyRecurringPosted(recurringNotice(recurring,due));
-      }else if(confirmation?.status==='already-confirmed')result.alreadyConfirmed++;
-      due=addRecurringDate(due,recurring.frequency,recurring.interval_count);
-    }
-    if(guard>=24&&due<=today)result.failures.push(`${recurring.id}: limite recupero scadenze raggiunto`);
-  }
-  await finishNotifications(result);return result;
+function cronAuthorized(req:Request){const secret=process.env.CRON_SECRET;return Boolean(secret&&req.headers.get('authorization')===`Bearer ${secret}`)}
+
+async function afterGenerated(rows:GeneratedRow[]){
+  const spaces=[...new Set(rows.map(row=>row.space_id))];
+  const notifications=await Promise.allSettled(rows.map(row=>notifyRecurringPosted({recurringId:row.recurring_id,transactionId:row.transaction_id,spaceId:row.space_id,dueDate:row.due_date,amount:Number(row.amount),note:row.note,categoryName:row.category_name})));
+  await Promise.all(spaces.map(spaceId=>safeEvaluateSpaceNotifications(spaceId,['budget'])));
+  return {notificationFailures:notifications.filter(result=>result.status==='rejected').length};
 }
 
-// Vercel Cron richiama questa route ogni giorno. CRON_SECRET impedisce esecuzioni esterne.
+/** Vercel Cron: esegue tutte le regole scadute con privilegi server-side. */
 export async function GET(req:Request){
-  const secret=process.env.CRON_SECRET;
-  if(!secret||req.headers.get('authorization')!==`Bearer ${secret}`)return NextResponse.json({error:'Unauthorized'},{status:401});
-  const sb=adminClient();if(!sb)return NextResponse.json({error:'Server configuration incomplete'},{status:503});
-  const today=todayInRome();
-  const {data,error}=await sb.from('recurring_transactions').select('id,space_id,next_run,frequency,interval_count,note,category_name,amount,currency').eq('active',true).eq('auto_post',true).lte('next_run',today).order('next_run').limit(500);
-  if(error)return NextResponse.json({error:error.message},{status:500});
-  const result=await runDue(sb,(data||[]) as RecurringRow[],'confirm_recurring_payment_for_cron');
-  return NextResponse.json({generated:result.generated,alreadyConfirmed:result.alreadyConfirmed,failures:result.failures,processedRules:data?.length||0,date:today},{status:result.failures.length?207:200});
+  if(!process.env.CRON_SECRET)return NextResponse.json({error:'CRON_SECRET non configurato.'},{status:503});
+  if(!cronAuthorized(req))return NextResponse.json({error:'Unauthorized'},{status:401});
+  const sb=admin();if(!sb)return NextResponse.json({error:'Supabase service role non configurata.'},{status:503});
+  const today=todayInRome();const {data,error}=await sb.rpc('process_due_recurring',{p_today:today});
+  if(error)return NextResponse.json({error:error.message,today},{status:500});
+  const rows=(data||[]) as GeneratedRow[];const notification=await afterGenerated(rows);
+  return NextResponse.json({ok:true,today,generated:rows.length,spaces:[...new Set(rows.map(row=>row.space_id))].length,...notification},{headers:{'cache-control':'no-store'}});
 }
 
-// Mantiene il runner autenticato esistente per recuperi manuali dell'utente.
+/** Catch-up autenticato: aprendo Ricorrenze l'utente recupera subito eventuali scadenze già maturate. */
 export async function POST(){
   const sb=await createClient();const {data:{user}}=await sb.auth.getUser();if(!user)return NextResponse.json({error:'Unauthorized'},{status:401});
-  const today=todayInRome();const {data,error}=await sb.from('recurring_transactions').select('id,space_id,next_run,frequency,interval_count,note,category_name,amount,currency').eq('created_by',user.id).eq('active',true).eq('auto_post',true).lte('next_run',today).order('next_run');
+  const today=todayInRome();const {data,error}=await sb.from('recurring_transactions').select('id,space_id,next_run,frequency,interval_count,amount,note,category_name').eq('created_by',user.id).eq('active',true).eq('auto_post',true).lte('next_run',today);
   if(error)return NextResponse.json({error:error.message},{status:400});
-  const result=await runDue(sb,(data||[]) as RecurringRow[],'confirm_recurring_payment');
-  return NextResponse.json({generated:result.generated,alreadyConfirmed:result.alreadyConfirmed,failures:result.failures},{status:result.failures.length?207:200});
+  const generated:GeneratedRow[]=[];const failures:string[]=[];
+  for(const recurring of data||[]){let due=recurring.next_run,guard=0;while(due<=today&&guard++<120){const {data:result,error:confirmError}=await sb.rpc('confirm_recurring_payment',{p_recurring_id:recurring.id,p_due_date:due});if(confirmError){failures.push(`${recurring.id}: ${confirmError.message}`);break}if(result?.status==='confirmed')generated.push({recurring_id:recurring.id,transaction_id:result.transactionId,space_id:recurring.space_id,due_date:due,amount:recurring.amount,note:recurring.note,category_name:recurring.category_name,created_by:user.id});due=addRecurringDate(due,recurring.frequency,recurring.interval_count)}}
+  const notification=await afterGenerated(generated);
+  return NextResponse.json({ok:failures.length===0,today,generated:generated.length,failures,...notification},{status:failures.length?207:200,headers:{'cache-control':'no-store'}});
 }
 
