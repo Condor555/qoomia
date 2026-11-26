@@ -18,6 +18,6 @@
       "path": "/api/recurring/run",
       "schedule": "10 0 * * *"
     }
-  ]
+  ],
+  "installCommand": "npm install --no-audit --no-fund"
 }
-
