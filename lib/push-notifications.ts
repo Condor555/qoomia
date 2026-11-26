@@ -131,3 +131,6 @@ export async function notifyRecurringPosted(item:{recurringId:string;transaction
   return {sent};
 }
 
+export async function safeNotifyRecurringPosted(item:Parameters<typeof notifyRecurringPosted>[0]){
+  try{return await notifyRecurringPosted(item)}catch(error){console.error('Recurring notification failed',error);return {error:error instanceof Error?error.message:'recurring-notification-failed'}}
+}
