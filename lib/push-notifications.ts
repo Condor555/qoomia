@@ -2,10 +2,11 @@ import {createClient as createAdminClient,type SupabaseClient} from '@supabase/s
 import {loadMacroBudgetSnapshot} from './macro-budget';
 import {sendWebPush} from './web-push';
 
-export type NotificationKind='budget'|'goal';
-type PreferenceRow={user_id:string;enabled:boolean;budget_enabled:boolean;budget_thresholds:number[];goals_enabled:boolean;goal_thresholds:number[]};
+export type NotificationKind='budget'|'goal'|'recurring';
+type PreferenceRow={user_id:string;enabled:boolean;budget_enabled:boolean;budget_thresholds:number[];goals_enabled:boolean;goal_thresholds:number[];recurring_enabled?:boolean};
 type SubscriptionRow={id:string;user_id:string;endpoint:string;p256dh:string;auth:string};
 type Locale='it'|'en';
+export type RecurringPostedNotice={recurringId:string;spaceId:string;dueDate:string;note:string;categoryName:string;amount:number;currency:string};
 
 function adminClient(){
   const url=process.env.NEXT_PUBLIC_SUPABASE_URL;const key=process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -39,6 +40,42 @@ async function deliver(sb:SupabaseClient,subscriptions:SubscriptionRow[],deliver
     }catch(error){errors.push(error instanceof Error?error.message:'push-failed')}
   }
   await sb.from('notification_deliveries').update({status:sent?'sent':'failed',sent_at:sent?new Date().toISOString():null,error:errors.length?errors.join(' | ').slice(0,1000):null}).eq('id',deliveryId);
+}
+function money(locale:Locale,value:number,currency:string){
+  try{return new Intl.NumberFormat(locale==='en'?'en-GB':'it-IT',{style:'currency',currency:currency||'EUR'}).format(Math.abs(value))}catch{return `${Math.abs(value).toFixed(2)} ${currency||'EUR'}`}
+}
+function recurringLabel(row:RecurringPostedNotice){return row.note?.trim()||row.categoryName}
+
+export async function notifyRecurringPosted(row:RecurringPostedNotice){
+  const sb=adminClient();
+  if(!sb||!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY||!process.env.VAPID_PRIVATE_KEY)return {skipped:'not-configured'};
+  const [{data:members,error:memberError},{data:space,error:spaceError}]=await Promise.all([
+    sb.from('space_members').select('user_id').eq('space_id',row.spaceId),
+    sb.from('spaces').select('id,name').eq('id',row.spaceId).single(),
+  ]);
+  if(memberError||spaceError||!space)throw memberError||spaceError||new Error('Space not found');
+  const userIds=[...new Set(((members||[]) as Array<{user_id:string}>).map(item=>item.user_id))];if(!userIds.length)return {sent:0};
+  const [{data:preferences,error:preferenceError},{data:subscriptions,error:subscriptionError},{data:profiles}]=await Promise.all([
+    sb.from('notification_preferences').select('user_id,enabled,recurring_enabled').in('user_id',userIds).eq('enabled',true).eq('recurring_enabled',true),
+    sb.from('push_subscriptions').select('id,user_id,endpoint,p256dh,auth').in('user_id',userIds),
+    sb.from('profiles').select('user_id,language').in('user_id',userIds),
+  ]);
+  if(preferenceError||subscriptionError)throw preferenceError||subscriptionError;
+  const prefs=(preferences||[]) as PreferenceRow[];const subs=(subscriptions||[]) as SubscriptionRow[];
+  const language=new Map(((profiles||[]) as Array<{user_id:string;language:string|null}>).map(item=>[item.user_id,item.language==='en'?'en':'it'] as const));
+  const subscriptionsByUser=new Map<string,SubscriptionRow[]>();for(const item of subs){const list=subscriptionsByUser.get(item.user_id)||[];list.push(item);subscriptionsByUser.set(item.user_id,list)}
+  let claimed=0;
+  for(const preference of prefs){
+    const userSubscriptions=subscriptionsByUser.get(preference.user_id)||[];if(!userSubscriptions.length)continue;
+    const locale=(language.get(preference.user_id)||'it') as Locale;const amount=money(locale,row.amount,row.currency);const label=recurringLabel(row);
+    const title=text(locale,'Movimento ricorrente registrato','Recurring transaction recorded');
+    const body=row.amount>=0?text(locale,`Entrata “${label}” di ${amount} registrata in ${space.name}.`,`Income “${label}” of ${amount} was recorded in ${space.name}.`):text(locale,`Uscita “${label}” di ${amount} registrata in ${space.name}.`,`Expense “${label}” of ${amount} was recorded in ${space.name}.`);
+    const tag=`qoomia:recurring:${row.spaceId}:${row.recurringId}:${row.dueDate}`;
+    const payload={title,body,url:'/movimenti',tag,kind:'recurring',spaceId:row.spaceId,recurringId:row.recurringId,dueDate:row.dueDate};
+    const deliveryId=await claimDelivery(sb,{user_id:preference.user_id,space_id:row.spaceId,kind:'recurring',subject_id:row.recurringId,period_key:row.dueDate,threshold:0,payload});
+    if(deliveryId){claimed++;await deliver(sb,userSubscriptions,deliveryId,payload)}
+  }
+  return {claimed};
 }
 async function notifyThreshold(sb:SupabaseClient,args:{preference:PreferenceRow;subscriptions:SubscriptionRow[];locale:Locale;spaceId:string;spaceName:string;kind:NotificationKind;subjectId:string;periodKey:string;progress:number;thresholds:number[];title:string;body:(threshold:number)=>string;url:string}){
   const eligible=thresholdList(args.thresholds).filter(threshold=>args.progress>=threshold);
@@ -100,3 +137,8 @@ export async function evaluateSpaceNotifications(spaceId:string,kinds:Notificati
 export async function safeEvaluateSpaceNotifications(spaceId:string,kinds:NotificationKind[]){
   try{return await evaluateSpaceNotifications(spaceId,kinds)}catch(error){console.error('Notification evaluation failed',error);return {error:error instanceof Error?error.message:'notification-failed'}}
 }
+
+export async function safeNotifyRecurringPosted(row:RecurringPostedNotice){
+  try{return await notifyRecurringPosted(row)}catch(error){console.error('Recurring notification failed',error);return {error:error instanceof Error?error.message:'recurring-notification-failed'}}
+}
+

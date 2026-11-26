@@ -12,5 +12,12 @@
       "destination": "https://qoomia.vercel.app/:path*",
       "permanent": true
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/recurring/run",
+      "schedule": "10 0 * * *"
+    }
   ]
 }
+

@@ -6,9 +6,9 @@ import Icon from '../../../components/Icon';
 import {useI18n} from '../../../components/LanguageProvider';
 
 type Threshold=50|60|70|80|90|100;
-type Preferences={enabled:boolean;budgetEnabled:boolean;budgetThresholds:Threshold[];goalsEnabled:boolean;goalThresholds:Threshold[]};
+type Preferences={enabled:boolean;budgetEnabled:boolean;budgetThresholds:Threshold[];goalsEnabled:boolean;goalThresholds:Threshold[];recurringEnabled:boolean};
 type SupportState='checking'|'ready'|'unsupported'|'install-required'|'missing-config';
-const defaults:Preferences={enabled:false,budgetEnabled:true,budgetThresholds:[80],goalsEnabled:true,goalThresholds:[80]};
+const defaults:Preferences={enabled:false,budgetEnabled:true,budgetThresholds:[80],goalsEnabled:true,goalThresholds:[80],recurringEnabled:true};
 const thresholds:Threshold[]=[50,60,70,80,90,100];
 const principal=(values:Threshold[])=>values.find(value=>thresholds.includes(value))||80;
 
@@ -97,7 +97,13 @@ export default function NotificationSettings(){
       <div className="threshold-slider" style={{'--threshold-fill':`${(principal(preferences.goalThresholds)-50)*2}%`} as CSSProperties}><output>{principal(preferences.goalThresholds)}%</output><input type="range" min="50" max="100" step="10" value={principal(preferences.goalThresholds)} disabled={!preferences.goalsEnabled} aria-label={t('notifications.goalThresholds')} aria-valuetext={`${principal(preferences.goalThresholds)}%`} onChange={event=>setThreshold('goalThresholds',Number(event.target.value))}/><div className="threshold-ticks" aria-hidden="true">{thresholds.map(value=><span key={value}>{value}</span>)}</div><small>{t('notifications.mainThreshold')}</small></div>
       <p className="notification-help">{t('notifications.familyHelp')}</p>
     </section>
+
+    <section className="section surface notification-preferences">
+      <div className="section-title"><div><h2>{t('account.recurringTitle')}</h2><small>{t('account.recurringSub')}</small></div><label className="mini-switch"><input type="checkbox" checked={preferences.recurringEnabled} onChange={event=>setPreferences(current=>({...current,recurringEnabled:event.target.checked}))}/><span aria-hidden="true"/></label></div>
+      <p className="notification-help">Ricevi un avviso quando una ricorrenza viene registrata automaticamente o confermata nei Movimenti.</p>
+    </section>
     <button type="button" className="save-btn notification-save" disabled={busy} onClick={savePreferences}>{busy?t('common.saving'):t('notifications.save')}</button>
     {message&&<div className="notice" role="status">{message}</div>}
   </>;
 }
+
