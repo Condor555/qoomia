@@ -1,12 +1,12 @@
 {
   "name": "qoomia",
-  "version": "4.2.2",
+  "version": "4.3.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "node scripts/verify-v4.1.6.mjs && node scripts/verify-v4.1.8.mjs && node scripts/verify-v4.1.8a.mjs && node scripts/verify-v4.1.8b.mjs && node scripts/verify-v4.1.8c.mjs && node scripts/verify-v4.1.9.mjs && node scripts/verify-v4.2.mjs && node scripts/verify-v4.2.1.mjs && node scripts/verify-v4.2.2.mjs",
+    "test": "node scripts/verify-v4.1.6.mjs && node scripts/verify-v4.1.8.mjs && node scripts/verify-v4.1.8a.mjs && node scripts/verify-v4.1.8b.mjs && node scripts/verify-v4.1.8c.mjs && node scripts/verify-v4.1.9.mjs && node scripts/verify-v4.2.mjs && node scripts/verify-v4.2.1.mjs && node scripts/verify-v4.2.2.mjs && node scripts/verify-v4.3.0.mjs",
     "audit:icons": "python3 scripts/audit-icon-assets-v4.2.2.py"
   },
   "dependencies": {

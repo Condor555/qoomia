@@ -6,7 +6,7 @@ export default function Informazioni(){
     <BackToAccount/>
     <header className="page-head"><div><h1>Informazioni</h1><p>Versione, licenze e attribuzioni</p></div></header>
     <section className="settings-card surface about-card">
-      <div className="about-brand"><QoomiaLogo size={48}/><div><h2>Qoomia</h2><p className="settings-help">Versione 4.2.2 · Qoomia.</p></div></div>
+      <div className="about-brand"><QoomiaLogo size={48}/><div><h2>Qoomia</h2><p className="settings-help">Versione 4.3.0 · Qoomia Smart Finance.</p></div></div>
       <p className="settings-help">Dai senso alle tue spese, in privato o in famiglia.</p>
       <div className="about-row"><span>Icone funzionali dell’interfaccia</span><b>Phosphor Icons</b></div>
       <div className="about-row"><span>Icone delle categorie</span><b>Asset locali + fallback Phosphor</b></div>

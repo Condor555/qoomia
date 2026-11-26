@@ -20,6 +20,7 @@ type InsightStats={
   daysInMonth?:number;
   topCategory:TopCategory|null;
   budget:{amount:number;spent?:number;available:number;percentage:number;status:'ok'|'warning'|'over';projected:number;projectedOverage:number};
+  forecast?:{projectedIncome:number;projectedExpense:number;projectedBalance:number;futureRecurringIncome:number;futureRecurringExpense:number;futureRecurringCount:number;confidence:'low'|'medium'|'high'};
 };
 
 type Props={stats:InsightStats|null;month:string;currency:(value:number)=>string;locale:'it'|'en'};
@@ -41,6 +42,7 @@ export default function MonthlyInsightCard({stats,month,currency,locale}:Props){
     budget:stats.budget,
     topCategory:stats.topCategory,
     categories:stats.topCategory?[stats.topCategory]:[],
+    forecast:stats.forecast,
   },{currency,locale,limit:1});
   if(!insight)return null;
   const icon=insight.icon.kind==='category'

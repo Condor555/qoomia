@@ -31,6 +31,7 @@ type Stats={
   categories:{name:string;value:number;icon?:string|null;color?:string|null}[];
   budget:{amount:number;spent:number;available:number;percentage:number;status:'ok'|'warning'|'over';projected:number;projectedOverage:number;commitments:number;distributable:number};
   savingGoals:Array<{id:string;name:string;icon:string;color:string;targetAmount:number;accumulated:number;remaining:number;progress:number;targetDate:string|null}>;
+  forecast:{status:'past'|'current'|'future';registeredIncome:number;registeredExpense:number;registeredBalance:number;futureRecurringIncome:number;futureRecurringExpense:number;futureRecurringCount:number;projectedIncome:number;projectedExpense:number;projectedBalance:number;confidence:'low'|'medium'|'high'};
 };
 type RecentTransaction={id:string;date:string;category_name:string;amount:number;note:string;author_name?:string};
 type RecentCategory={name:string;icon?:string|null;color?:string|null};
@@ -110,6 +111,7 @@ export default function Home(){
     <section className={`balance-card${stats?'':' is-loading'}`} aria-busy={!stats}>
       <header><Icon name="wallet" size={18}/><span>{t('home.monthBalance')}</span><Icon name="chart" size={20}/></header>
       <strong>{stats?currency(stats.balance):<Skeleton className="ui-skeleton-balance"/>}</strong>
+      {stats?.periodStatus==='current'&&<div className="balance-forecast"><span>{locale==='it'?'Saldo previsto a fine mese':'Forecast month-end balance'}</span><b className={stats.forecast.projectedBalance<0?'red':stats.forecast.projectedBalance>0?'green':''}>{stats.forecast.projectedBalance>0?'+ ':''}{currency(stats.forecast.projectedBalance)}</b><small>{locale==='it'?`${currency(stats.forecast.projectedIncome)} entrate · ${currency(stats.forecast.projectedExpense)} uscite previste`:`${currency(stats.forecast.projectedIncome)} income · ${currency(stats.forecast.projectedExpense)} forecast expenses`}</small></div>}
       <div className="balance-average"><span>{t('home.dailyAverage')}</span><b>{stats?currency(stats.dailyAverageExpense):<Skeleton width="88px" height="18px"/>}</b><small>{stats?(stats.daysConsidered?(stats.daysConsidered===1?t('home.elapsedOne'):t('home.elapsedMany',{count:stats.daysConsidered})):t('home.noElapsed')):<Skeleton width="132px" height="11px"/>}</small></div>
     </section>
 

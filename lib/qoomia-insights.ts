@@ -16,6 +16,7 @@ export type QoomiaInsight={
 
 type Category={name:string;value:number;changePercent?:number|null;comparison?:'available'|'no-previous-data';icon?:string|null;color?:string|null};
 type Budget={amount:number;spent?:number;available:number;percentage:number;status:'ok'|'warning'|'over';projected?:number|null;projectedOverage?:number};
+type Forecast={projectedIncome:number;projectedExpense:number;projectedBalance:number;futureRecurringIncome:number;futureRecurringExpense:number;futureRecurringCount:number;confidence:'low'|'medium'|'high'};
 export type InsightInput={
   month:string;
   periodStatus?:'past'|'current'|'future';
@@ -31,6 +32,7 @@ export type InsightInput={
   budget:Budget;
   categories?:Category[];
   topCategory?:Category|null;
+  forecast?:Forecast;
 };
 
 type BuildOptions={currency:(value:number)=>string;locale?:'it'|'en';limit?:number};
@@ -55,6 +57,12 @@ export function buildQoomiaInsights(input:InsightInput,{currency,locale='it',lim
 
   if(input.periodStatus==='future'){
     candidates.push({id:'future',priority:100,tone:'neutral',icon:{kind:'projection'},href:'',actionLabel:undefined,title:it?'Il mese deve ancora iniziare':'The month has not started yet',description:it?'Gli insight compariranno quando saranno disponibili movimenti per il periodo selezionato.':'Insights will appear once transactions are available for the selected period.'});
+  }
+
+  if(input.periodStatus==='current'&&input.forecast){
+    const forecast=input.forecast;const recurring=forecast.futureRecurringCount>0?(it?` Include ${currency(forecast.futureRecurringExpense)} di uscite ricorrenti future.`:` It includes ${currency(forecast.futureRecurringExpense)} in upcoming recurring expenses.`):'';
+    if(forecast.projectedBalance<0)candidates.push({id:'negative-balance-forecast',priority:97,tone:'attention',icon:{kind:'projection'},href:'/statistiche#stats-forecast',actionLabel:it?'Apri previsione':'Open forecast',title:it?'Saldo previsto sotto zero':'Forecast balance below zero',description:it?`A fine mese il saldo stimato è ${currency(forecast.projectedBalance)}.${recurring}`:`The estimated month-end balance is ${currency(forecast.projectedBalance)}.${recurring}`});
+    else candidates.push({id:'balance-forecast',priority:82,tone:'positive',icon:{kind:'projection'},href:'/statistiche#stats-forecast',actionLabel:it?'Apri previsione':'Open forecast',title:it?'Saldo previsto a fine mese':'Forecast month-end balance',description:it?`La stima è ${currency(forecast.projectedBalance)}: ${currency(forecast.projectedIncome)} di entrate e ${currency(forecast.projectedExpense)} di uscite.${recurring}`:`The estimate is ${currency(forecast.projectedBalance)}: ${currency(forecast.projectedIncome)} in income and ${currency(forecast.projectedExpense)} in expenses.${recurring}`});
   }
 
   if(budget.amount>0&&projectedOverage>0){
