@@ -5,7 +5,6 @@ import Link from 'next/link';
 import Icon from '../components/Icon';
 import CategoryIcon from '../components/CategoryIcon';
 import MonthPicker from '../components/MonthPicker';
-import {categoryStyle} from '../lib/category-style';
 import {onActiveSpaceChanged} from '../lib/active-space-client';
 import {useSharedMonth} from '../lib/selected-period-client';
 import {useI18n} from '../components/LanguageProvider';
@@ -29,9 +28,7 @@ type Stats={
   daysInMonth:number;
   smartFinance:{projectedBalance:number;currentBalance:number;scheduledIncome:number;scheduledExpense:number;historicalIncome:number;projectedVariableExpense:number;confidence:'high'|'medium'|'low'}|null;
   topCategory:TopCategory|null;
-  categories:{name:string;value:number;icon?:string|null;color?:string|null}[];
   budget:{amount:number;spent:number;available:number;percentage:number;status:'ok'|'warning'|'over';projected:number;projectedOverage:number;commitments:number;distributable:number};
-  savingGoals:Array<{id:string;name:string;icon:string;color:string;targetAmount:number;accumulated:number;remaining:number;progress:number;targetDate:string|null}>;
 };
 type RecentTransaction={id:string;date:string;category_name:string;amount:number;note:string;author_name?:string};
 type RecentCategory={name:string;icon?:string|null;color?:string|null};
@@ -103,8 +100,6 @@ export default function Home(){
     loadRecent(spaceId);
   }),[loadStats,loadRecent]);
 
-  const total=stats?.expense||1;
-
   return <>
     <header className="page-head home-head"><div className="home-brand"><QoomiaLogo size={42}/><div><h1>Qoomia</h1><p>{t('home.subtitle')}</p></div></div><MonthPicker value={month} onChange={setMonth}/></header>
 
@@ -130,21 +125,6 @@ export default function Home(){
       {recentLoading&&!recent.length?<SkeletonRows rows={4}/>:recentError?<InlineError message={recentError} onRetry={()=>void loadRecent()}/>:recent.length?<div className="home-recent-list">{recent.map(row=>{const metadata=recentCategories.find(item=>item.name===row.category_name);return <Link href="/movimenti" className="home-recent-row" key={row.id}><CategoryIcon name={row.category_name} icon={metadata?.icon||undefined} color={metadata?.color||undefined} size={40}/><span><b>{row.note||row.category_name}</b><small>{row.category_name} · {new Intl.DateTimeFormat(localeTag,{day:'numeric',month:'short'}).format(new Date(`${row.date}T12:00:00`))}</small></span><strong className={Number(row.amount)>=0?'green':'red'}>{Number(row.amount)>=0?'+ ':''}{currency(Number(row.amount))}</strong></Link>})}</div>:<div className="home-recent-empty"><p>Nessun movimento nello spazio selezionato.</p><Link href="/nuovo">Aggiungi il primo</Link></div>}
     </section>
 
-    <section className="section surface home-saving-goals">
-      <div className="section-title"><div><h2>{t('goals.homeTitle')}</h2><small>{t('goals.homeSubtitle')}</small></div><Link href="/obiettivi">{t('goals.viewAll')}</Link></div>
-      {stats?.savingGoals?.slice(0,3).map(goal=><Link href="/obiettivi" className="home-goal-row" key={goal.id}><CategoryIcon name={goal.name} icon={goal.icon} color={goal.color} size={38}/><div><span><b>{goal.name}</b><strong>{goal.progress}%</strong></span><div className="progress"><i style={{width:`${goal.progress}%`,background:goal.color}}/></div><small>{t('goals.homeProgress',{saved:currency(goal.accumulated),target:currency(goal.targetAmount),remaining:currency(goal.remaining)})}</small></div></Link>)}
-      {stats&&!stats.savingGoals.length&&<div className="home-goals-empty"><p>{t('goals.homeEmpty')}</p><Link href="/obiettivi">{t('goals.createFirst')}</Link></div>}
-      {!stats&&<SkeletonRows rows={2} className="home-goals-loading"/>}
-    </section>
-
-    <section className="section surface">
-      <div className="section-title"><h2>{t('home.topCategories')}</h2><small>{stats?t('home.movementsCount',{count:stats.count}):'Caricamento…'}</small></div>
-      {stats?.categories?.slice(0,5).map(category=>{
-        const style=categoryStyle(category.name);
-        return <div className="category-row" key={category.name}><CategoryIcon name={category.name} icon={category.icon} color={category.color}/><div className="category-main"><div className="category-row-head"><b>{category.name}</b><strong>{currency(category.value)}</strong></div><div className="category-progress-row"><div className="progress"><span style={{width:`${Math.max(4,category.value/(stats.categories[0]?.value||1)*100)}%`,background:style.color}}/></div><small className="category-percentage">{Math.round(category.value/total*100)}%</small></div></div></div>;
-      })}
-      {!stats&&<SkeletonRows rows={4}/>} 
-    </section>
   </>;
 }
 

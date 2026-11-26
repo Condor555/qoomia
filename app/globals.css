@@ -1330,3 +1330,45 @@ button,a,.transaction-button,.macro-compact-row{-webkit-tap-highlight-color:tran
 
 /* V4.3.2 Smart Finance */
 .smart-finance-card{display:grid;gap:16px;scroll-margin-top:24px}.smart-finance-confidence{align-self:flex-start;padding:6px 10px;border-radius:999px;background:var(--surface2);font-size:.75rem;font-weight:800}.smart-finance-total{display:flex;align-items:end;justify-content:space-between;gap:16px;padding:18px;border-radius:18px;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 13%,var(--surface)),var(--surface2))}.smart-finance-total span{font-size:.82rem;color:var(--muted)}.smart-finance-total strong{font-size:clamp(1.55rem,6vw,2.25rem)}.smart-finance-formula{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.smart-finance-formula>span{display:grid;gap:5px;padding:12px;border:1px solid var(--border);border-radius:14px}.smart-finance-formula small{color:var(--muted);line-height:1.3}.smart-finance-items{display:grid;gap:8px}.smart-finance-items h3{margin:0 0 2px;font-size:.9rem}.smart-finance-items>div{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}.smart-finance-items>div:last-child{border-bottom:0}.smart-finance-items span{display:grid;gap:2px;min-width:0}.smart-finance-items b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.smart-finance-items small,.smart-finance-note{color:var(--muted)}.smart-finance-note{margin:0;font-size:.78rem;line-height:1.5}@media(max-width:520px){.smart-finance-formula{grid-template-columns:1fr}.smart-finance-total{align-items:flex-start;flex-direction:column}}
+
+
+/* Qoomia V4.3.2 UX audit quick wins — visual polish only, no product logic changes. */
+html:not([data-theme="dark"]){
+  --bg:#FAF7F0;
+  --surface:#FFFEFB;
+  --surface2:#F4F1E9;
+  --surface-elevated:#F8F4EC;
+  --text:#17312E;
+  --muted:#5E6F6C;
+  --line:#DED9CF;
+  --primary:#0B6B63;
+  --primary2:#12877C;
+  --green:#087052;
+  --red:#B83F4C;
+  --shadow:0 4px 16px rgba(23,49,46,.055);
+}
+body{line-height:1.45}
+h1,h2,h3,strong,b{letter-spacing:-.012em}
+.surface{box-shadow:var(--shadow)}
+.balance-card{background:linear-gradient(135deg,#07564F,#0B6B63 62%,#12877C);box-shadow:0 8px 24px rgba(7,86,79,.16)}
+.bottom-nav{box-shadow:0 8px 28px rgba(23,49,46,.12)}
+.monthly-insight-card{margin:18px 0 14px;padding:12px 13px;background:color-mix(in srgb,var(--surface) 97%,var(--primary) 3%);border-color:var(--line);box-shadow:var(--shadow)}
+.monthly-insight-card.attention::before{background:var(--red)}
+.monthly-insight-copy strong{line-height:1.25}.monthly-insight-copy>span{line-height:1.4}
+.smart-finance-card{gap:12px;scroll-margin-top:24px}
+.smart-finance-card>.section-title{margin-bottom:0}
+.smart-finance-total{padding:15px 16px;border:1px solid color-mix(in srgb,var(--primary) 15%,var(--line));background:linear-gradient(135deg,color-mix(in srgb,var(--primary) 8%,var(--surface)),var(--surface2))}
+.smart-finance-details{border-top:1px solid var(--line)}
+.smart-finance-details>summary{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 2px;cursor:pointer;list-style:none;color:var(--text)}
+.smart-finance-details>summary::-webkit-details-marker{display:none}
+.smart-finance-details>summary>span:first-child{display:grid;gap:2px}
+.smart-finance-details>summary small{color:var(--muted);font-size:.75rem;font-weight:500}
+.smart-finance-details-chevron{color:var(--muted);font-size:24px;line-height:1;transition:transform .18s ease}
+.smart-finance-details[open] .smart-finance-details-chevron{transform:rotate(90deg)}
+.smart-finance-details-body{display:grid;gap:14px;padding:4px 0 2px}
+.smart-finance-items>div{border-bottom-color:var(--line)}
+.smart-finance-summary>div{padding:9px 0}
+button,[role="button"],summary,.bottom-nav>a,.monthly-insight-card,.home-budget-link,.home-recent-row{min-height:44px}
+:where(button,a,summary,input,select,textarea):focus-visible{outline:3px solid color-mix(in srgb,var(--primary) 34%,transparent);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
+@media(max-width:520px){.smart-finance-total{align-items:flex-start;flex-direction:row}.smart-finance-total strong{font-size:clamp(1.45rem,7vw,2rem)}}
